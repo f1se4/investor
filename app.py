@@ -14,6 +14,15 @@ plt.style.use("dark_background")
 #### Funciones Principales
 ###########################
 
+def get_company_name(ticker):
+    # Crear un objeto ticker con yfinance
+    ticker_data = yf.Ticker(ticker)
+    
+    # Obtener el nombre de la empresa
+    company_name = ticker_data.info['longName']
+    
+    return company_name
+
 def get_data(stock, start_time, end_time):
     df = yf.download(stock, start=start_time, end=end_time)
     return df
@@ -188,9 +197,13 @@ def plot_ma(data):
 
 logo = Image.open('assets/logo.jpeg')
 
+# Leer los tickers desde el archivo
+with open('tickers.txt', 'r') as file:
+    tickers = [line.strip() for line in file.readlines()]
+
 with st.sidebar:
     st.image(logo)
-    stock = st.selectbox('Ticker', ['^GSPC','MSCI'], index=0)
+    stock = st.selectbox('Ticker', tickers, index=0)
     start_time = st.date_input(
                     "Fecha de Inicio",
                     datetime.date.today() - datetime.timedelta(days=182))
@@ -216,9 +229,8 @@ plot_vol = plot_volatility(df_vol)
 ###########################
 #### LAYOUT - Render Final
 ###########################
-
-st.title(f"Análisis {stock}")
-
+company_name = get_company_name(stock)
+st.title(f"Análisis {stock}: {company_name}")
 
 st.pyplot(plot_full_fig)
 
