@@ -1,0 +1,8 @@
+# .streamlit/config.toml
+
+[theme]
+base = "dark"  # Selecciona el tema oscuro como predeterminado
+
+[ui]
+hideThemeSelector = true  # Oculta el selector de tema
+

@@ -1,0 +1,12 @@
+[Unit]
+Description=FiSeR Investor
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/investor
+ExecStart=/usr/local/bin/streamlit run app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
