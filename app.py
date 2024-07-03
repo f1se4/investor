@@ -434,6 +434,7 @@ def plot_volatility(df_vol):
 
 def plot_ma(data):
     # Calcular medias móviles
+    fig, ax = plt.subplots(figsize=(12, 6))
     data['MA_20'] = data['Close'].rolling(window=20).mean()
     data['MA_50'] = data['Close'].rolling(window=50).mean()
 
@@ -441,17 +442,19 @@ def plot_ma(data):
     data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()
 
     # Calcular Holt-Winters - Aditivo
-    model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
-    fitted = model.fit()
-    data['Holt_Winters'] = fitted.fittedvalues
+    try:
+        model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
+        fitted = model.fit()
+        data['Holt_Winters'] = fitted.fittedvalues
+        ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
+    except:
+        print('error')
 
     # Configurar gráfico
-    fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(data.index, data['Close'], label='Close', color='dodgerblue', linewidth=1, alpha=0.3)
     ax.plot(data.index, data['MA_20'], label='MA 20', color='orange', linestyle='--', linewidth=1)
     ax.plot(data.index, data['MA_50'], label='MA 50', color='green', linestyle='--', linewidth=1)
     ax.plot(data.index, data['EMA_10'], label='EMA_10', color='red', linestyle='--', linewidth=1)
-    ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
 
     ax.legend()
     ax.spines['top'].set_visible(False)
