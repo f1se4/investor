@@ -542,7 +542,7 @@ def plot_arima(data, forecast_arima, forecast_periods):
     fig.tight_layout()
     return fig
 
-def plot_xgboost_forecast(data):
+def plot_xgboost_forecast(data, periods):
     fig, ax = plt.subplots(figsize=(12, 6))
 
     # Preparar datos para el modelo (ejemplo básico)
@@ -565,7 +565,7 @@ def plot_xgboost_forecast(data):
     ultima_fecha = data.index[-1]
 
     # Crear un DataFrame con las fechas futuras para predecir
-    fechas_futuras = pd.date_range(start=ultima_fecha + timedelta(days=1), periods=10, freq='D')
+    fechas_futuras = pd.date_range(start=ultima_fecha + timedelta(days=1), periods=periods, freq='D')
     df_prediccion = pd.DataFrame(index=fechas_futuras, columns=['Year', 'Month', 'Day'])
 
     # Llenar el DataFrame con valores de año, mes y día para las fechas futuras
@@ -580,8 +580,8 @@ def plot_xgboost_forecast(data):
     df_resultados = pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones})
 
     # Graficar los resultados con Matplotlib
-    ax.plot(df_resultados['Fecha'], df_resultados['Prediccion'], marker='o', linestyle='-', color='b', label='Predicción')
     ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
+    ax.plot(df_resultados['Fecha'], df_resultados['Prediccion'], linestyle='--', color='orange', label='Forecast')
     ax.yaxis.set_ticks([])  # Quitar los ticks
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -589,6 +589,7 @@ def plot_xgboost_forecast(data):
     ax.spines['bottom'].set_visible(False)
     ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
     plt.xticks(rotation=45, ha='right')
+    fig.tight_layout()
     ax.legend()
 
     return fig  # Devolvemos la figura actual de Matplotlib
@@ -862,7 +863,7 @@ if (end_time - start_time).days >= 35:
         forecast_plot = plot_forecast_hw(data, forecast_df)
         st.pyplot(forecast_plot)
     elif modelo_seleccionado == 'XGBoost':
-        st.pyplot(plot_xgboost_forecast(data))
+        st.pyplot(plot_xgboost_forecast(data, periods))
 else:
     st.write("For an optimal forecasting you need at least 35 days")
     
