@@ -563,7 +563,7 @@ def plot_xgboost_forecast(data, periods):
 
     # Obtener la última fecha en los datos históricos
     ultima_fecha = data.index[-1]
-    ultimo_valor = data.loc[-1]['Close']
+    ultimo_valor = data.iloc[-1]['Close']
 
     df_resultados = pd.DataFrame({'Fecha': ultima_fecha, 'Prediccion': ultimo_valor})
 
@@ -580,7 +580,7 @@ def plot_xgboost_forecast(data, periods):
     predicciones = model.predict(df_prediccion)
 
     # Crear un DataFrame con las fechas y las predicciones
-    df_resultados = pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones})
+    df_resultados = df_resultados.append(pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones}))
 
     # Graficar los resultados con Matplotlib
     ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
