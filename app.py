@@ -785,7 +785,7 @@ if (end_time - start_time).days >= 35:
     
     # Columna 2: st.radio para seleccionar el modelo de forecasting
     with col2:
-        modelos = ["ARIMA", "Holt-Winters", "LSTM"]
+        modelos = ["ARIMA", "Holt-Winters"]
         modelo_seleccionado = st.radio("Forecasting Model:", modelos)
     
     if modelo_seleccionado == 'ARIMA':
