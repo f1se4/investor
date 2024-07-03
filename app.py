@@ -671,18 +671,17 @@ prev_day_data = historical_data.iloc[-2]
 # Por ejemplo, calcular el cambio porcentual
 price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
 volume_change = last_day_data['Volume'] - prev_day_data['Volume']
-max_diff = last_day_data['Volume'] - prev_day_data['Volume']
-min_diff = last_day_data['Volume'] - prev_day_data['Volume']
+max_diff = last_day_data['High'] - prev_day_data['High']
+min_diff = last_day_data['Low'] - prev_day_data['Low']
 
+st.markdown("### Daily")
 # Crear dos columnas
 col1, col2 = st.columns(2)
-
 with col1:
     plot_candlestick_3 = plot_candlestick(historical_data)
     st.pyplot(plot_candlestick_3)
 with col2:
     # Mostrar valores en Streamlit usando st.markdown
-    st.markdown("### Last Values")
     st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)
     st.markdown(f"**Volume**: {format_value(volume_change)}", unsafe_allow_html=True)
     st.markdown(f"**Difference in Max Values**: {format_value(max_diff)}", unsafe_allow_html=True)
