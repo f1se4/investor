@@ -632,7 +632,13 @@ data = get_data(stock, start_time.strftime("%Y-%m-%d"), end_time.strftime("%Y-%m
 #########################################################################################
 
 company_name = get_company_name(stock)
-st.title(f"{stock} - {company_name}")
+# Título de la app con estilos
+st.markdown(f"""
+    <div style="text-align: center; color: #4CAF50; font-size: 48px; font-weight: bold; padding: 10px 0;">
+            {stock} - {company_name}
+    </div>
+    <hr style="border: 2px solid #4CAF50;">
+""", unsafe_allow_html=True)
 
 ticker_data = yf.Ticker(stock)
 
