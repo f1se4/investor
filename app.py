@@ -451,7 +451,7 @@ def plot_ma(data):
         print('error')
 
     # Configurar gráfico
-    ax.plot(data.index, data['Close'], label='Close', color='dodgerblue', linewidth=1, alpha=0.3)
+    ax.plot(data.index, data['Close'], label='Real', color='dodgerblue', linewidth=1, alpha=0.3)
     ax.plot(data.index, data['MA_20'], label='MA 20', color='orange', linestyle='--', linewidth=1)
     ax.plot(data.index, data['MA_50'], label='MA 50', color='green', linestyle='--', linewidth=1)
     ax.plot(data.index, data['EMA_10'], label='EMA_10', color='red', linestyle='--', linewidth=1)
@@ -573,6 +573,146 @@ st.subheader('Chaikin Money Flow & SMA')
 # Graficar CMF y Medias Móviles
 fig_cmf_ma = plot_cmf_with_moving_averages(data)
 st.pyplot(fig_cmf_ma)
+with st.expander('CMF'):
+    st.markdown('''
+El Chaikin Money Flow (CMF) es un indicador técnico utilizado en el análisis financiero para medir la acumulación o distribución de un activo, basado en el volumen y el precio. Fue desarrollado por el analista Marc Chaikin y se enfoca en la relación entre el precio y el volumen para determinar la presión de compra o venta sobre un activo.
+
+Cálculo del CMF
+El CMF se calcula utilizando una fórmula que toma en cuenta la posición del precio de cierre respecto a su rango (máximo-mínimo) durante un periodo específico, generalmente 21 días, y el volumen de negociación de cada día. La fórmula básica es:
+
+CMF
+=
+∑
+i
+=
+1
+n
+(
+(
+C
+i
+−
+L
+i
+)
+−
+(
+H
+i
+−
+C
+i
+)
+H
+i
+−
+L
+i
+⋅
+V
+i
+)
+∑
+i
+=
+1
+n
+V
+i
+CMF= 
+∑ 
+i=1
+n
+​	
+ V 
+i
+​	
+ 
+∑ 
+i=1
+n
+​	
+ ( 
+H 
+i
+​	
+ −L 
+i
+​	
+ 
+(C 
+i
+​	
+ −L 
+i
+​	
+ )−(H 
+i
+​	
+ −C 
+i
+​	
+ )
+​	
+ ⋅V 
+i
+​	
+ )
+​	
+ 
+
+Donde:
+
+C
+i
+C 
+i
+​	
+  es el precio de cierre.
+H
+i
+H 
+i
+​	
+  es el precio máximo.
+L
+i
+L 
+i
+​	
+  es el precio mínimo.
+V
+i
+V 
+i
+​	
+  es el volumen de negociación.
+n
+n es el número de periodos.
+El resultado es un valor que oscila entre -1 y 1:
+
+Valores positivos indican acumulación (presión de compra).
+Valores negativos indican distribución (presión de venta).
+¿Por qué es típico compararlo con las medias móviles?
+Confirmación de Tendencias:
+
+Las medias móviles ayudan a suavizar el ruido del mercado y a identificar la dirección general de la tendencia.
+El CMF puede ayudar a confirmar si la tendencia observada en las medias móviles está respaldada por el volumen. Por ejemplo, una media móvil que indica una tendencia alcista acompañada por un CMF positivo sugiere que la tendencia está respaldada por una presión de compra sostenida.
+Identificación de Divergencias:
+
+Comparar el CMF con medias móviles puede ayudar a identificar divergencias entre el precio y el volumen.
+Si las medias móviles indican una tendencia alcista pero el CMF está en negativo, podría indicar que, a pesar de la subida del precio, hay una acumulación de presión de venta, lo que podría señalar una posible reversión de la tendencia.
+Validez de Señales de Compra/Venta:
+
+Las medias móviles se utilizan a menudo para generar señales de compra y venta cuando cruzan ciertos niveles.
+El CMF puede validar estas señales. Por ejemplo, una señal de compra basada en un cruce de media móvil es más fiable si el CMF es positivo, ya que indica que la presión de compra está respaldando la subida del precio.
+Análisis de Sentimiento del Mercado:
+
+Las medias móviles reflejan la tendencia del precio a lo largo del tiempo.
+El CMF, al considerar el volumen, proporciona información sobre el sentimiento del mercado (acumulación o distribución). Comparar ambos puede ofrecer una visión más completa de la situación del mercado.
+Resumen
+El CMF es una herramienta valiosa en el análisis técnico para evaluar la presión de compra o venta de un activo, basada en el volumen y el precio. Compararlo con medias móviles es una práctica común porque ayuda a confirmar tendencias, identificar divergencias y validar señales de trading, proporcionando una visión más completa y precisa del comportamiento del mercado.
+    ''')
 
 # Renderizar gráfico de medias móviles
 st.subheader('Smoothing')
