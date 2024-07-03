@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import datetime
+from datetime import datetime, timedelta
 from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -535,6 +536,32 @@ data = get_data(stock, start_time.strftime("%Y-%m-%d"), end_time.strftime("%Y-%m
 
 company_name = get_company_name(stock)
 st.title(f"{stock} - {company_name}")
+
+ticker_data = yf.Ticker(stock)
+
+# Obtener información general del ticker
+info = ticker_data.info
+st.subheader('Información general')
+st.write(info)
+
+# Obtener datos históricos
+today = datetime.today().strftime('%Y-%m-%d')
+two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
+historical_data = ticker_data.history(start=two_days_ago, end=today)
+
+# Mostrar datos históricos
+st.subheader('Datos históricos de los últimos 2 días')
+st.write(historical_data)
+
+# Calcular KPIs para los últimos 2 días
+last_day_data = historical_data.iloc[-1]
+prev_day_data = historical_data.iloc[-2]
+
+# Por ejemplo, calcular el cambio porcentual
+price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
+st.subheader('Resumen de KPIs de los últimos 2 días')
+st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
+
 
 plot_full_fig = plot_full(data)
 st.pyplot(plot_full_fig)
