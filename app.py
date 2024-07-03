@@ -535,6 +535,9 @@ st.pyplot(plot_full_fig)
 
 plot_candlestick_fig = plot_candlestick(data)
 st.pyplot(plot_candlestick_fig)
+with st.expander("Patterns"):
+    st.image(Image.open('assets/patterns.jpg'))
+
 
 # Plotear volúmenes
 plot_volume_fig = plot_volume(data)
