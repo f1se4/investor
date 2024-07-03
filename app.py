@@ -529,6 +529,7 @@ def plot_ma(data):
 
 def plot_arima(data, forecast_arima, forecast_periods):
     fig, ax = plt.subplots(figsize=(12, 6))
+
     ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
     ax.plot(pd.date_range(start=data.index[-1], periods=forecast_periods+1, freq='D')[1:], forecast_arima, label='Forecast', linestyle='--', color='orange')
     ax.legend()
@@ -581,7 +582,7 @@ def plot_xgboost_forecast(data, periods):
     predicciones = model.predict(df_prediccion)
 
     # Crear un DataFrame con las fechas y las predicciones
-    df_resultados = df_resultados.append(pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones}), ignore_index=True)
+    df_resultados = pd.concat([df_resultados, pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones})], ignore_index=True)
 
     # Graficar los resultados con Matplotlib
     ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
