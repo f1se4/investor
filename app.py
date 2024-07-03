@@ -586,12 +586,12 @@ def plot_rendimiento(ticker):
                             'value': 0
                         }
                     },
-                    domain = {'x': [positions[i]/4, (positions[i]+1)/4], 'y': [0, 1]}
+                    domain = {'x': [positions[i]/4, (positions[i]+1)/4], 'y': [0, 1, 2, 3]}
                 ))
             else:
                 st.warning(f'No hay datos disponibles para el periodo: {period}')
     
-        fig.update_layout(height=250, width=1000, grid={'rows': 2, 'columns': 4, 'pattern': "independent"})
+        fig.update_layout(height=250, width=1000, grid={'rows': 2, 'columns': 2, 'pattern': "independent"})
     
         return fig
 
