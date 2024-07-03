@@ -538,6 +538,10 @@ def plot_rendimiento(ticker):
     def get_performance(ticker, period):
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)
+        print("----------------------------------------------")
+        print(period)
+        print(len(data))
+        print(data)
         if data.empty or len(data) < 2:
             return None
         
