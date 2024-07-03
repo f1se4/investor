@@ -615,6 +615,7 @@ with st.sidebar:
     st.image(logo)
     selected_option = st.selectbox('Selecciona un Ticker', options, index=0)
     stock = selected_option.split(' - ')[0]
+    st.header("")
     start_time = st.date_input(
                     "Fecha de Inicio",
                     datetime.today() - timedelta(days=182),
