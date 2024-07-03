@@ -538,10 +538,6 @@ def plot_rendimiento(ticker):
     def get_performance(ticker, period):
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)
-        print("----------------------------------------------")
-        print(period)
-        print(len(data))
-        print(data)
         if data.empty or len(data) < 2:
             return None
         
@@ -554,7 +550,7 @@ def plot_rendimiento(ticker):
     
     # Función para crear la figura de Plotly con los gráficos de velocímetro
     def create_gauge_fig(ticker):
-        periods = ['8d', '1mo', '6mo', '1y']
+        periods = ['5d', '1mo', '6mo', '1y']
         positions = [0, 1, 2, 3]
         fig = go.Figure()
     
@@ -654,25 +650,24 @@ with st.expander(""):
     # Mostrar información general
     mostrar_informacion_general(ticker_data)
 
-# Obtener datos históricos
-today = datetime.today().strftime('%Y-%m-%d')
-two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
-historical_data = ticker_data.history(start=two_days_ago, end=today)
-
 st.subheader('Performance')
 rendimiento_plot = plot_rendimiento(stock)
 st.plotly_chart(rendimiento_plot, use_container_width=True)
 
-# Mostrar datos históricos
-#st.subheader('Datos históricos de los últimos 2 días')
-#st.write(historical_data)
-
-# Calcular KPIs para los últimos 2 días
+# Obtener datos históricos
 last_day_data = historical_data.iloc[-1]
 prev_day_data = historical_data.iloc[-2]
+prev_day_data3 = historical_data.iloc[-3]
+
+today = datetime.today().strftime('%Y-%m-%d')
+two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
+historical_data = ticker_data.history(start=two_days_ago, end=today)
+# Calcular KPIs para los últimos 2 días
 
 # Por ejemplo, calcular el cambio porcentual
 price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
+plot_candlestick_3 = plot_candlestick(historical_data)
+st.pyplot(plot_candlestick_3)
 st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
 
 
