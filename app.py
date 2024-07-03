@@ -13,6 +13,7 @@ from statsmodels.tsa.arima.model import ARIMA
 #from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
+from io import BytesIO
 
 st.set_page_config(layout="wide")
 
@@ -648,7 +649,12 @@ two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
 historical_data = ticker_data.history(start=two_days_ago, end=today)
 
 rendimiento_plot = plot_rendimiento(stock)
-st.pyplot(rendimiento_plot)
+# Convertir la figura de Plotly a una imagen para matplotlib
+image_streamlit = rendimiento_plot.to_image(format="png")
+image_bytes = BytesIO(image_streamlit)
+image = plt.imread(image_bytes)
+
+st.image(image, use_column_width=True)
 
 # Mostrar datos históricos
 st.subheader('Datos históricos de los últimos 2 días')
@@ -672,7 +678,6 @@ plot_candlestick_fig = plot_candlestick(data)
 st.pyplot(plot_candlestick_fig)
 with st.expander("Patterns"):
     st.image(Image.open('assets/patterns.jpg'))
-
 
 # Plotear volúmenes
 plot_volume_fig = plot_volume(data)
