@@ -7,8 +7,19 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import mplfinance as mpf
-import matplotlib.dates as mdates
+from statsmodels.tsa.ar_model import AutoReg
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+#from alpha_vantage.timeseries import TimeSeries
+
+# # Librería tiempo real
+# import finnhub
+# api_key = 'cq266u1r01ql95ncj820cq266u1r01ql95ncj82g'
+# finnhub_client = finnhub.Client(api_key=api_key)
+
+#API_KEY = 'TVOT6OCQEK98JBTR'
 
 st.set_page_config(layout="wide")
 
@@ -20,6 +31,103 @@ plt.style.use("dark_background")
 ###########################
 #### Funciones Principales
 ###########################
+# Función para realizar forecasting con ARIMA
+def arima_forecasting(data, periods):
+    # Ajustar el modelo ARIMA automáticamente
+    model = ARIMA(data, order=(1, 1, 1))  # Ejemplo con ARIMA(1,1,1)
+    fitted_model = model.fit()
+    
+    # Hacer las predicciones
+    forecast = fitted_model.forecast(steps=periods)
+    
+    return forecast
+
+# Función para realizar forecasting con auto_arima
+def auto_arima_forecasting(data, periods):
+    from pmdarima.arima import auto_arima
+    model = auto_arima(data, seasonal=False, suppress_warnings=True)
+    forecast = model.predict(n_periods=periods)
+    
+    return forecast
+# Función para obtener los datos en tiempo real desde Alpha Vantage
+# def get_realtime_data(symbol, interval='1min', outputsize='compact'):
+#     try:
+#         ts = TimeSeries(key=API_KEY, output_format='pandas')
+#         data, meta_data = ts.get_intraday(symbol=symbol, interval=interval, outputsize=outputsize)
+#         return data
+#     except ValueError as e:
+#         st.error(f"Error al obtener datos: {e}")
+#         return None
+#
+# # Función para plotear el gráfico en tiempo real
+# def plot_realtime_graph(symbol):
+#     data = get_realtime_data(symbol)
+#     if data is not None:
+#         fig, ax = plt.subplots(figsize=(14, 6))
+#         ax.plot(data.index, data['4. close'], label='Close Price', color='dodgerblue')
+#         ax.set_xlabel('Time')
+#         ax.set_ylabel('Price')
+#         ax.set_title(f'Intraday Price Chart for {symbol}')
+#         ax.legend()
+#         st.pyplot(fig)
+#
+# # Función para plotear gráfico en tiempo real
+# def plot_realtime_graph(symbol):
+#     res = get_realtime_data(symbol)
+#     timestamps = [datetime.datetime.fromtimestamp(ts) for ts in res['t']]
+#     close_prices = res['c']
+#
+#     plt.figure(figsize=(12, 6))
+#     plt.plot(timestamps, close_prices, label=f'Precio de cierre - {symbol}')
+#     plt.xlabel('Tiempo')
+#     plt.ylabel('Precio')
+#     plt.title(f'Gráfico de precios en tiempo real para {symbol}')
+#     plt.legend()
+#     plt.grid(True)
+#     st.pyplot()
+#
+def forecast_next_days(data, num_days=5):
+    # Utilizar la columna 'Close' para el modelo AR
+    close_series = data['Close']
+
+    # Entrenar el modelo AR con un retraso de 1 día (AR(1))
+    model = AutoReg(close_series, lags=1)
+    model_fit = model.fit()
+
+    # Predecir los próximos num_days días
+    forecast_values = model_fit.predict(start=len(close_series), end=len(close_series)+num_days-1, dynamic=False)
+
+    # Crear índice de fechas para las predicciones
+    forecast_dates = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=num_days, freq='D')
+
+    # Crear un DataFrame para las predicciones
+    forecast_df = pd.DataFrame({'Date': forecast_dates, 'Forecast': forecast_values})
+
+    return forecast_df
+
+def plot_forecast_hw(data, forecast):
+    fig, ax = plt.subplots(figsize=(14, 6))
+    
+    # Gráfico del Precio Histórico
+    ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
+
+    # Gráfico de la Predicción
+    ax.plot(forecast.index, forecast, label='ForeCast', color='orange', linestyle='--', linewidth=1)
+
+    ax.set_ylabel('')
+    ax.tick_params(axis='x', rotation=45, which='both')
+    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    
+    ax.legend()
+    fig.tight_layout()
+
+    return fig
+
 def plot_volume(data):
     fig, ax = plt.subplots(figsize=(14, 3))
     ax.bar(data.index, data['Volume'], color='dodgerblue', alpha=0.7)
@@ -34,6 +142,16 @@ def plot_volume(data):
     ax.spines['bottom'].set_visible(False)
     return fig
 
+# # Función para obtener datos en tiempo real desde Finnhub
+# def get_realtime_data(symbol, resolution='1', count=50):
+#     # Obtener la fecha y hora actual
+#     to_time = int(datetime.datetime.now().timestamp())
+#     # Calcular el tiempo inicial restando 'count' veces 'resolution' segundos a la fecha y hora actual
+#     from_time = to_time - count * int(resolution)
+#     res = finnhub_client.stock_candles(symbol=symbol, resolution=resolution, _from=from_time, to=to_time)
+#
+#     return res
+
 def get_company_name(ticker):
     # Crear un objeto ticker con yfinance
     ticker_data = yf.Ticker(ticker)
@@ -46,6 +164,78 @@ def get_company_name(ticker):
 def get_data(stock, start_time, end_time):
     df = yf.download(stock, start=start_time, end=end_time)
     return df
+
+def normalize_sma(data, sma, window):
+    sma_mean = sma.rolling(window=window).mean()
+    sma_std = sma.rolling(window=window).std()
+    normalized_sma = (sma - sma_mean) / sma_std
+    return normalized_sma
+
+def calculate_cmf(data, period=8):
+    mfv = ((data['Close'] - data['Low']) - (data['High'] - data['Close'])) / (data['High'] - data['Low']) * data['Volume']
+    cmf = mfv.rolling(window=period).sum() / data['Volume'].rolling(window=period).sum()
+    return cmf
+
+def normalize_to_range(data, min_val, max_val):
+    return 2 * ((data - min_val) / (max_val - min_val)) - 1
+
+def calculate_moving_average(data, window):
+    return data['Close'].rolling(window=window).mean()
+
+def normalize_sma_to_range(data, sma, window, min_val=-1, max_val=1):
+    sma_mean = sma.rolling(window=window).mean()
+    sma_std = sma.rolling(window=window).std()
+    normalized_sma = (sma - sma_mean) / sma_std
+    
+    # Normalizar al rango [-1, 1]
+    return normalize_to_range(normalized_sma, normalized_sma.min(), normalized_sma.max())
+
+def normalize_cmf_to_range(data, period=8, min_val=-1, max_val=1):
+    cmf = calculate_cmf(data, period)
+    return normalize_to_range(cmf, cmf.min(), cmf.max())
+
+def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
+    fig, ax = plt.subplots(figsize=(14, 4))
+    
+    # Calcular CMF
+    cmf = calculate_cmf(data, period=cmf_period)
+    norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
+    
+    # Calcular Medias Móviles
+    ma1 = calculate_moving_average(data, window=ma_period1)
+    ma2 = calculate_moving_average(data, window=ma_period2)
+
+    # Normalizar Medias Móviles al rango [0, 1]
+    norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
+    norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
+
+    
+    # Graficar CMF
+    ax.bar(data.index, norm_cmf, width=1.5, color=np.where(cmf >= 0, 'green', 'red'), alpha=0.3, label ='CFD(8)')
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+    
+    # Graficar Medias Móviles
+    # ax.plot(data.index, ma1, label=f'SMA({ma_period1})', color='dodgerblue')
+    # ax.plot(data.index, ma2, label=f'SMA({ma_period2})', color='green')
+
+    # Graficar Medias Móviles Normalizadas
+    ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
+    ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
+    
+    # Personalizar el gráfico
+    ax.legend(loc='best')
+    ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    plt.xticks(rotation=45, ha='right')
+    fig.tight_layout()
+    
+    return fig
+
 
 def calculate_rsi(data, window=14):
     delta = data['Close'].diff()
@@ -276,6 +466,21 @@ def plot_ma(data):
 
     return fig
 
+def plot_arima(data, forecast_arima, forecast_periods):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
+    ax.plot(pd.date_range(start=data.index[-1], periods=forecast_periods+1, freq='D')[1:], forecast_arima, label='Forecast', linestyle='--', color='orange')
+    ax.legend()
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
+    plt.xticks(rotation=45, ha='right')
+    fig.tight_layout()
+    return fig
+
 ###########################
 #### LAYOUT - Sidebar
 ###########################
@@ -304,6 +509,7 @@ with st.sidebar:
                     "Fecha Final",
                     datetime.date.today(),
                     format="DD/MM/YYYY")
+
     st.header("Help")
     st.image(Image.open('assets/velas.jpg'))
 
@@ -319,7 +525,7 @@ data = get_data(stock, start_time.strftime("%Y-%m-%d"), end_time.strftime("%Y-%m
 ###########################
 
 company_name = get_company_name(stock)
-st.title(f"Análisis {stock}: {company_name}")
+st.title(f"{stock} - {company_name}")
 
 plot_full_fig = plot_full(data)
 st.pyplot(plot_full_fig)
@@ -330,51 +536,95 @@ st.pyplot(plot_candlestick_fig)
 # Plotear volúmenes
 plot_volume_fig = plot_volume(data)
 st.pyplot(plot_volume_fig)
-st.markdown("""
-    - **Volumen:**
+with st.expander("Volumen"):
+    st.markdown("""
       - El volumen representa la cantidad total de acciones negociadas de un activo en un período de tiempo específico.
       - Se utiliza para evaluar la liquidez del mercado y la intensidad de las transacciones.
-""")
+    """)
 
 
 plot_indicator = plot_indicators(data)
 st.pyplot(plot_indicator)
-st.markdown("""
+with st.expander("Indicators"):
+    st.markdown("""
     - **RSI (Relative Strength Index):**
       - El RSI es un indicador de momentum que mide la velocidad y el cambio de los movimientos de precios.
       - Se calcula como un valor oscilante entre 0 y 120 y se utiliza comúnmente para identificar condiciones de sobrecompra (por encima de 70) y sobreventa (por debajo de 30).
       - Cuando el RSI está por encima de 70, el activo se considera sobrecomprado, lo que podría indicar una posible corrección a la baja.
       - Por el contrario, cuando el RSI está por debajo de 30, el activo se considera sobrevendido, lo que podría señalar una oportunidad de compra.
-""")
-
-
-st.markdown("""
+    """)
+    st.markdown("""
     - **MACD (Moving Average Convergence Divergence):**
     
-    El MACD es un indicador de seguimiento de tendencias que muestra la diferencia entre dos medias móviles exponenciales (EMA) de distintos períodos.
+        - El MACD es un indicador de seguimiento de tendencias que muestra la diferencia entre dos medias móviles exponenciales (EMA) de distintos períodos.
       El MACD Line se representa como una línea sólida y la Signal Line como una línea punteada. Cuando la Línea MACD está por encima de la Línea de Señal, 
       a menudo se colorea de verde. 
-Esto suele indicar un **impulso alcista** y es considerado un signo positivo para el activo, sugiriendo una tendencia alcista en el corto plazo.
+    Esto suele indicar un **impulso alcista** y es considerado un signo positivo para el activo, sugiriendo una tendencia alcista en el corto plazo.
 
-    Histograma del MACD: Además de las líneas, el MACD también se representa mediante un histograma que muestra la diferencia entre la Línea MACD y la Signal Line. En muchos gráficos, las barras del histograma se pintan de verde cuando la Línea MACD está por encima de la Signal Line, lo que refuerza la indicación de una tendencia alcista.
-""")
+        - Histograma del MACD: Además de las líneas, el MACD también se representa mediante un histograma que muestra la diferencia entre la Línea MACD y la Signal Line. En muchos gráficos, las barras del histograma se pintan de verde cuando la Línea MACD está por encima de la Signal Line, lo que refuerza la indicación de una tendencia alcista.
+    """)
+
+# Integrar en la interfaz de Streamlit
+st.subheader('Chaikin Money Flow y Medias Móviles')
+
+# Graficar CMF y Medias Móviles
+fig_cmf_ma = plot_cmf_with_moving_averages(data)
+st.pyplot(fig_cmf_ma)
 
 # Renderizar gráfico de medias móviles
-st.subheader('Rolling Means')
+st.subheader('Smoothing')
 plot_ma_fig = plot_ma(data)
 st.pyplot(plot_ma_fig)
 
-st.subheader('Daily Returns')
+st.subheader('Daily Returns & Volatitlity')
 df_ret = daily_returns(data)
 df_vol = returns_vol(df_ret)
 plot_vol = plot_volatility(df_vol)
 st.pyplot(plot_vol)
-# Explicación de los retornos diarios y volatilidad
-st.markdown("""
+with st.expander("Volatility"):
+    # Explicación de los retornos diarios y volatilidad
+    st.markdown("""
     Este gráfico muestra los retornos diarios logarítmicos del precio de cierre del activo y la volatilidad asociada.
     - **Retornos Diarios:** Representan el cambio porcentual en el precio de cierre de un día a otro.
     - **Volatilidad:** Es la desviación estándar de los retornos diarios móviles (últimos 12 días), que indica la variabilidad en los cambios de precio.     - La volatilidad alta puede indicar fluctuaciones significativas en el precio del activo.
-""")
+    """)
+
+# Mostrar datos históricos y predicción en la interfaz
+st.subheader('ForeCasting')
+
+# Configurar dos columnas en Streamlit
+col1, col2 = st.columns([1, 1])
+
+# Columna 1: number_input para los períodos
+with col1:
+    periods = st.number_input("Periods:", value=10, min_value=1, step=1)
+
+# Columna 2: st.radio para seleccionar el modelo de forecasting
+with col2:
+    modelos = ["ARIMA", "Holt-Winters", "LSTM"]
+    modelo_seleccionado = st.radio("Forecasting Model:", modelos)
+
+if modelo_seleccionado == 'ARIMA':
+    # Realizar forecasting con ARIMA
+    forecast_arima = arima_forecasting(data['Close'], periods)
+    arima_plot = plot_arima(data, forecast_arima, periods)
+    st.pyplot(arima_plot)
+elif modelo_seleccionado == 'Holt-Winters':
+    # Crear el modelo Holt-Winters
+    model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
+    fitted_model = model.fit()
+    
+    # Hacer la predicción para los próximos 5 días
+    forecast = fitted_model.forecast(periods)
+    
+    st.write(f"Forecasting {periods} days for Model {modelo_seleccionado}")
+    forecast_df = pd.DataFrame(forecast, columns=['forecast_values'])
+    forecast_df['Date'] = pd.to_datetime(pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=len(forecast_df)))
+    forecast_df.set_index('Date', inplace=True)
+    # Mostrar gráficos de datos históricos y predicción
+    forecast_plot = plot_forecast_hw(data, forecast_df)
+    st.pyplot(forecast_plot)
+    st.dataframe(forecast_df)
 
 st.subheader('Raw Data')
 st.dataframe(data)
