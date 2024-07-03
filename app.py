@@ -12,6 +12,7 @@ from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
+import xgboost as xgb
 
 import warnings
 # Suprimir advertencias para una mejor visualización
@@ -541,6 +542,52 @@ def plot_arima(data, forecast_arima, forecast_periods):
     fig.tight_layout()
     return fig
 
+def predecir_y_graficar(data):
+    # Preparar datos para el modelo (ejemplo básico)
+    data['Date'] = data.index
+    data['Year'] = data['Date'].dt.year
+    data['Month'] = data['Date'].dt.month
+    data['Day'] = data['Date'].dt.day
+
+    # Variable objetivo (por ejemplo, Adj Close)
+    y = data['Adj Close']
+
+    # Variables predictoras (ejemplo básico)
+    X = data[['Year', 'Month', 'Day']]
+
+    # Entrenar modelo xgboost
+    model = xgb.XGBRegressor(objective='reg:squarederror')
+    model.fit(X, y)
+
+    # Obtener la última fecha en los datos históricos
+    ultima_fecha = data.index[-1]
+
+    # Crear un DataFrame con las fechas futuras para predecir
+    fechas_futuras = pd.date_range(start=ultima_fecha + timedelta(days=1), periods=10, freq='D')
+    df_prediccion = pd.DataFrame(index=fechas_futuras, columns=['Year', 'Month', 'Day'])
+
+    # Llenar el DataFrame con valores de año, mes y día para las fechas futuras
+    df_prediccion['Year'] = df_prediccion.index.year
+    df_prediccion['Month'] = df_prediccion.index.month
+    df_prediccion['Day'] = df_prediccion.index.day
+
+    # Hacer la predicción con el modelo xgboost
+    predicciones = model.predict(df_prediccion)
+
+    # Crear un DataFrame con las fechas y las predicciones
+    df_resultados = pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones})
+
+    # Graficar los resultados con Matplotlib
+    plt.figure(figsize=(12, 6))
+    plt.plot(df_resultados['Fecha'], df_resultados['Prediccion'], marker='o', linestyle='-', color='b', label='Predicción')
+    plt.title(f'Predicción de precios para {data.columns[0]} a 10 días')
+    plt.xlabel('Fecha')
+    plt.ylabel('Precio')
+    plt.grid(True)
+    plt.legend()
+
+    return plt.gcf()  # Devolvemos la figura actual de Matplotlib
+
 def plot_rendimiento(ticker):
     # Función para obtener el rendimiento en porcentaje
     def get_performance(ticker, period):
@@ -787,7 +834,7 @@ if (end_time - start_time).days >= 35:
     
     # Columna 2: st.radio para seleccionar el modelo de forecasting
     with col2:
-        modelos = ["ARIMA", "Holt-Winters"]
+        modelos = ["ARIMA", "Holt-Winters", "XGBoost"]
         modelo_seleccionado = st.radio("Forecasting Model:", modelos)
     
     if modelo_seleccionado == 'ARIMA':
