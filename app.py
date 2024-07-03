@@ -655,21 +655,28 @@ rendimiento_plot = plot_rendimiento(stock)
 st.plotly_chart(rendimiento_plot, use_container_width=True)
 
 # Obtener datos históricos
+today = datetime.today().strftime('%Y-%m-%d')
+five_days_ago = (datetime.today() - timedelta(days=5)).strftime('%Y-%m-%d')
+historical_data = ticker_data.history(start=five_days_ago, end=today)
+
+# Calcular KPIs para los últimos 2 días
 last_day_data = historical_data.iloc[-1]
 prev_day_data = historical_data.iloc[-2]
 prev_day_data3 = historical_data.iloc[-3]
 
-today = datetime.today().strftime('%Y-%m-%d')
-two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
-historical_data = ticker_data.history(start=two_days_ago, end=today)
-# Calcular KPIs para los últimos 2 días
+historical_data = ticker_data.history(start=prev_day_data3, end=today)
 
 # Por ejemplo, calcular el cambio porcentual
 price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
-plot_candlestick_3 = plot_candlestick(historical_data)
-st.pyplot(plot_candlestick_3)
-st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
 
+# Crear dos columnas
+col1, col2 = st.columns(2)
+
+with col1:
+    plot_candlestick_3 = plot_candlestick(historical_data)
+    st.pyplot(plot_candlestick_3)
+with col2:
+    st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
 
 st.subheader('Graphic Analysis')
 plot_full_fig = plot_full(data)
