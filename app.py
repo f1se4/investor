@@ -595,6 +595,8 @@ with st.expander("Volatility"):
 # Mostrar datos históricos y predicción en la interfaz
 st.subheader('ForeCasting')
 
+
+
 # Configurar dos columnas en Streamlit
 col1, col2 = st.columns([1, 1])
 
