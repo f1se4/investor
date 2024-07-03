@@ -24,6 +24,29 @@ plt.style.use("dark_background")
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+def mostrar_informacion_general(ticker_data):
+    info = {
+        "Nombre": ticker_data.info.get('longName', 'N/A'),
+        "Símbolo": ticker_data.info.get('symbol', 'N/A'),
+        "Tipo": ticker_data.info.get('quoteType', 'N/A'),
+        "Sector": ticker_data.info.get('sector', 'N/A'),
+        "Exchange": ticker_data.info.get('exchange', 'N/A'),
+        "Divisa": ticker_data.info.get('currency', 'N/A'),
+        "Precio anterior de cierre": ticker_data.info.get('previousClose', 'N/A'),
+        "Precio de apertura": ticker_data.info.get('open', 'N/A'),
+        "Precio más bajo del día": ticker_data.info.get('dayLow', 'N/A'),
+        "Precio más alto del día": ticker_data.info.get('dayHigh', 'N/A'),
+        "Volumen promedio (10 días)": ticker_data.info.get('averageVolume10days', 'N/A'),
+        "Volumen": ticker_data.info.get('volume', 'N/A'),
+        "Ratio P/E (trailing)": ticker_data.info.get('trailingPE', 'N/A'),
+        "Ratio PEG (trailing)": ticker_data.info.get('trailingPegRatio', 'N/A'),
+        "Rango de 52 semanas - Mínimo": ticker_data.info.get('fiftyTwoWeekLow', 'N/A'),
+        "Rango de 52 semanas - Máximo": ticker_data.info.get('fiftyTwoWeekHigh', 'N/A')
+    }
+    
+    for key, value in info.items():
+        st.write(f"**{key}:** {value}")
+
 # Función para calcular la Repulsión Alisada (similar a una EMA)
 def repulsion_alisada(data, span):
     return data.ewm(span=span, adjust=False).mean()
@@ -540,8 +563,11 @@ ticker_data = yf.Ticker(stock)
 
 # Obtener información general del ticker
 info = ticker_data.info
+
 st.subheader('Información general')
-st.write(info)
+with st.expander(""):
+    # Mostrar información general
+    mostrar_informacion_general(ticker_data)
 
 # Obtener datos históricos
 today = datetime.today().strftime('%Y-%m-%d')
@@ -562,6 +588,7 @@ st.subheader('Resumen de KPIs de los últimos 2 días')
 st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
 
 
+st.subheader('Graphic Analysis')
 plot_full_fig = plot_full(data)
 st.pyplot(plot_full_fig)
 
