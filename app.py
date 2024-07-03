@@ -649,13 +649,13 @@ today = datetime.today().strftime('%Y-%m-%d')
 two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
 historical_data = ticker_data.history(start=two_days_ago, end=today)
 
+st.subheader('Performance')
 rendimiento_plot = plot_rendimiento(stock)
-
 st.plotly_chart(rendimiento_plot, use_container_width=True)
 
 # Mostrar datos históricos
-st.subheader('Datos históricos de los últimos 2 días')
-st.write(historical_data)
+#st.subheader('Datos históricos de los últimos 2 días')
+#st.write(historical_data)
 
 # Calcular KPIs para los últimos 2 días
 last_day_data = historical_data.iloc[-1]
@@ -663,7 +663,6 @@ prev_day_data = historical_data.iloc[-2]
 
 # Por ejemplo, calcular el cambio porcentual
 price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
-st.subheader('Resumen de KPIs de los últimos 2 días')
 st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
 
 
