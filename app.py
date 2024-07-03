@@ -543,6 +543,8 @@ def plot_arima(data, forecast_arima, forecast_periods):
     return fig
 
 def plot_xgboost_forecast(data):
+    fig, ax = plt.subplots(figsize=(12, 6))
+
     # Preparar datos para el modelo (ejemplo básico)
     data['Date'] = data.index
     data['Year'] = data['Date'].dt.year
@@ -578,15 +580,18 @@ def plot_xgboost_forecast(data):
     df_resultados = pd.DataFrame({'Fecha': fechas_futuras, 'Prediccion': predicciones})
 
     # Graficar los resultados con Matplotlib
-    plt.figure(figsize=(12, 6))
-    plt.plot(df_resultados['Fecha'], df_resultados['Prediccion'], marker='o', linestyle='-', color='b', label='Predicción')
-    plt.title(f'Predicción de precios para {data.columns[0]} a 10 días')
-    plt.xlabel('Fecha')
-    plt.ylabel('Precio')
-    plt.grid(True)
-    plt.legend()
+    ax.plot(df_resultados['Fecha'], df_resultados['Prediccion'], marker='o', linestyle='-', color='b', label='Predicción')
+    ax.plot(data.index, data['Close'], color='dodgerblue', linewidth=1, alpha=0.8)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
+    plt.xticks(rotation=45, ha='right')
+    ax.legend()
 
-    return plt.gcf()  # Devolvemos la figura actual de Matplotlib
+    return fig  # Devolvemos la figura actual de Matplotlib
 
 def plot_rendimiento(ticker):
     # Función para obtener el rendimiento en porcentaje
@@ -847,10 +852,8 @@ if (end_time - start_time).days >= 35:
         # Crear el modelo Holt-Winters
         model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
         fitted_model = model.fit()
-        
         # Hacer la predicción para los próximos 5 días
         forecast = fitted_model.forecast(periods)
-        
         st.write(f"Forecasting {periods} days for Model {modelo_seleccionado}")
         forecast_df = pd.DataFrame(forecast, columns=['forecast_values'])
         forecast_df['Date'] = pd.to_datetime(pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=len(forecast_df)))
@@ -858,9 +861,8 @@ if (end_time - start_time).days >= 35:
         # Mostrar gráficos de datos históricos y predicción
         forecast_plot = plot_forecast_hw(data, forecast_df)
         st.pyplot(forecast_plot)
-        #st.dataframe(forecast_df)
     elif modelo_seleccionado == 'XGBoost':
-        st.pyplot(predecir_y_graficar(data))
+        st.pyplot(plot_xgboost_forecast(data))
 else:
     st.write("For an optimal forecasting you need at least 35 days")
     
