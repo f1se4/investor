@@ -551,6 +551,7 @@ def plot_rendimiento(ticker):
     # Función para crear la figura de Plotly con los gráficos de velocímetro
     def create_gauge_fig(ticker):
         periods = ['1wk', '1mo', '6mo', '1y']
+        positions = [0, 1, 2, 3]
         fig = go.Figure()
     
         for period in periods:
@@ -649,12 +650,8 @@ two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
 historical_data = ticker_data.history(start=two_days_ago, end=today)
 
 rendimiento_plot = plot_rendimiento(stock)
-# Convertir la figura de Plotly a una imagen para matplotlib
-image_streamlit = rendimiento_plot.to_image(format="png")
-image_bytes = BytesIO(image_streamlit)
-image = plt.imread(image_bytes)
 
-st.image(image, use_column_width=True)
+st.plotly_chart(rendimiento_plot, use_container_width=True)
 
 # Mostrar datos históricos
 st.subheader('Datos históricos de los últimos 2 días')
