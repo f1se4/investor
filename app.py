@@ -542,7 +542,7 @@ def plot_arima(data, forecast_arima, forecast_periods):
     fig.tight_layout()
     return fig
 
-def predecir_y_graficar(data):
+def plot_xgboost_forecast(data):
     # Preparar datos para el modelo (ejemplo básico)
     data['Date'] = data.index
     data['Year'] = data['Date'].dt.year
@@ -859,6 +859,8 @@ if (end_time - start_time).days >= 35:
         forecast_plot = plot_forecast_hw(data, forecast_df)
         st.pyplot(forecast_plot)
         #st.dataframe(forecast_df)
+    elif modelo_seleccionado == 'XGBoost':
+        st.pyplot(predecir_y_graficar(data))
 else:
     st.write("For an optimal forecasting you need at least 35 days")
     
