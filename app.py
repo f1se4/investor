@@ -20,9 +20,10 @@ mpl.rcParams.update({'font.size': 10})
 plt.rcParams.update({'font.size': 10})
 
 plt.style.use("dark_background")
-###########################
-#### Funciones Principales
-###########################
+
+#########################################################################################
+#### Funciones Cálculos
+#########################################################################################
 # Función para calcular la Repulsión Alisada (similar a una EMA)
 def repulsion_alisada(data, span):
     return data.ewm(span=span, adjust=False).mean()
@@ -44,7 +45,221 @@ def dema(data, window):
     ema2 = ema1.ewm(span=window, adjust=False).mean()
     return 2 * ema1 - ema2
 
-# Definir la función para graficar
+# Función para realizar forecasting con ARIMA
+def arima_forecasting(data, periods):
+    # Ajustar el modelo ARIMA automáticamente
+    model = ARIMA(data, order=(1, 1, 1))  # Ejemplo con ARIMA(1,1,1)
+    fitted_model = model.fit()
+    
+    # Hacer las predicciones
+    forecast = fitted_model.forecast(steps=periods)
+    
+    return forecast
+
+def forecast_next_days(data, num_days=5):
+    # Utilizar la columna 'Close' para el modelo AR
+    close_series = data['Close']
+
+    # Entrenar el modelo AR con un retraso de 1 día (AR(1))
+    model = AutoReg(close_series, lags=1)
+    model_fit = model.fit()
+
+    # Predecir los próximos num_days días
+    forecast_values = model_fit.predict(start=len(close_series), end=len(close_series)+num_days-1, dynamic=False)
+
+    # Crear índice de fechas para las predicciones
+    forecast_dates = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=num_days, freq='D')
+
+    # Crear un DataFrame para las predicciones
+    forecast_df = pd.DataFrame({'Date': forecast_dates, 'Forecast': forecast_values})
+
+    return forecast_df
+
+
+def get_company_name(ticker):
+    # Crear un objeto ticker con yfinance
+    ticker_data = yf.Ticker(ticker)
+    # Obtener el nombre de la empresa
+    company_name = ticker_data.info['longName']
+    return company_name
+
+def get_data(stock, start_time, end_time):
+    df = yf.download(stock, start=start_time, end=end_time)
+    return df
+
+def normalize_sma(data, sma, window):
+    sma_mean = sma.rolling(window=window).mean()
+    sma_std = sma.rolling(window=window).std()
+    normalized_sma = (sma - sma_mean) / sma_std
+    return normalized_sma
+
+def calculate_cmf(data, period=8):
+    mfv = ((data['Close'] - data['Low']) - (data['High'] - data['Close'])) / (data['High'] - data['Low']) * data['Volume']
+    cmf = mfv.rolling(window=period).sum() / data['Volume'].rolling(window=period).sum()
+    return cmf
+
+def normalize_to_range(data, min_val, max_val):
+    return 2 * ((data - min_val) / (max_val - min_val)) - 1
+
+def calculate_moving_average(data, window):
+    return data['Close'].rolling(window=window).mean()
+
+def normalize_sma_to_range(data, sma, window, min_val=-1, max_val=1):
+    sma_mean = sma.rolling(window=window).mean()
+    sma_std = sma.rolling(window=window).std()
+    normalized_sma = (sma - sma_mean) / sma_std
+    
+    # Normalizar al rango [-1, 1]
+    return normalize_to_range(normalized_sma, normalized_sma.min(), normalized_sma.max())
+
+def normalize_cmf_to_range(data, period=8, min_val=-1, max_val=1):
+    cmf = calculate_cmf(data, period)
+    return normalize_to_range(cmf, cmf.min(), cmf.max())
+
+
+
+def calculate_rsi(data, window=14):
+    delta = data['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+    rs = gain / loss
+    rsi = 120 - (100 / (1 + rs))
+    return rsi
+
+
+def calculate_macd(data, short_window=12, long_window=26):
+    short_ema = data['Close'].ewm(span=short_window, adjust=False).mean()
+    long_ema = data['Close'].ewm(span=long_window, adjust=False).mean()
+    macd_line = short_ema - long_ema
+    signal_line = macd_line.ewm(span=9, adjust=False).mean()
+    return macd_line, signal_line
+
+
+def get_levels(dfvar):
+    def isSupport(df,i):
+        support = df['low'][i] < df['low'][i-1]  and df['low'][i] < df['low'][i+1] and df['low'][i+1] < df['low'][i+2] and df['low'][i-1] < df['low'][i-2]
+        return support
+
+    def isResistance(df,i):
+        resistance = df['high'][i] > df['high'][i-1]  and df['high'][i] > df['high'][i+1] and df['high'][i+1] > df['high'][i+2] and df['high'][i-1] > df['high'][i-2]
+        return resistance
+
+    def isFarFromLevel(l, levels, s):
+        level = np.sum([abs(l-x[0]) < s  for x in levels])
+        return  level == 0
+    
+    
+    df = dfvar.copy()
+    df.rename(columns={'High':'high','Low':'low'}, inplace=True)
+    s =  np.mean(df['high'] - df['low'])
+    levels = []
+    for i in range(2,df.shape[0]-2):
+        if isSupport(df,i):  
+            levels.append((i,df['low'][i]))
+        elif isResistance(df,i):
+            levels.append((i,df['high'][i]))
+
+    filter_levels = []
+    for i in range(2,df.shape[0]-2):
+        if isSupport(df,i):
+            l = df['low'][i]
+            if isFarFromLevel(l, levels, s):
+                filter_levels.append((i,l))
+        elif isResistance(df,i):
+            l = df['high'][i]
+            if isFarFromLevel(l, levels, s):
+                filter_levels.append((i,l))
+
+    return filter_levels
+
+def daily_returns(df):
+    df = df.sort_index(ascending=True)
+    df['returns'] = np.log(df['Close']).diff()
+    return df
+
+def returns_vol(df):
+    df['volatility'] = df.returns.rolling(12).std()
+    return df
+
+#########################################################################################
+#### Funciones para gráficos
+#########################################################################################
+
+def plot_forecast_hw(data, forecast):
+    fig, ax = plt.subplots(figsize=(14, 6))
+    
+    # Gráfico del Precio Histórico
+    ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
+
+    # Gráfico de la Predicción
+    ax.plot(forecast.index, forecast, label='ForeCast', color='orange', linestyle='--', linewidth=1)
+
+    ax.set_ylabel('')
+    ax.tick_params(axis='x', rotation=45, which='both')
+    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    
+    ax.legend()
+    fig.tight_layout()
+
+    return fig
+
+def plot_volume(data):
+    fig, ax = plt.subplots(figsize=(14, 3))
+    ax.bar(data.index, data['Volume'], color='dodgerblue', alpha=0.7)
+    ax.set_ylabel('')
+    # ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    return fig
+
+def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
+    fig, ax = plt.subplots(figsize=(14, 4))
+    
+    # Calcular CMF
+    cmf = calculate_cmf(data, period=cmf_period)
+    norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
+    
+    # Calcular Medias Móviles
+    ma1 = calculate_moving_average(data, window=ma_period1)
+    ma2 = calculate_moving_average(data, window=ma_period2)
+
+    # Normalizar Medias Móviles al rango [0, 1]
+    norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
+    norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
+
+    
+    # Graficar CMF
+    ax.bar(data.index, norm_cmf, width=1.5, color=np.where(cmf >= 0, 'green', 'red'), alpha=0.3, label ='CFD(8)')
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+    
+    # Graficar Medias Móviles Normalizadas
+    ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
+    ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
+    
+    # Personalizar el gráfico
+    ax.legend(loc='best')
+    ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
+    plt.xticks(rotation=45, ha='right')
+    fig.tight_layout()
+    
+    return fig
+
 def plot_with_indicators(data):
     fig, ax = plt.subplots(figsize=(14, 4))
     
@@ -91,169 +306,6 @@ def plot_with_indicators(data):
     fig.tight_layout()
     return fig
 
-# Función para realizar forecasting con ARIMA
-def arima_forecasting(data, periods):
-    # Ajustar el modelo ARIMA automáticamente
-    model = ARIMA(data, order=(1, 1, 1))  # Ejemplo con ARIMA(1,1,1)
-    fitted_model = model.fit()
-    
-    # Hacer las predicciones
-    forecast = fitted_model.forecast(steps=periods)
-    
-    return forecast
-
-def forecast_next_days(data, num_days=5):
-    # Utilizar la columna 'Close' para el modelo AR
-    close_series = data['Close']
-
-    # Entrenar el modelo AR con un retraso de 1 día (AR(1))
-    model = AutoReg(close_series, lags=1)
-    model_fit = model.fit()
-
-    # Predecir los próximos num_days días
-    forecast_values = model_fit.predict(start=len(close_series), end=len(close_series)+num_days-1, dynamic=False)
-
-    # Crear índice de fechas para las predicciones
-    forecast_dates = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=num_days, freq='D')
-
-    # Crear un DataFrame para las predicciones
-    forecast_df = pd.DataFrame({'Date': forecast_dates, 'Forecast': forecast_values})
-
-    return forecast_df
-
-def plot_forecast_hw(data, forecast):
-    fig, ax = plt.subplots(figsize=(14, 6))
-    
-    # Gráfico del Precio Histórico
-    ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
-
-    # Gráfico de la Predicción
-    ax.plot(forecast.index, forecast, label='ForeCast', color='orange', linestyle='--', linewidth=1)
-
-    ax.set_ylabel('')
-    ax.tick_params(axis='x', rotation=45, which='both')
-    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    
-    ax.legend()
-    fig.tight_layout()
-
-    return fig
-
-def plot_volume(data):
-    fig, ax = plt.subplots(figsize=(14, 3))
-    ax.bar(data.index, data['Volume'], color='dodgerblue', alpha=0.7)
-    ax.set_ylabel('')
-    # ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    ax.spines['top'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    return fig
-
-def get_company_name(ticker):
-    # Crear un objeto ticker con yfinance
-    ticker_data = yf.Ticker(ticker)
-    
-    # Obtener el nombre de la empresa
-    company_name = ticker_data.info['longName']
-    
-    return company_name
-
-def get_data(stock, start_time, end_time):
-    df = yf.download(stock, start=start_time, end=end_time)
-    return df
-
-def normalize_sma(data, sma, window):
-    sma_mean = sma.rolling(window=window).mean()
-    sma_std = sma.rolling(window=window).std()
-    normalized_sma = (sma - sma_mean) / sma_std
-    return normalized_sma
-
-def calculate_cmf(data, period=8):
-    mfv = ((data['Close'] - data['Low']) - (data['High'] - data['Close'])) / (data['High'] - data['Low']) * data['Volume']
-    cmf = mfv.rolling(window=period).sum() / data['Volume'].rolling(window=period).sum()
-    return cmf
-
-def normalize_to_range(data, min_val, max_val):
-    return 2 * ((data - min_val) / (max_val - min_val)) - 1
-
-def calculate_moving_average(data, window):
-    return data['Close'].rolling(window=window).mean()
-
-def normalize_sma_to_range(data, sma, window, min_val=-1, max_val=1):
-    sma_mean = sma.rolling(window=window).mean()
-    sma_std = sma.rolling(window=window).std()
-    normalized_sma = (sma - sma_mean) / sma_std
-    
-    # Normalizar al rango [-1, 1]
-    return normalize_to_range(normalized_sma, normalized_sma.min(), normalized_sma.max())
-
-def normalize_cmf_to_range(data, period=8, min_val=-1, max_val=1):
-    cmf = calculate_cmf(data, period)
-    return normalize_to_range(cmf, cmf.min(), cmf.max())
-
-def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
-    fig, ax = plt.subplots(figsize=(14, 4))
-    
-    # Calcular CMF
-    cmf = calculate_cmf(data, period=cmf_period)
-    norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
-    
-    # Calcular Medias Móviles
-    ma1 = calculate_moving_average(data, window=ma_period1)
-    ma2 = calculate_moving_average(data, window=ma_period2)
-
-    # Normalizar Medias Móviles al rango [0, 1]
-    norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
-    norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
-
-    
-    # Graficar CMF
-    ax.bar(data.index, norm_cmf, width=1.5, color=np.where(cmf >= 0, 'green', 'red'), alpha=0.3, label ='CFD(8)')
-    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
-    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
-    
-    # Graficar Medias Móviles Normalizadas
-    ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
-    ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
-    
-    # Personalizar el gráfico
-    ax.legend(loc='best')
-    ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    plt.xticks(rotation=45, ha='right')
-    fig.tight_layout()
-    
-    return fig
-
-
-def calculate_rsi(data, window=14):
-    delta = data['Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
-    rs = gain / loss
-    rsi = 120 - (100 / (1 + rs))
-    return rsi
-
-
-def calculate_macd(data, short_window=12, long_window=26):
-    short_ema = data['Close'].ewm(span=short_window, adjust=False).mean()
-    long_ema = data['Close'].ewm(span=long_window, adjust=False).mean()
-    macd_line = short_ema - long_ema
-    signal_line = macd_line.ewm(span=9, adjust=False).mean()
-    return macd_line, signal_line
 
 def plot_candlestick(data):
     fig, ax = plt.subplots(figsize=(14, 6))
@@ -354,52 +406,6 @@ def plot_indicators(data):
 
     return fig
 
-def get_levels(dfvar):
-    def isSupport(df,i):
-        support = df['low'][i] < df['low'][i-1]  and df['low'][i] < df['low'][i+1] and df['low'][i+1] < df['low'][i+2] and df['low'][i-1] < df['low'][i-2]
-        return support
-
-    def isResistance(df,i):
-        resistance = df['high'][i] > df['high'][i-1]  and df['high'][i] > df['high'][i+1] and df['high'][i+1] > df['high'][i+2] and df['high'][i-1] > df['high'][i-2]
-        return resistance
-
-    def isFarFromLevel(l, levels, s):
-        level = np.sum([abs(l-x[0]) < s  for x in levels])
-        return  level == 0
-    
-    
-    df = dfvar.copy()
-    df.rename(columns={'High':'high','Low':'low'}, inplace=True)
-    s =  np.mean(df['high'] - df['low'])
-    levels = []
-    for i in range(2,df.shape[0]-2):
-        if isSupport(df,i):  
-            levels.append((i,df['low'][i]))
-        elif isResistance(df,i):
-            levels.append((i,df['high'][i]))
-
-    filter_levels = []
-    for i in range(2,df.shape[0]-2):
-        if isSupport(df,i):
-            l = df['low'][i]
-            if isFarFromLevel(l, levels, s):
-                filter_levels.append((i,l))
-        elif isResistance(df,i):
-            l = df['high'][i]
-            if isFarFromLevel(l, levels, s):
-                filter_levels.append((i,l))
-
-    return filter_levels
-
-def daily_returns(df):
-    df = df.sort_index(ascending=True)
-    df['returns'] = np.log(df['Close']).diff()
-    return df
-
-def returns_vol(df):
-    df['volatility'] = df.returns.rolling(12).std()
-    return df
-
 def plot_volatility(df_vol):
     df_plot = df_vol.copy()
     fig = plt.figure(figsize=(12,6))
@@ -485,10 +491,9 @@ def plot_arima(data, forecast_arima, forecast_periods):
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
     return fig
-
-###########################
+#########################################################################################
 #### LAYOUT - Sidebar
-###########################
+#########################################################################################
 
 logo = Image.open('assets/logo.jpeg')
 
