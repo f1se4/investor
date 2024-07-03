@@ -53,25 +53,30 @@ def plot_with_indicators(data):
     fig, ax = plt.subplots(figsize=(14, 6))
     
     # Graficar el precio de cierre
-    ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
+    #ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
     
     # Calcular y graficar la Repulsión Alisada
     repulsion = repulsion_alisada(data['Close'], span=5)
-    ax.plot(data.index, repulsion, label='Repulsión Alisada (5 sesiones)', color='green', linestyle='--', alpha=0.8)
+    ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='--', alpha=0.8)
     
     # Calcular y graficar la TEMA
     tema_line = tema(data['Close'], window=21)
-    ax.plot(data.index, tema_line, label='TEMA (21 sesiones)', color='red', linestyle='--', alpha=0.8)
+    ax.plot(data.index, tema_line, label='TEMA (21)', color='orange', linestyle='--', alpha=0.8)
     
     # Calcular y graficar la DEMA
     dema_line = dema(data['Close'], window=21)
-    ax.plot(data.index, dema_line, label='DEMA (21 sesiones)', color='orange', linestyle='--', alpha=0.8)
+    ax.plot(data.index, dema_line, label='DEMA (21)', color='r', linestyle='--', alpha=0.8)
     
     # Configuraciones del gráfico
     ax.legend()
     ax.grid(True)
-    ax.set_title('Indicadores: Repulsión Alisada, TEMA y DEMA')
     plt.xticks(rotation=45, ha='right')
+    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.yaxis.set_ticks([])  # Quitar los ticks
     fig.tight_layout()
     return fig
 
