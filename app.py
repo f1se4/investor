@@ -10,11 +10,14 @@ import numpy as np
 import mplfinance as mpf
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.arima.model import ARIMA
+#from statsmodels.tsa.arima.model import ARIMA
 #from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
-from io import BytesIO
+
+import warnings
+# Suprimir advertencias para una mejor visualización
+warnings.filterwarnings("ignore")
 
 st.set_page_config(layout="wide")
 
@@ -79,7 +82,7 @@ def dema(data, window):
 # Función para realizar forecasting con ARIMA
 def arima_forecasting(data, periods):
     # Ajustar el modelo ARIMA automáticamente
-    model = ARIMA(data, order=(1, 2, 1))  # Ejemplo con ARIMA(1,1,1)
+    #model = ARIMA(data, order=(1, 2, 1))  # Ejemplo con ARIMA(1,1,1)
     prices = data['Close'].dropna()
     model = SARIMAX(prices, order=(3, 1, 3), seasonal_order=(1, 1, 1, 252))
     fitted_model = model.fit()
@@ -793,7 +796,7 @@ if (end_time - start_time).days >= 35:
     
     if modelo_seleccionado == 'ARIMA':
         # Realizar forecasting con ARIMA
-        forecast_arima = arima_forecasting(data['Close'], periods)
+        forecast_arima = arima_forecasting(data, periods)
         arima_plot = plot_arima(data, forecast_arima, periods)
         st.pyplot(arima_plot)
     elif modelo_seleccionado == 'Holt-Winters':
