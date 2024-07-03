@@ -81,7 +81,7 @@ def dema(data, window):
 def arima_forecasting(data, periods):
     # Ajustar el modelo ARIMA automáticamente
     prices = data['Close'].dropna()
-    model = ARIMA(data, order=(1, 2, 1))  # Ejemplo con ARIMA(1,1,1)
+    model = ARIMA(prices, order=(3, 1, 3))
     fitted_model = model.fit()
     
     # Hacer las predicciones
@@ -795,6 +795,7 @@ if (end_time - start_time).days >= 35:
         forecast_arima = arima_forecasting(data, periods)
         arima_plot = plot_arima(data, forecast_arima, periods)
         st.pyplot(arima_plot)
+        st.markdown("*ARIMA(3,1,3)*")
     elif modelo_seleccionado == 'Holt-Winters':
         # Crear el modelo Holt-Winters
         model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
@@ -810,7 +811,7 @@ if (end_time - start_time).days >= 35:
         # Mostrar gráficos de datos históricos y predicción
         forecast_plot = plot_forecast_hw(data, forecast_df)
         st.pyplot(forecast_plot)
-        st.dataframe(forecast_df)
+        #st.dataframe(forecast_df)
 else:
     st.write("For an optimal forecasting you need at least 35 days")
     
