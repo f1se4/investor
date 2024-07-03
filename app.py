@@ -662,9 +662,6 @@ historical_data = ticker_data.history(start=five_days_ago, end=today)
 # Calcular KPIs para los últimos 2 días
 last_day_data = historical_data.iloc[-1]
 prev_day_data = historical_data.iloc[-2]
-prev_day_data3 = historical_data.iloc[-3]
-
-historical_data = ticker_data.history(start=prev_day_data3, end=today)
 
 # Por ejemplo, calcular el cambio porcentual
 price_change_percent = ((last_day_data['Close'] - prev_day_data['Close']) / prev_day_data['Close']) * 100
