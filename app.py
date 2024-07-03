@@ -534,8 +534,32 @@ def plot_arima(data, forecast_arima, forecast_periods):
     fig.tight_layout()
     return fig
 
-
 def plot_rendimiento(ticker):
+    def plot_velocimeter(ax, value, min_value, max_value, title):
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+    
+        # Valores para los extremos del velocímetro
+        theta = np.linspace(0, 2 * np.pi, 100)
+        r = np.linspace(0, 1, 100)
+    
+        # Sombreado del área
+        ax.fill_between(theta, min_value, max_value, color='lightgray')
+    
+        # Área correspondiente al valor
+        ax.fill_between(theta, min_value, value, color='deepskyblue')
+    
+        # Línea indicadora del valor
+        theta_value = value / (max_value - min_value) * 2 * np.pi  # Convertir a ángulo
+        ax.plot([0, theta_value], [0, value], color='blue', linewidth=1.5)
+    
+        # Configuración de la gráfica
+        ax.set_ylim(min_value, max_value)
+        ax.set_title(title, fontsize=12)
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        ax.grid(False)
+
     # Función para obtener los datos de rendimiento
     def get_performance_data(ticker, period):
         stock = yf.Ticker(ticker)
