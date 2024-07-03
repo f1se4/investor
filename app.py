@@ -680,7 +680,7 @@ with col1:
 with col2:
     # Mostrar valores en Streamlit usando st.markdown
     st.markdown("### Last Values")
-    st.markdown(f"**Performance**: {format_value(price_change_percent)}%")
+    st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)
 
 st.subheader('Graphic Analysis')
 plot_full_fig = plot_full(data)
