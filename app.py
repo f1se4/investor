@@ -26,6 +26,11 @@ plt.style.use("dark_background")
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+# Función para formatear valores con color
+def format_value(value):
+    color = "green" if value >= 0 else "red"
+    return f"<span style='color:{color}'>{value:.2f}</span>"
+
 def mostrar_informacion_general(ticker_data):
     info = {
         "Nombre": ticker_data.info.get('longName', 'N/A'),
@@ -673,7 +678,9 @@ with col1:
     plot_candlestick_3 = plot_candlestick(historical_data)
     st.pyplot(plot_candlestick_3)
 with col2:
-    st.write(f'Porcentaje de cambio en el precio: {price_change_percent:.2f}%')
+    # Mostrar valores en Streamlit usando st.markdown
+    st.markdown("### Last Values")
+    st.markdown(f"**Performance**: {format_value(price_change_percent)}%")
 
 st.subheader('Graphic Analysis')
 plot_full_fig = plot_full(data)
