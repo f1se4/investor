@@ -54,7 +54,7 @@ def dema(data, window):
 
 # Definir la función para graficar
 def plot_with_indicators(data):
-    fig, ax = plt.subplots(figsize=(14, 6))
+    fig, ax = plt.subplots(figsize=(14, 4))
     
     # Graficar el precio de cierre
     #ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
@@ -62,7 +62,7 @@ def plot_with_indicators(data):
     # Calcular y graficar la Repulsión Alisada
     repulsion_raw = repulsion_alisada(data['Close'], span=5)
     repulsion = normalize(repulsion_raw)
-    ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='--', alpha=0.8)
+    ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='-', alpha=0.8)
     
     # Calcular y graficar la TEMA
     tema_line_raw = tema(data['Close'], window=21)
@@ -73,6 +73,15 @@ def plot_with_indicators(data):
     dema_line_raw = dema(data['Close'], window=21)
     dema_line = normalize(dema_line_raw)
     ax.plot(data.index, dema_line, label='DEMA (21)', color='r', linestyle='--', alpha=0.8)
+
+    # Rellenar el área según las condiciones
+    ax.fill_between(data.index, repulsion, tema_line, 
+                    where=(repulsion > tema_line) & (repulsion> dema_line), 
+                    color='blue', alpha=0.3, interpolate=True)
+    
+    ax.fill_between(data.index, repulsion, tema_line, 
+                    where=(repulsion > tema_line) & (repulsion <= dema_line), 
+                    color='green', alpha=0.3, interpolate=True)
     
     # Configuraciones del gráfico
     ax.legend()
