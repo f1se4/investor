@@ -78,7 +78,7 @@ def dema(data, window):
 # Función para realizar forecasting con ARIMA
 def arima_forecasting(data, periods):
     # Ajustar el modelo ARIMA automáticamente
-    model = ARIMA(data, order=(1, 1, 1))  # Ejemplo con ARIMA(1,1,1)
+    model = ARIMA(data, order=(1, 2, 1))  # Ejemplo con ARIMA(1,1,1)
     fitted_model = model.fit()
     
     # Hacer las predicciones
