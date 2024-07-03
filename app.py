@@ -558,8 +558,8 @@ def plot_rendimiento(ticker):
     
     # Función para crear la figura de Plotly con los gráficos de velocímetro
     def create_gauge_fig(ticker):
-        periods = ['5d', '1mo', '6mo', '1y']
-        positions = [0, 1, 2, 3]
+        periods = ['5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', 'max']
+        positions = [(0, 0), (0, 1), (0, 2), (0, 3), (1, 0), (1, 1), (1, 2), (1, 3)]
         fig = go.Figure()
     
         for i, period in enumerate(periods):
@@ -586,12 +586,12 @@ def plot_rendimiento(ticker):
                             'value': 0
                         }
                     },
-                    domain = {'x': [positions[i]/4, (positions[i]+1)/4], 'y': [0, 1, 2, 3]}
+                    domain = {'row': positions[i][0], 'column': positions[i][1]}
                 ))
             else:
                 st.warning(f'No hay datos disponibles para el periodo: {period}')
     
-        fig.update_layout(height=250, width=1000, grid={'rows': 2, 'columns': 2, 'pattern': "independent"})
+        fig.update_layout(height=500, width=1000, grid={'rows': 2, 'columns': 4, 'pattern': "independent"})
     
         return fig
 
