@@ -534,6 +534,48 @@ def plot_arima(data, forecast_arima, forecast_periods):
     fig.tight_layout()
     return fig
 
+
+def plot_rendimiento(ticker):
+    # Función para obtener los datos de rendimiento
+    def get_performance_data(ticker, period):
+        stock = yf.Ticker(ticker)
+        data = stock.history(period=period)
+        return data
+    
+    # Obtener datos de rendimiento para ticker de ejemplo 'AAPL'
+    periods = ['1wk', '1mo', '6mo', '1y']
+    data = []
+    
+    # Obtener datos y manejar casos sin datos disponibles
+    for period in periods:
+        try:
+            data.append(get_performance_data(ticker, period))
+        except:
+            data.append(None)
+    
+    # Crear una fila para los gráficos de velocímetro
+    fig, axs = plt.subplots(1, 4, figsize=(16, 4), subplot_kw={'projection': 'polar'})
+    
+    # Rangos máximos para los gráficos de velocímetro
+    ranges = {
+        '1wk': (-10, 10),
+        '1mo': (-20, 20),
+        '6mo': (-50, 50),
+        '1y': (-100, 100)
+    }
+    
+    # Generar los gráficos de velocímetro
+    for i, period in enumerate(periods):
+        min_val, max_val = ranges[period]
+        if data[i] is not None and not data[i].empty:
+            performance = data[i]['Close'].pct_change().iloc[-1] * 100
+            plot_velocimeter(axs[i], performance, min_val, max_val, period)
+        else:
+            axs[i].set_title(f'No data ({period})', fontsize=12)
+            axs[i].set_axis_off()
+
+    return fig
+
 #########################################################################################
 #### LAYOUT - Sidebar
 #########################################################################################
@@ -593,8 +635,8 @@ today = datetime.today().strftime('%Y-%m-%d')
 two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
 historical_data = ticker_data.history(start=two_days_ago, end=today)
 
-dias_recientes = mostrar_grafico_precios(historical_data)
-st.pyplot(dias_recientes)
+rendimiento_plot = plot_rendimiento(stock)
+st.pyplot(rendimiento_plot)
 
 # Mostrar datos históricos
 st.subheader('Datos históricos de los últimos 2 días')
