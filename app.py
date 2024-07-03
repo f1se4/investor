@@ -568,7 +568,7 @@ with st.expander("Indicators"):
     """)
 
 # Integrar en la interfaz de Streamlit
-st.subheader('Chaikin Money Flow y Medias Móviles')
+st.subheader('Chaikin Money Flow & SMA')
 
 # Graficar CMF y Medias Móviles
 fig_cmf_ma = plot_cmf_with_moving_averages(data)
@@ -595,41 +595,43 @@ with st.expander("Volatility"):
 # Mostrar datos históricos y predicción en la interfaz
 st.subheader('ForeCasting')
 
-
-
-# Configurar dos columnas en Streamlit
-col1, col2 = st.columns([1, 1])
-
-# Columna 1: number_input para los períodos
-with col1:
-    periods = st.number_input("Periods:", value=10, min_value=1, step=1)
-
-# Columna 2: st.radio para seleccionar el modelo de forecasting
-with col2:
-    modelos = ["ARIMA", "Holt-Winters", "LSTM"]
-    modelo_seleccionado = st.radio("Forecasting Model:", modelos)
-
-if modelo_seleccionado == 'ARIMA':
-    # Realizar forecasting con ARIMA
-    forecast_arima = arima_forecasting(data['Close'], periods)
-    arima_plot = plot_arima(data, forecast_arima, periods)
-    st.pyplot(arima_plot)
-elif modelo_seleccionado == 'Holt-Winters':
-    # Crear el modelo Holt-Winters
-    model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
-    fitted_model = model.fit()
+if (end_time - start_time).days >= 35:
     
-    # Hacer la predicción para los próximos 5 días
-    forecast = fitted_model.forecast(periods)
+    # Configurar dos columnas en Streamlit
+    col1, col2 = st.columns([1, 1])
     
-    st.write(f"Forecasting {periods} days for Model {modelo_seleccionado}")
-    forecast_df = pd.DataFrame(forecast, columns=['forecast_values'])
-    forecast_df['Date'] = pd.to_datetime(pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=len(forecast_df)))
-    forecast_df.set_index('Date', inplace=True)
-    # Mostrar gráficos de datos históricos y predicción
-    forecast_plot = plot_forecast_hw(data, forecast_df)
-    st.pyplot(forecast_plot)
-    st.dataframe(forecast_df)
-
+    # Columna 1: number_input para los períodos
+    with col1:
+        periods = st.number_input("Periods:", value=10, min_value=1, step=1)
+    
+    # Columna 2: st.radio para seleccionar el modelo de forecasting
+    with col2:
+        modelos = ["ARIMA", "Holt-Winters", "LSTM"]
+        modelo_seleccionado = st.radio("Forecasting Model:", modelos)
+    
+    if modelo_seleccionado == 'ARIMA':
+        # Realizar forecasting con ARIMA
+        forecast_arima = arima_forecasting(data['Close'], periods)
+        arima_plot = plot_arima(data, forecast_arima, periods)
+        st.pyplot(arima_plot)
+    elif modelo_seleccionado == 'Holt-Winters':
+        # Crear el modelo Holt-Winters
+        model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
+        fitted_model = model.fit()
+        
+        # Hacer la predicción para los próximos 5 días
+        forecast = fitted_model.forecast(periods)
+        
+        st.write(f"Forecasting {periods} days for Model {modelo_seleccionado}")
+        forecast_df = pd.DataFrame(forecast, columns=['forecast_values'])
+        forecast_df['Date'] = pd.to_datetime(pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=len(forecast_df)))
+        forecast_df.set_index('Date', inplace=True)
+        # Mostrar gráficos de datos históricos y predicción
+        forecast_plot = plot_forecast_hw(data, forecast_df)
+        st.pyplot(forecast_plot)
+        st.dataframe(forecast_df)
+else:
+    st.write("For an optimal forecasting you need at least 35 days")
+    
 st.subheader('Raw Data')
 st.dataframe(data)
