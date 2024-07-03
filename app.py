@@ -12,6 +12,9 @@ from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 #from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import seaborn as sns
+# Configuración de estilo para gráficos
+#sns.set(style="whitegrid")
 
 st.set_page_config(layout="wide")
 
@@ -388,6 +391,22 @@ def plot_full(data):
 
     return fig
 
+def mostrar_grafico_precios(historical_data):
+    # Crear figura y ejes para el gráfico
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Graficar precios de cierre
+    ax.plot(historical_data.index, historical_data['Close'], marker='o', linestyle='-', color='b', label='Precio de cierre')
+
+    # Añadir etiquetas y título
+    ax.set_xlabel('Fecha')
+    ax.set_ylabel('Precio de cierre')
+    ax.set_title('Precio de cierre en los últimos 2 días')
+    ax.legend()
+
+    # Mostrar el gráfico en Streamlit
+    return fig
+
 def plot_indicators(data):
     plt.rcParams.update({'font.size': 10})
     levels = get_levels(data)
@@ -573,6 +592,9 @@ with st.expander(""):
 today = datetime.today().strftime('%Y-%m-%d')
 two_days_ago = (datetime.today() - timedelta(days=2)).strftime('%Y-%m-%d')
 historical_data = ticker_data.history(start=two_days_ago, end=today)
+
+dias_recientes = mostrar_grafico_precios(historical_data)
+st.pyplot(dias_recientes)
 
 # Mostrar datos históricos
 st.subheader('Datos históricos de los últimos 2 días')
