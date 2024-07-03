@@ -591,7 +591,7 @@ def plot_rendimiento(ticker):
             else:
                 st.warning(f'No hay datos disponibles para el periodo: {period}')
     
-        fig.update_layout(height=250, width=1000, grid={'rows': 1, 'columns': 4, 'pattern': "independent"})
+        fig.update_layout(height=250, width=1000, grid={'rows': 2, 'columns': 4, 'pattern': "independent"})
     
         return fig
 
