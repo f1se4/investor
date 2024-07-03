@@ -9,17 +9,9 @@ import numpy as np
 import mplfinance as mpf
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.arima.model import ARIMAResults
+#from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-
-#from alpha_vantage.timeseries import TimeSeries
-
-# # Librería tiempo real
-# import finnhub
-# api_key = 'cq266u1r01ql95ncj820cq266u1r01ql95ncj82g'
-# finnhub_client = finnhub.Client(api_key=api_key)
-
-#API_KEY = 'TVOT6OCQEK98JBTR'
+from pmdarima.arima import auto_arima
 
 st.set_page_config(layout="wide")
 
@@ -110,43 +102,6 @@ def arima_forecasting(data, periods):
     
     return forecast
 
-# Función para obtener los datos en tiempo real desde Alpha Vantage
-# def get_realtime_data(symbol, interval='1min', outputsize='compact'):
-#     try:
-#         ts = TimeSeries(key=API_KEY, output_format='pandas')
-#         data, meta_data = ts.get_intraday(symbol=symbol, interval=interval, outputsize=outputsize)
-#         return data
-#     except ValueError as e:
-#         st.error(f"Error al obtener datos: {e}")
-#         return None
-#
-# # Función para plotear el gráfico en tiempo real
-# def plot_realtime_graph(symbol):
-#     data = get_realtime_data(symbol)
-#     if data is not None:
-#         fig, ax = plt.subplots(figsize=(14, 6))
-#         ax.plot(data.index, data['4. close'], label='Close Price', color='dodgerblue')
-#         ax.set_xlabel('Time')
-#         ax.set_ylabel('Price')
-#         ax.set_title(f'Intraday Price Chart for {symbol}')
-#         ax.legend()
-#         st.pyplot(fig)
-#
-# # Función para plotear gráfico en tiempo real
-# def plot_realtime_graph(symbol):
-#     res = get_realtime_data(symbol)
-#     timestamps = [datetime.datetime.fromtimestamp(ts) for ts in res['t']]
-#     close_prices = res['c']
-#
-#     plt.figure(figsize=(12, 6))
-#     plt.plot(timestamps, close_prices, label=f'Precio de cierre - {symbol}')
-#     plt.xlabel('Tiempo')
-#     plt.ylabel('Precio')
-#     plt.title(f'Gráfico de precios en tiempo real para {symbol}')
-#     plt.legend()
-#     plt.grid(True)
-#     st.pyplot()
-#
 def forecast_next_days(data, num_days=5):
     # Utilizar la columna 'Close' para el modelo AR
     close_series = data['Close']
@@ -202,16 +157,6 @@ def plot_volume(data):
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
     return fig
-
-# # Función para obtener datos en tiempo real desde Finnhub
-# def get_realtime_data(symbol, resolution='1', count=50):
-#     # Obtener la fecha y hora actual
-#     to_time = int(datetime.datetime.now().timestamp())
-#     # Calcular el tiempo inicial restando 'count' veces 'resolution' segundos a la fecha y hora actual
-#     from_time = to_time - count * int(resolution)
-#     res = finnhub_client.stock_candles(symbol=symbol, resolution=resolution, _from=from_time, to=to_time)
-#
-#     return res
 
 def get_company_name(ticker):
     # Crear un objeto ticker con yfinance
@@ -276,10 +221,6 @@ def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=2
     ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
     ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
     
-    # Graficar Medias Móviles
-    # ax.plot(data.index, ma1, label=f'SMA({ma_period1})', color='dodgerblue')
-    # ax.plot(data.index, ma2, label=f'SMA({ma_period2})', color='green')
-
     # Graficar Medias Móviles Normalizadas
     ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
     ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
