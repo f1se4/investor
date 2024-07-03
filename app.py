@@ -31,6 +31,50 @@ plt.style.use("dark_background")
 ###########################
 #### Funciones Principales
 ###########################
+# Función para calcular la Repulsión Alisada (similar a una EMA)
+def repulsion_alisada(data, span):
+    return data.ewm(span=span, adjust=False).mean()
+
+# Función para calcular la TEMA
+def tema(data, window):
+    ema1 = data.ewm(span=window, adjust=False).mean()
+    ema2 = ema1.ewm(span=window, adjust=False).mean()
+    ema3 = ema2.ewm(span=window, adjust=False).mean()
+    return 3 * (ema1 - ema2) + ema3
+
+# Función para calcular la DEMA
+def dema(data, window):
+    ema1 = data.ewm(span=window, adjust=False).mean()
+    ema2 = ema1.ewm(span=window, adjust=False).mean()
+    return 2 * ema1 - ema2
+
+# Definir la función para graficar
+def plot_with_indicators(data):
+    fig, ax = plt.subplots(figsize=(14, 6))
+    
+    # Graficar el precio de cierre
+    ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
+    
+    # Calcular y graficar la Repulsión Alisada
+    repulsion = repulsion_alisada(data['Close'], span=5)
+    ax.plot(data.index, repulsion, label='Repulsión Alisada (5 sesiones)', color='green', linestyle='--', alpha=0.8)
+    
+    # Calcular y graficar la TEMA
+    tema_line = tema(data['Close'], window=21)
+    ax.plot(data.index, tema_line, label='TEMA (21 sesiones)', color='red', linestyle='--', alpha=0.8)
+    
+    # Calcular y graficar la DEMA
+    dema_line = dema(data['Close'], window=21)
+    ax.plot(data.index, dema_line, label='DEMA (21 sesiones)', color='orange', linestyle='--', alpha=0.8)
+    
+    # Configuraciones del gráfico
+    ax.legend()
+    ax.grid(True)
+    ax.set_title('Indicadores: Repulsión Alisada, TEMA y DEMA')
+    plt.xticks(rotation=45, ha='right')
+    fig.tight_layout()
+    return fig
+
 # Función para realizar forecasting con ARIMA
 def arima_forecasting(data, periods):
     # Ajustar el modelo ARIMA automáticamente
@@ -548,6 +592,8 @@ with st.expander("Volumen"):
       - Se utiliza para evaluar la liquidez del mercado y la intensidad de las transacciones.
     """)
 
+plot_ind_sintetico = plot_with_indicators(data)
+st.pyplot(plot_ind_sintetico)
 
 plot_indicator = plot_indicators(data)
 st.pyplot(plot_indicator)
