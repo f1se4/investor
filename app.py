@@ -35,6 +35,10 @@ plt.style.use("dark_background")
 def repulsion_alisada(data, span):
     return data.ewm(span=span, adjust=False).mean()
 
+# Función para normalizar una serie
+def normalize(series):
+    return (series - series.min()) / (series.max() - series.min())
+
 # Función para calcular la TEMA
 def tema(data, window):
     ema1 = data.ewm(span=window, adjust=False).mean()
@@ -56,15 +60,18 @@ def plot_with_indicators(data):
     #ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
     
     # Calcular y graficar la Repulsión Alisada
-    repulsion = repulsion_alisada(data['Close'], span=5)
+    repulsion_raw = repulsion_alisada(data['Close'], span=5)
+    repulsion = normalize(repulsion_raw)
     ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='--', alpha=0.8)
     
     # Calcular y graficar la TEMA
-    tema_line = tema(data['Close'], window=21)
+    tema_line_raw = tema(data['Close'], window=21)
+    tema_line = normalize(tema_line_raw)
     ax.plot(data.index, tema_line, label='TEMA (21)', color='orange', linestyle='--', alpha=0.8)
     
     # Calcular y graficar la DEMA
-    dema_line = dema(data['Close'], window=21)
+    dema_line_raw = dema(data['Close'], window=21)
+    dema_line = normalize(dema_line_raw)
     ax.plot(data.index, dema_line, label='DEMA (21)', color='r', linestyle='--', alpha=0.8)
     
     # Configuraciones del gráfico
@@ -91,13 +98,6 @@ def arima_forecasting(data, periods):
     
     return forecast
 
-# Función para realizar forecasting con auto_arima
-def auto_arima_forecasting(data, periods):
-    from pmdarima.arima import auto_arima
-    model = auto_arima(data, seasonal=False, suppress_warnings=True)
-    forecast = model.predict(n_periods=periods)
-    
-    return forecast
 # Función para obtener los datos en tiempo real desde Alpha Vantage
 # def get_realtime_data(symbol, interval='1min', outputsize='compact'):
 #     try:
