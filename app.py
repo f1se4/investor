@@ -12,7 +12,6 @@ from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 #from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from pmdarima.arima import auto_arima
 
 st.set_page_config(layout="wide")
 
@@ -515,11 +514,11 @@ with st.sidebar:
     stock = selected_option.split(' - ')[0]
     start_time = st.date_input(
                     "Fecha de Inicio",
-                    datetime.date.today() - datetime.timedelta(days=182),
+                    datetime.today() - timedelta(days=182),
                     format="DD/MM/YYYY")
     end_time = st.date_input(
                     "Fecha Final",
-                    datetime.date.today(),
+                    datetime.today(),
                     format="DD/MM/YYYY")
 
     st.header("Help")
