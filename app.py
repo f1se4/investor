@@ -552,7 +552,7 @@ def plot_xgboost_forecast(data, periods):
     data['Day'] = data['Date'].dt.day
 
     # Variable objetivo (por ejemplo, Adj Close)
-    y = data['Adj Close']
+    y = data['Close']
 
     # Variables predictoras (ejemplo básico)
     X = data[['Year', 'Month', 'Day']]
