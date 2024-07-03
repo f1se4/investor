@@ -12,9 +12,7 @@ from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 #from statsmodels.tsa.arima.model import ARIMAResults
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-import seaborn as sns
-# Configuración de estilo para gráficos
-#sns.set(style="whitegrid")
+import plotly.graph_objects as go
 
 st.set_page_config(layout="wide")
 
@@ -535,70 +533,60 @@ def plot_arima(data, forecast_arima, forecast_periods):
     return fig
 
 def plot_rendimiento(ticker):
-    def plot_velocimeter(ax, value, min_value, max_value, title):
-        ax.set_theta_offset(np.pi / 2)
-        ax.set_theta_direction(-1)
-    
-        # Valores para los extremos del velocímetro
-        theta = np.linspace(0, 2 * np.pi, 100)
-        r = np.linspace(0, 1, 100)
-    
-        # Sombreado del área
-        ax.fill_between(theta, min_value, max_value, color='lightgray')
-    
-        # Área correspondiente al valor
-        ax.fill_between(theta, min_value, value, color='deepskyblue')
-    
-        # Línea indicadora del valor
-        theta_value = value / (max_value - min_value) * 2 * np.pi  # Convertir a ángulo
-        ax.plot([0, theta_value], [0, value], color='blue', linewidth=1.5)
-    
-        # Configuración de la gráfica
-        ax.set_ylim(min_value, max_value)
-        ax.set_title(title, fontsize=12)
-        ax.set_yticklabels([])
-        ax.set_xticklabels([])
-        ax.grid(False)
-
-    # Función para obtener los datos de rendimiento
-    def get_performance_data(ticker, period):
+    # Función para obtener el rendimiento en porcentaje
+    def get_performance(ticker, period):
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)
-        return data
+        if data.empty or len(data) < 2:
+            return None
+        
+        # Calcular el rendimiento porcentual
+        start_price = data['Close'].iloc[0]
+        end_price = data['Close'].iloc[-1]
+        performance = (end_price - start_price) / start_price * 100
+        
+        return performance
     
-    # Obtener datos de rendimiento para ticker de ejemplo 'AAPL'
-    periods = ['1wk', '1mo', '6mo', '1y']
-    data = []
+    # Función para crear la figura de Plotly con los gráficos de velocímetro
+    def create_gauge_fig(ticker):
+        periods = ['1wk', '1mo', '6mo', '1y']
+        fig = go.Figure()
     
-    # Obtener datos y manejar casos sin datos disponibles
-    for period in periods:
-        try:
-            data.append(get_performance_data(ticker, period))
-        except:
-            data.append(None)
+        for period in periods:
+            performance = get_performance(ticker, period)
+            if performance is not None:
+                if performance < 0:
+                    color = 'darkred'
+                else:
+                    color = 'darkblue'
+                
+                fig.add_trace(go.Indicator(
+                    mode = "gauge+number",
+                    value = performance,
+                    domain = {'x': [0, 1], 'y': [0, 1]},
+                    title = {'text': f"Rendimiento - {period}"},
+                    gauge = {
+                        'axis': {'range': [-100, 100]},
+                        'bar': {'color': color},
+                        'steps': [
+                            {'range': [-100, 0], 'color': 'lightgray'},
+                            {'range': [0, 100], 'color': 'lightgreen'}
+                        ],
+                        'threshold': {
+                            'line': {'color': 'red', 'width': 4},
+                            'thickness': 0.75,
+                            'value': 0
+                        }
+                    }
+                ))
+            else:
+                st.warning(f'No hay datos disponibles para el periodo: {period}')
     
-    # Crear una fila para los gráficos de velocímetro
-    fig, axs = plt.subplots(1, 4, figsize=(16, 4), subplot_kw={'projection': 'polar'})
+        fig.update_layout(height=250, width=1000)
     
-    # Rangos máximos para los gráficos de velocímetro
-    ranges = {
-        '1wk': (-10, 10),
-        '1mo': (-20, 20),
-        '6mo': (-50, 50),
-        '1y': (-100, 100)
-    }
-    
-    # Generar los gráficos de velocímetro
-    for i, period in enumerate(periods):
-        min_val, max_val = ranges[period]
-        if data[i] is not None and not data[i].empty:
-            performance = data[i]['Close'].pct_change().iloc[-1] * 100
-            plot_velocimeter(axs[i], performance, min_val, max_val, period)
-        else:
-            axs[i].set_title(f'No data ({period})', fontsize=12)
-            axs[i].set_axis_off()
+        return fig
 
-    return fig
+    return create_gauge_fig(ticker)
 
 #########################################################################################
 #### LAYOUT - Sidebar
