@@ -563,6 +563,9 @@ def plot_xgboost_forecast(data, periods):
 
     # Obtener la última fecha en los datos históricos
     ultima_fecha = data.index[-1]
+    ultimo_valor = data.loc[-1]['Close']
+
+    df_resultados = pd.DataFrame({'Fecha': ultima_fecha, 'Prediccion': ultimo_valor})
 
     # Crear un DataFrame con las fechas futuras para predecir
     fechas_futuras = pd.date_range(start=ultima_fecha + timedelta(days=1), periods=periods, freq='D')
