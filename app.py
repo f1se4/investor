@@ -118,11 +118,11 @@ def main():
         if checkbox1:
             # Plot synthetic indicators
             plot_ind_sintetico = plot_with_indicators(data)
-            st.pyplot(plot_ind_sintetico)
+            st.plotly_chart(plot_ind_sintetico)
 
         if checkbox2:
             plot_indicator = plot_indicators(data)
-            st.pyplot(plot_indicator)
+            st.plotly_chart(plot_indicator)
             with st.expander("Indicators"):
                 st.markdown("""
                 - **RSI (Relative Strength Index):**
@@ -142,7 +142,7 @@ def main():
         if checkbox3:
             # Chaikin Money Flow & SMA
             fig_cmf_ma = plot_cmf_with_moving_averages(data)
-            st.pyplot(fig_cmf_ma)
+            st.plotly_chart(fig_cmf_ma)
             with st.expander('CMF'):
                 st.markdown('''
             El **Chaikin Money** Flow (CMF) es un indicador técnico utilizado en el análisis financiero para medir la acumulación o distribución de un activo, basado en el volumen y el precio.
@@ -161,7 +161,7 @@ def main():
             df_ret = daily_returns(data)
             df_vol = returns_vol(df_ret)
             plot_vol = plot_volatility(df_vol)
-            st.pyplot(plot_vol)
+            st.plotly_chart(plot_vol)
             with st.expander("Volatility"):
                 st.markdown("""
                 Este gráfico muestra los retornos diarios logarítmicos del precio de cierre del activo y la volatilidad asociada.

@@ -485,3 +485,86 @@ def plot_rendimiento(ticker):
         return fig
 
     return create_gauge_fig(ticker)
+
+def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True)
+
+    # Calcular CMF
+    cmf = calculate_cmf(data, period=cmf_period)
+    norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
+    
+    # Calcular Medias Móviles
+    ma1 = calculate_moving_average(data, window=ma_period1)
+    ma2 = calculate_moving_average(data, window=ma_period2)
+
+    # Normalizar Medias Móviles al rango [0, 1]
+    norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
+    norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
+
+    # Graficar CMF
+    fig.add_trace(go.Bar(x=data.index, y=norm_cmf, marker_color=np.where(cmf >= 0, 'green', 'red'), opacity=0.3, name='CFD(8)'))
+    
+    # Graficar Medias Móviles Normalizadas
+    fig.add_trace(go.Scatter(x=data.index, y=norm_ma1, name=f'SMA {ma_period1}', line=dict(color='dodgerblue')))
+    fig.add_trace(go.Scatter(x=data.index, y=norm_ma2, name=f'SMA {ma_period2}', line=dict(color='rosybrown')))
+
+    # Personalizar el gráfico
+    fig.update_layout(showlegend=True, barmode='overlay', xaxis_rangeslider_visible=False)
+    
+    return fig
+
+def plot_with_indicators(data):
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True)
+
+    # Calcular y graficar la Repulsión Alisada
+    repulsion = repulsion_alisada(data['Close'], span=5)
+    fig.add_trace(go.Scatter(x=data.index, y=repulsion, name='Repulsión Alisada (5)', line=dict(color='dodgerblue')))
+
+    # Calcular y graficar la TEMA
+    tema_line = tema(data['Close'], window=21)
+    fig.add_trace(go.Scatter(x=data.index, y=tema_line, name='TEMA (21)', line=dict(color='orange', dash='dash')))
+
+    # Calcular y graficar la DEMA
+    dema_line = dema(data['Close'], window=21)
+    fig.add_trace(go.Scatter(x=data.index, y=dema_line, name='DEMA (21)', line=dict(color='red', dash='dash')))
+
+    # Rellenar el área según las condiciones
+    fig.add_trace(go.Scatter(x=data.index, y=repulsion, fill='tonexty', name='Área Azul', fillcolor='rgba(0,0,255,0.3)'))
+    
+    return fig
+
+def plot_indicators(data):
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1)
+
+    # Plot RSI
+    rsi = calculate_rsi(data)
+    fig.add_trace(go.Scatter(x=data.index, y=rsi, name='RSI', line=dict(color='orange')), row=1, col=1)
+    fig.add_trace(go.Scatter(x=[data.index[0], data.index[-1]], y=[70, 70], mode='lines', line=dict(color='red', dash='dash')), row=1, col=1)
+    fig.add_trace(go.Scatter(x=[data.index[0], data.index[-1]], y=[30, 30], mode='lines', line=dict(color='green', dash='dash')), row=1, col=1)
+
+    # Plot MACD
+    macd_line, signal_line = calculate_macd(data)
+    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD', line=dict(color='dodgerblue')), row=2, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=signal_line, name='Signal', line=dict(color='magenta', dash='dash')), row=2, col=1)
+
+    # Plot Histograma del MACD
+    macd_histogram = macd_line - signal_line
+    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=2, col=1)
+
+    return fig
+
+def plot_volatility(df_vol):
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True)
+
+    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol.returns, name='Returns', line=dict(color='dodgerblue')))
+    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol.volatility, name='Volatility', line=dict(color='darkorange')))
+
+    max_vol = df_vol['volatility'].max()
+    min_vol = df_vol['volatility'].min()
+    idx_max = df_vol['volatility'].idxmax()
+    idx_min = df_vol['volatility'].idxmin()
+
+    fig.add_annotation(x=idx_max, y=max_vol, text=f'{max_vol:.3f}', showarrow=True, arrowhead=1)
+    fig.add_annotation(x=idx_min, y=min_vol, text=f'{min_vol:.3f}', showarrow=True, arrowhead=1)
+
+    return fig
