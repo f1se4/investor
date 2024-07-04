@@ -279,7 +279,7 @@ def plot_indicators(data):
 
 def plot_volatility(df_vol):
     df_plot = df_vol.copy()
-    fig = plt.figure(figsize=(12,6))
+    fig = plt.figure(figsize=(12,3))
     plt.plot(df_plot.index, df_plot.returns, color='dodgerblue', linewidth=0.5, alpha=0.6)
     plt.plot(df_plot.index, df_plot.volatility, color='darkorange', linewidth=1)
     plt.ylabel('')

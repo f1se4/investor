@@ -81,7 +81,7 @@ def main():
         st.markdown(f"**Shadow Market**: {format_value(open_close)}", unsafe_allow_html=True)
 
     # Graphic Analysis section
-    st.subheader('Graphic Analysis')
+    st.subheader('Graphical Analysis (Selected Period)')
     selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
     if selected_graph == 'Line':
         plot_full_fig = plot_price_and_volume(data)
@@ -99,16 +99,16 @@ def main():
     
     # Agregar una casilla de verificación en cada columna
     with col1:
-        checkbox1 = st.checkbox('Paddle Traders')
+        checkbox1 = st.checkbox('Paddle Traders', value=True)
     
     with col2:
-        checkbox2 = st.checkbox('RSI/MACD')
+        checkbox2 = st.checkbox('RSI/MACD', value=True)
     
     with col3:
-        checkbox3 = st.checkbox('CMF & SMA')
+        checkbox3 = st.checkbox('CMF & SMA', value=True)
 
     with col4:
-        checkbox4 = st.checkbox('Volatility & Daily Returns')
+        checkbox4 = st.checkbox('Volatility & Daily Returns', value=True)
 
     # with col5:
     #     checkbox5 = st.checkbox('Opción 5')
@@ -139,7 +139,6 @@ def main():
 
     if checkbox3:
         # Chaikin Money Flow & SMA
-        st.subheader('Chaikin Money Flow & SMA')
         fig_cmf_ma = plot_cmf_with_moving_averages(data)
         st.pyplot(fig_cmf_ma)
         with st.expander('CMF'):
@@ -157,7 +156,6 @@ def main():
 
     if checkbox4:
         # Daily Returns & Volatility
-        st.subheader('Daily Returns & Volatility')
         df_ret = daily_returns(data)
         df_vol = returns_vol(df_ret)
         plot_vol = plot_volatility(df_vol)
@@ -211,8 +209,10 @@ def main():
     else:
         st.write("For an optimal forecasting you need at least 35 days")
     
+    st.divider()
+
     # Display raw data
-    with st.expander('Raw Data'):
+    with st.expander('YFinance Raw Data'):
         st.dataframe(data)
 
 if __name__ == '__main__':
