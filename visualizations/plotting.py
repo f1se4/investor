@@ -90,6 +90,97 @@ def plot_volume(data_in):
 
     return fig
 
+def plot_price_and_volume(data_in):
+    data = data_in.copy()
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
+
+    # Crear un objeto de figura de Plotly con subplots
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[2, 1])  # 3 filas, 1 columna
+    # row_heights=[2, 1] significa que la primera fila (precio) será 2 veces más alta que la segunda fila (volumen)
+
+    # Añadir el gráfico del precio (arriba)
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
+
+    # Añadir texto de máximo y mínimo para el gráfico de precios
+    max_price = data['Close'].max()
+    min_price = data['Close'].min()
+    idx_max = data['Close'].idxmax()
+    idx_min = data['Close'].idxmin()
+    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
+    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
+
+    # Añadir el gráfico de volumen (abajo)
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    # Configuraciones de ejes para cada subplot
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+
+    return fig
+
+import pandas as pd
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
+def plot_price_and_volume(data_in):
+    data = data_in.copy()
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
+
+    # Crear un objeto de figura de Plotly con subplots
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.3, row_heights=[0.7, 0.3])  # 2 filas, 1 columna
+    # row_heights=[0.7, 0.3] significa que la primera fila (precio) será 0.7 veces más alta que la segunda fila (volumen)
+
+    # Añadir el gráfico del precio (arriba)
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
+
+    # Añadir texto de máximo y mínimo para el gráfico de precios
+    max_price = data['Close'].max()
+    min_price = data['Close'].min()
+    idx_max = data['Close'].idxmax()
+    idx_min = data['Close'].idxmin()
+    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
+    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
+
+    # Añadir el gráfico de volumen (abajo)
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    # Configuraciones de ejes para cada subplot
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+
+    return fig
+
+
 def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
     fig, ax = plt.subplots(figsize=(14, 4))
     

@@ -14,7 +14,8 @@ from calculations.calculations import (
 from visualizations.plotting import (
     plot_forecast_hw, plot_volume, plot_cmf_with_moving_averages,
     plot_with_indicators, plot_candlestick, plot_full, plot_indicators,
-    plot_volatility, plot_ma, plot_arima, plot_xgboost_forecast, plot_rendimiento
+    plot_volatility, plot_ma, plot_arima, plot_xgboost_forecast, plot_rendimiento,
+    plot_price_and_volume
 )
 from layout.sidebar import configure_sidebar
 
@@ -84,7 +85,7 @@ def main():
     st.subheader('Graphic Analysis')
     selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
     if selected_graph == 'Line':
-        plot_full_fig = plot_full(data)
+        plot_full_fig = plot_price_and_volume(data)
         st.plotly_chart(plot_full_fig)
     elif selected_graph == 'Candle/Velas':
         plot_candlestick_fig = plot_candlestick(data)
