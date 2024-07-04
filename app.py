@@ -99,16 +99,16 @@ def main():
     
     # Agregar una casilla de verificación en cada columna
     with col1:
-        checkbox1 = st.checkbox('Paddle Traders', value=True)
+        checkbox1 = st.checkbox('Paddle Traders')
     
     with col2:
-        checkbox2 = st.checkbox('RSI/MACD', value=True)
+        checkbox2 = st.checkbox('RSI/MACD')
     
     with col3:
-        checkbox3 = st.checkbox('CMF & SMA', value=True)
+        checkbox3 = st.checkbox('CMF & SMA')
 
     with col4:
-        checkbox4 = st.checkbox('Volatility & Daily Returns', value=True)
+        checkbox4 = st.checkbox('Volatility & Daily Returns')
 
     # with col5:
     #     checkbox5 = st.checkbox('Opción 5')

@@ -293,7 +293,7 @@ def plot_volatility(df_vol):
     return fig
 
 
-def plot_ma(data_in):
+def plot_ma(data_in, check_list):
     data = data_in.copy()
     # Convertir el índice a datetime si es necesario
     if isinstance(data.index, pd.DatetimeIndex):
@@ -307,20 +307,25 @@ def plot_ma(data_in):
     data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()
 
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
-
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Real', line=dict(color='dodgerblue', width=1)), row=1, col=1)
-    fig.add_trace(go.Scatter(x=data.index, y=data['MA_20'], mode='lines', name='MA 20', line=dict(color='orange', width=2)), row=1, col=1)
-    fig.add_trace(go.Scatter(x=data.index, y=data['MA_50'], mode='lines', name='MA 50', line=dict(color='green', width=2)), row=1, col=1)
-    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_10'], mode='lines', name='EMA 10', line=dict(color='green', width=2)), row=1, col=1)
+    
+    if check_list[0]:
+        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Real', line=dict(color='dodgerblue', width=1)), row=1, col=1)
+    if check_list[2]:
+        fig.add_trace(go.Scatter(x=data.index, y=data['MA_20'], mode='lines', name='MA 20', line=dict(color='orange', width=2)), row=1, col=1)
+    if check_list[3]:
+        fig.add_trace(go.Scatter(x=data.index, y=data['MA_50'], mode='lines', name='MA 50', line=dict(color='green', width=2)), row=1, col=1)
+    if check_list[4]:
+        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_10'], mode='lines', name='EMA 10', line=dict(color='green', width=2)), row=1, col=1)
 
     # Calcular Holt-Winters - Aditivo
-    try:
-        model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
-        fitted = model.fit()
-        data['Holt_Winters'] = fitted.fittedvalues
-        fig.add_trace(go.Scatter(x=data.index, y=data['Holt_Winters'], mode='lines', name='Holt-Winters', line=dict(color='magenta', width=2)), row=1, col=1)
-    except:
-        print('error')
+    if check_list[1]:
+        try:
+            model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
+            fitted = model.fit()
+            data['Holt_Winters'] = fitted.fittedvalues
+            fig.add_trace(go.Scatter(x=data.index, y=data['Holt_Winters'], mode='lines', name='Holt-Winters', line=dict(color='magenta', width=2)), row=1, col=1)
+        except:
+            print('error')
 
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
