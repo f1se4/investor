@@ -10,6 +10,8 @@ import plotly.graph_objects as go
 import xgboost as xgb
 from datetime import timedelta
 import plotly.tools as tls
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from calculations.calculations import repulsion_alisada, tema, dema, calculate_cmf, calculate_moving_average, normalize_sma_to_range, normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels
 
@@ -204,6 +206,40 @@ def plot_full(data):
     plotly_fig = tls.mpl_to_plotly(fig)
 
     return plotly_fig
+
+def plot_full(data):
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
+
+    # Crear un objeto de figura de Plotly con subplots
+    fig = make_subplots(rows=1, cols=1)
+
+    # Añadir el gráfico del precio
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)))
+
+    # Añadir texto de máximo y mínimo
+    max_price = data['Close'].max()
+    min_price = data['Close'].min()
+    idx_max = data['Close'].idxmax()
+    idx_min = data['Close'].idxmin()
+
+    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40)
+    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40)
+
+    # Configuraciones de diseño y estilo
+    fig.update_layout(
+        title='Gráfico interactivo de Precio de Cierre',
+        #xaxis=dict(title='Fecha'),
+        #yaxis=dict(title='Precio de Cierre'),
+        hovermode='x',  # Activar el modo hover
+        #showlegend=True,
+        plot_bgcolor='white',
+        margin=dict(l=0, r=0, t=50, b=0),  # Ajustar márgenes
+        height=600,  # Altura del gráfico
+    )
+
+    return fig
 
 def mostrar_grafico_precios(historical_data):
     # Crear figura y ejes para el gráfico

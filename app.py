@@ -83,7 +83,7 @@ def main():
     # Graphic Analysis section
     st.subheader('Graphic Analysis')
     plot_full_fig = plot_full(data)
-    st.pyplot(plot_full_fig)
+    st.plotly_chart(plot_full_fig)
 
     plot_candlestick_fig = plot_candlestick(data)
     st.pyplot(plot_candlestick_fig)
