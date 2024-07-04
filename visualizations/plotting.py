@@ -134,164 +134,163 @@ def plot_candlestick(data_in, range_slide=False, tools=True):
 
     return fig
 
-def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
-    fig, ax = plt.subplots(figsize=(14, 4))
-    
-    # Calcular CMF
-    cmf = calculate_cmf(data, period=cmf_period)
-    norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
-    
-    # Calcular Medias Móviles
-    ma1 = calculate_moving_average(data, window=ma_period1)
-    ma2 = calculate_moving_average(data, window=ma_period2)
-
-    # Normalizar Medias Móviles al rango [0, 1]
-    norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
-    norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
-
-    
-    # Graficar CMF
-    ax.bar(data.index, norm_cmf, width=1.5, color=np.where(cmf >= 0, 'green', 'red'), alpha=0.3, label ='CFD(8)')
-    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
-    ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
-    
-    # Graficar Medias Móviles Normalizadas
-    ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
-    ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
-    
-    # Personalizar el gráfico
-    ax.legend(loc='best')
-    ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    plt.xticks(rotation=45, ha='right')
-    fig.tight_layout()
-    
-    return fig
-
-def plot_with_indicators(data):
-    fig, ax = plt.subplots(figsize=(14, 4))
-    
-    # Graficar el precio de cierre
-    #ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
-    
-    # Calcular y graficar la Repulsión Alisada
-    repulsion = repulsion_alisada(data['Close'], span=5)
-    #repulsion_raw = repulsion_alisada(data['Close'], span=5)
-    #repulsion = normalize(repulsion_raw)
-    ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='-', alpha=0.8)
-    
-    # Calcular y graficar la TEMA
-    #tema_line_raw = tema(data['Close'], window=21)
-    tema_line = tema(data['Close'], window=21)
-    #tema_line = normalize(tema_line_raw)
-    ax.plot(data.index, tema_line, label='TEMA (21)', color='orange', linestyle='--', alpha=0.8)
-    
-    # Calcular y graficar la DEMA
-    #dema_line_raw = dema(data['Close'], window=21)
-    dema_line = dema(data['Close'], window=21)
-    #dema_line = normalize(dema_line_raw)
-    ax.plot(data.index, dema_line, label='DEMA (21)', color='r', linestyle='--', alpha=0.8)
-
-    # Rellenar el área según las condiciones
-    ax.fill_between(data.index, repulsion, tema_line, 
-                    where=(repulsion > tema_line) & (repulsion> dema_line), 
-                    color='blue', alpha=0.3, interpolate=True)
-    
-    ax.fill_between(data.index, repulsion, tema_line, 
-                    where=(repulsion > tema_line) & (repulsion <= dema_line), 
-                    color='green', alpha=0.3, interpolate=True)
-    
-    # Configuraciones del gráfico
-    ax.legend()
-    ax.grid(True)
-    plt.xticks(rotation=45, ha='right')
-    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    fig.tight_layout()
-    return fig
-
-def plot_indicators(data):
-    plt.rcParams.update({'font.size': 10})
-    levels = get_levels(data)
-    df_levels = pd.DataFrame(levels, columns=['index','close'])
-    df_levels.set_index('index', inplace=True)
-
-    fig, axs = plt.subplots(2, 1, figsize=(12, 4), sharex=True)
-
-    # Plot RSI
-    rsi = calculate_rsi(data)
-    axs[0].plot(data.index, rsi, color='orange', linewidth=1)
-    axs[0].axhline(70, color='red', linestyle='--', linewidth=0.7)
-    axs[0].axhline(30, color='green', linestyle='--', linewidth=0.7)
-    axs[0].set_ylabel('RSI')
-    axs[0].tick_params(axis='x', rotation=45, which='both')
-    axs[0].grid(True, color='gray', linestyle='-', linewidth=0.01)
-    axs[0].spines['bottom'].set_visible(False)
-    axs[0].yaxis.set_ticks([])  # Quitar los ticks
-    axs[0].xaxis.set_ticks([])  # Quitar los ticks
-
-    # Plot MACD
-    macd_line, signal_line = calculate_macd(data)
-    axs[1].plot(data.index, macd_line, label='MACD', color='dodgerblue', linewidth=1)
-    axs[1].plot(data.index, signal_line, label='Signal', color='magenta', linewidth=1, linestyle='--')
-    axs[1].fill_between(data.index, macd_line, signal_line, where=(macd_line >= signal_line), color='green', alpha=0.3)
-    
-    # Plot Histograma del MACD
-    macd_histogram = macd_line - signal_line
-    axs[1].bar(data.index, macd_histogram, color=np.where(macd_histogram >= 0, 'green', 'darkgray'), alpha=0.6)
-
-    axs[1].axhline(0, color='gray', linestyle='-', linewidth=0.5)
-    axs[1].set_ylabel('MACD')
-    axs[1].tick_params(axis='x', rotation=45, which='both')
-    axs[1].grid(True, color='gray', linestyle='-', linewidth=0.01)
-    axs[1].spines['top'].set_visible(False)
-    axs[1].yaxis.set_ticks([])  # Quitar los ticks
-
-    fig.tight_layout()
-
-    return fig
-
-def plot_volatility(df_vol):
-    df_plot = df_vol.copy()
-    fig = plt.figure(figsize=(12,3))
-    plt.plot(df_plot.index, df_plot.returns, color='dodgerblue', linewidth=0.5, alpha=0.6)
-    plt.plot(df_plot.index, df_plot.volatility, color='darkorange', linewidth=1)
-    plt.ylabel('')
-    plt.xticks(rotation=45,  ha='right')
-    ax = plt.gca()
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.axhline(0, color='gray', linestyle='--', alpha=0.2)
-    ax.axhline(0.01, color='red', linestyle='--', alpha=0.8)
-    ax.axhline(0.005, color='green', linestyle='--', alpha=0.8)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    plt.grid(True,color='gray', linestyle='-', linewidth=0.01)
-    plt.legend(('Returns', 'Volatility'), frameon=False)
-
-    # Añadir texto de máximo y mínimo
-    max_vol = df_plot['volatility'].max()
-    min_vol = df_plot['volatility'].min()
-    
-    # Encontrar el índice correspondiente al máximo y mínimo
-    idx_max = df_plot['volatility'].idxmax()
-    idx_min = df_plot['volatility'].idxmin()
-    
-    plt.text(idx_max, max_vol, f'{max_vol:.3f}', va='bottom', ha='center', color='darkorange', fontsize=10)
-    plt.text(idx_min, min_vol, f'{min_vol:.3f}', va='top', ha='center', color='darkorange', fontsize=10)
-    fig.tight_layout()
-
-    return fig
-
+# def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
+#     fig, ax = plt.subplots(figsize=(14, 4))
+#     
+#     # Calcular CMF
+#     cmf = calculate_cmf(data, period=cmf_period)
+#     norm_cmf = normalize_cmf_to_range(data, period=cmf_period)
+#     
+#     # Calcular Medias Móviles
+#     ma1 = calculate_moving_average(data, window=ma_period1)
+#     ma2 = calculate_moving_average(data, window=ma_period2)
+#
+#     # Normalizar Medias Móviles al rango [0, 1]
+#     norm_ma1 = normalize_sma_to_range(data, ma1, ma_period1)
+#     norm_ma2 = normalize_sma_to_range(data, ma2, ma_period2)
+#
+#     
+#     # Graficar CMF
+#     ax.bar(data.index, norm_cmf, width=1.5, color=np.where(cmf >= 0, 'green', 'red'), alpha=0.3, label ='CFD(8)')
+#     ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+#     ax.axhline(0, color='gray', linestyle='--', linewidth=0.7)
+#     
+#     # Graficar Medias Móviles Normalizadas
+#     ax.plot(data.index, norm_ma1, label=f'SMA {ma_period1}', color='dodgerblue')
+#     ax.plot(data.index, norm_ma2, label=f'SMA {ma_period2}', color='rosybrown')
+#     
+#     # Personalizar el gráfico
+#     ax.legend(loc='best')
+#     ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+#     ax.yaxis.set_ticks([])  # Quitar los ticks
+#     plt.xticks(rotation=45, ha='right')
+#     fig.tight_layout()
+#     
+#     return fig
+#
+# def plot_with_indicators(data):
+#     fig, ax = plt.subplots(figsize=(14, 4))
+#     
+#     # Graficar el precio de cierre
+#     #ax.plot(data.index, data['Close'], label='Precio de Cierre', color='blue', alpha=0.5)
+#     
+#     # Calcular y graficar la Repulsión Alisada
+#     repulsion = repulsion_alisada(data['Close'], span=5)
+#     #repulsion_raw = repulsion_alisada(data['Close'], span=5)
+#     #repulsion = normalize(repulsion_raw)
+#     ax.plot(data.index, repulsion, label='Repulsión Alisada (5)', color='dodgerblue', linestyle='-', alpha=0.8)
+#     
+#     # Calcular y graficar la TEMA
+#     #tema_line_raw = tema(data['Close'], window=21)
+#     tema_line = tema(data['Close'], window=21)
+#     #tema_line = normalize(tema_line_raw)
+#     ax.plot(data.index, tema_line, label='TEMA (21)', color='orange', linestyle='--', alpha=0.8)
+#     
+#     # Calcular y graficar la DEMA
+#     #dema_line_raw = dema(data['Close'], window=21)
+#     dema_line = dema(data['Close'], window=21)
+#     #dema_line = normalize(dema_line_raw)
+#     ax.plot(data.index, dema_line, label='DEMA (21)', color='r', linestyle='--', alpha=0.8)
+#
+#     # Rellenar el área según las condiciones
+#     ax.fill_between(data.index, repulsion, tema_line, 
+#                     where=(repulsion > tema_line) & (repulsion> dema_line), 
+#                     color='blue', alpha=0.3, interpolate=True)
+#     
+#     ax.fill_between(data.index, repulsion, tema_line, 
+#                     where=(repulsion > tema_line) & (repulsion <= dema_line), 
+#                     color='green', alpha=0.3, interpolate=True)
+#     
+#     # Configuraciones del gráfico
+#     ax.legend()
+#     ax.grid(True)
+#     plt.xticks(rotation=45, ha='right')
+#     ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+#     ax.yaxis.set_ticks([])  # Quitar los ticks
+#     fig.tight_layout()
+#     return fig
+#
+# def plot_indicators(data):
+#     plt.rcParams.update({'font.size': 10})
+#     levels = get_levels(data)
+#     df_levels = pd.DataFrame(levels, columns=['index','close'])
+#     df_levels.set_index('index', inplace=True)
+#
+#     fig, axs = plt.subplots(2, 1, figsize=(12, 4), sharex=True)
+#
+#     # Plot RSI
+#     rsi = calculate_rsi(data)
+#     axs[0].plot(data.index, rsi, color='orange', linewidth=1)
+#     axs[0].axhline(70, color='red', linestyle='--', linewidth=0.7)
+#     axs[0].axhline(30, color='green', linestyle='--', linewidth=0.7)
+#     axs[0].set_ylabel('RSI')
+#     axs[0].tick_params(axis='x', rotation=45, which='both')
+#     axs[0].grid(True, color='gray', linestyle='-', linewidth=0.01)
+#     axs[0].spines['bottom'].set_visible(False)
+#     axs[0].yaxis.set_ticks([])  # Quitar los ticks
+#     axs[0].xaxis.set_ticks([])  # Quitar los ticks
+#
+#     # Plot MACD
+#     macd_line, signal_line = calculate_macd(data)
+#     axs[1].plot(data.index, macd_line, label='MACD', color='dodgerblue', linewidth=1)
+#     axs[1].plot(data.index, signal_line, label='Signal', color='magenta', linewidth=1, linestyle='--')
+#     axs[1].fill_between(data.index, macd_line, signal_line, where=(macd_line >= signal_line), color='green', alpha=0.3)
+#     
+#     # Plot Histograma del MACD
+#     macd_histogram = macd_line - signal_line
+#     axs[1].bar(data.index, macd_histogram, color=np.where(macd_histogram >= 0, 'green', 'darkgray'), alpha=0.6)
+#
+#     axs[1].axhline(0, color='gray', linestyle='-', linewidth=0.5)
+#     axs[1].set_ylabel('MACD')
+#     axs[1].tick_params(axis='x', rotation=45, which='both')
+#     axs[1].grid(True, color='gray', linestyle='-', linewidth=0.01)
+#     axs[1].spines['top'].set_visible(False)
+#     axs[1].yaxis.set_ticks([])  # Quitar los ticks
+#
+#     fig.tight_layout()
+#
+#     return fig
+#
+# def plot_volatility(df_vol):
+#     df_plot = df_vol.copy()
+#     fig = plt.figure(figsize=(12,3))
+#     plt.plot(df_plot.index, df_plot.returns, color='dodgerblue', linewidth=0.5, alpha=0.6)
+#     plt.plot(df_plot.index, df_plot.volatility, color='darkorange', linewidth=1)
+#     plt.ylabel('')
+#     plt.xticks(rotation=45,  ha='right')
+#     ax = plt.gca()
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+#     ax.axhline(0, color='gray', linestyle='--', alpha=0.2)
+#     ax.axhline(0.01, color='red', linestyle='--', alpha=0.8)
+#     ax.axhline(0.005, color='green', linestyle='--', alpha=0.8)
+#     ax.yaxis.set_ticks([])  # Quitar los ticks
+#     plt.grid(True,color='gray', linestyle='-', linewidth=0.01)
+#     plt.legend(('Returns', 'Volatility'), frameon=False)
+#
+#     # Añadir texto de máximo y mínimo
+#     max_vol = df_plot['volatility'].max()
+#     min_vol = df_plot['volatility'].min()
+#     
+#     # Encontrar el índice correspondiente al máximo y mínimo
+#     idx_max = df_plot['volatility'].idxmax()
+#     idx_min = df_plot['volatility'].idxmin()
+#     
+#     plt.text(idx_max, max_vol, f'{max_vol:.3f}', va='bottom', ha='center', color='darkorange', fontsize=10)
+#     plt.text(idx_min, min_vol, f'{min_vol:.3f}', va='top', ha='center', color='darkorange', fontsize=10)
+#     fig.tight_layout()
+#
+#     return fig
 
 def plot_ma(data_in, check_list):
     data = data_in.copy()
@@ -611,12 +610,12 @@ def plot_indicators_macd(data):
 
     # Plot MACD
     macd_line, signal_line = calculate_macd(data)
-    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD', line=dict(color='dodgerblue')), row=2, col=1)
-    fig.add_trace(go.Scatter(x=data.index, y=signal_line, name='Signal', line=dict(color='magenta', dash='dash')), row=2, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD', line=dict(color='dodgerblue')), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=signal_line, name='Signal', line=dict(color='magenta', dash='dash')), row=1, col=1)
 
     # Plot Histograma del MACD
     macd_histogram = macd_line - signal_line
-    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=2, col=1)
+    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=1, col=1)
 
     fig.update_yaxes(title_text="MACD", showticklabels=False)
 
