@@ -49,94 +49,6 @@ def plot_forecast_hw(data, forecast):
 
     return fig
 
-def plot_volume(data):
-    fig, ax = plt.subplots(figsize=(14, 3))
-    ax.bar(data.index, data['Volume'], color='dodgerblue', alpha=0.7)
-    ax.set_ylabel('')
-    # ax.grid(True, color='gray', linestyle='-', linewidth=0.2)
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    ax.spines['top'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    return fig
-
-def plot_volume(data_in):
-    data = data_in.copy()
-    # Convertir el índice a datetime si es necesario
-    if isinstance(data.index, pd.DatetimeIndex):
-        data.index = data.index.astype(str)
-
-    # Crear un objeto de figura de Plotly con subplots
-    fig = make_subplots(rows=1, cols=1)
-
-    # Añadir el gráfico de volumen
-    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')))
-
-    # Configuraciones de diseño y estilo
-    fig.update_layout(
-        hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
-        xaxis=dict(
-            domain=[0, 1],  # Ajustar la posición horizontal del eje x
-        ),
-        yaxis=dict(
-            titlefont=dict(color='rgba(31,119,180,0.6)'),
-            tickfont=dict(color='rgba(31,119,180,0.6)'),
-        ),
-    )
-
-    return fig
-
-def plot_price_and_volume(data_in):
-    data = data_in.copy()
-    # Convertir el índice a datetime si es necesario
-    if isinstance(data.index, pd.DatetimeIndex):
-        data.index = data.index.astype(str)
-
-    # Crear un objeto de figura de Plotly con subplots
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[2, 1])  # 3 filas, 1 columna
-    # row_heights=[2, 1] significa que la primera fila (precio) será 2 veces más alta que la segunda fila (volumen)
-
-    # Añadir el gráfico del precio (arriba)
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
-
-    # Añadir texto de máximo y mínimo para el gráfico de precios
-    max_price = data['Close'].max()
-    min_price = data['Close'].min()
-    idx_max = data['Close'].idxmax()
-    idx_min = data['Close'].idxmin()
-    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
-    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
-
-    # Añadir el gráfico de volumen (abajo)
-    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
-
-    # Configuraciones de diseño y estilo para el gráfico completo
-    fig.update_layout(
-        hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
-        xaxis=dict(
-            domain=[0, 1],  # Ajustar la posición horizontal del eje x
-        ),
-        yaxis=dict(
-            titlefont=dict(color='rgba(31,119,180,0.6)'),
-            tickfont=dict(color='rgba(31,119,180,0.6)'),
-        ),
-    )
-
-    # Configuraciones de ejes para cada subplot
-    fig.update_yaxes(title_text="Price", row=1, col=1)
-    fig.update_yaxes(title_text="Volume", row=2, col=1)
-
-    return fig
-
-import pandas as pd
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-
 def plot_price_and_volume(data_in):
     data = data_in.copy()
     # Convertir el índice a datetime si es necesario
@@ -164,7 +76,7 @@ def plot_price_and_volume(data_in):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
-        margin=dict(l=20, r=20, t=20, b=20),
+        margin=dict(l=20, r=20, t=0, b=0),
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -265,103 +177,6 @@ def plot_with_indicators(data):
     ax.spines['bottom'].set_visible(False)
     ax.yaxis.set_ticks([])  # Quitar los ticks
     fig.tight_layout()
-    return fig
-
-
-# def plot_candlestick(data):
-#     fig, ax = plt.subplots(figsize=(14, 6))
-#     mpf.plot(data,type='candle', style='yahoo',ax=ax, ylabel='')
-#
-#     # Mover el eje y del precio al lado izquierdo
-#     ax.yaxis.tick_left()
-#
-#     # Configurar la posición de la etiqueta del eje y del precio
-#     ax.yaxis.set_label_position('left')
-#
-#     ax.spines['top'].set_visible(False)
-#     ax.spines['right'].set_visible(False)
-#     ax.spines['left'].set_visible(False)
-#     ax.spines['bottom'].set_visible(False)
-#
-#     # Quitar los ticks y etiquetas del eje y izquierdo
-#     ax.yaxis.set_ticks([])  # Quitar los ticks
-#     ax.set_yticklabels([])  # Quitar las etiquetas de los ticks
-#
-#     ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
-#     plt.xticks(fontsize=10)
-#     plt.yticks(fontsize=10)
-#     # Ajustar el margen derecho para mostrar toda la información de la fecha
-#     fig.autofmt_xdate()
-#     fig.tight_layout()
-#
-#     return fig
-#
-# def plot_full(data):
-#     fig, ax = plt.subplots(figsize=(14, 6))
-#     
-#     # Gráfico del Precio
-#     ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
-#     ax.set_ylabel('')
-#     ax.tick_params(axis='x', rotation=45, which='both')
-#     ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
-#     ax.spines['top'].set_visible(False)
-#     ax.spines['right'].set_visible(False)
-#     ax.spines['left'].set_visible(False)
-#     ax.spines['bottom'].set_visible(False)
-#
-#     ax.yaxis.set_ticks([])  # Quitar los ticks
-#
-#     # Añadir texto de máximo y mínimo
-#     max_price = data['Close'].max()
-#     min_price = data['Close'].min()
-#     
-#     # Encontrar el índice correspondiente al máximo y mínimo
-#     idx_max = data['Close'].idxmax()
-#     idx_min = data['Close'].idxmin()
-#     
-#     plt.text(idx_max, max_price, f'{max_price:.3f}', va='bottom', ha='center', color='dodgerblue')
-#     plt.text(idx_min, min_price, f'{min_price:.3f}', va='top', ha='center', color='dodgerblue')
-#
-#     fig.tight_layout()
-#
-#     plotly_fig = tls.mpl_to_plotly(fig)
-#
-#     return plotly_fig
-
-def plot_full(data_in):
-    data = data_in.copy()
-    # Convertir el índice a datetime si es necesario
-    if isinstance(data.index, pd.DatetimeIndex):
-        data.index = data.index.astype(str)
-
-    # Crear un objeto de figura de Plotly con subplots
-    fig = make_subplots(rows=1, cols=1)
-
-    # Añadir el gráfico del precio
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)))
-
-    # Añadir texto de máximo y mínimo
-    max_price = data['Close'].max()
-    min_price = data['Close'].min()
-    idx_max = data['Close'].idxmax()
-    idx_min = data['Close'].idxmin()
-
-    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40)
-    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40)
-
-    # Configuraciones de diseño y estilo
-    fig.update_layout(
-        hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
-        xaxis=dict(
-            domain=[0, 1],  # Ajustar la posición horizontal del eje x
-        ),
-        yaxis=dict(
-            titlefont=dict(color='rgba(31,119,180,0.6)'),
-            tickfont=dict(color='rgba(31,119,180,0.6)'),
-        ),
-    )
-
     return fig
 
 def plot_candlestick(data, range_slide=True, tools=True):

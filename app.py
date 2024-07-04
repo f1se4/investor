@@ -12,8 +12,8 @@ from calculations.calculations import (
     get_company_name,daily_returns, returns_vol, retrieve_data
 )
 from visualizations.plotting import (
-    plot_forecast_hw, plot_volume, plot_cmf_with_moving_averages,
-    plot_with_indicators, plot_candlestick, plot_full, plot_indicators,
+    plot_forecast_hw, plot_cmf_with_moving_averages,
+    plot_with_indicators, plot_candlestick, plot_indicators,
     plot_volatility, plot_ma, plot_arima, plot_xgboost_forecast, plot_rendimiento,
     plot_price_and_volume
 )
