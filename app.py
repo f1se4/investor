@@ -71,7 +71,7 @@ def main():
     st.markdown("### Daily")
     col1, col2 = st.columns(2)
     with col1:
-        plot_candlestick_3 = plot_candlestick(historical_data)
+        plot_candlestick_3 = plot_candlestick(historical_data,False, False)
         st.plotly_chart(plot_candlestick_3)
     with col2:
         st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)

@@ -271,7 +271,7 @@ def plot_full(data_in):
 
     return fig
 
-def plot_candlestick(data):
+def plot_candlestick(data, range_slide=True, tools=True):
     candlestick = go.Candlestick(x=data.index,
                                  open=data['Open'],
                                  high=data['High'],
@@ -284,6 +284,7 @@ def plot_candlestick(data):
     fig.update_layout(
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
+        xaxis_rangeslider_visible=range_slide,
         xaxis=dict(
             domain=[0, 1],  # Ajustar la posición horizontal del eje x
         ),
@@ -293,6 +294,8 @@ def plot_candlestick(data):
         ),
     )
 
+    # Remove range slider and toolbar buttons
+    fig.update(config={'displayModeBar': tools})
 
     return fig
 
