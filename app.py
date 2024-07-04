@@ -86,7 +86,7 @@ def main():
     st.plotly_chart(plot_full_fig)
 
     plot_candlestick_fig = plot_candlestick(data)
-    st.pyplot(plot_candlestick_fig)
+    st.plotly_chart(plot_candlestick_fig)
     with st.expander("Patterns"):
         st.image(Image.open('assets/patterns.jpg'))
 
