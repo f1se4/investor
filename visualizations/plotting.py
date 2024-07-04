@@ -294,9 +294,6 @@ def plot_candlestick(data, range_slide=True, tools=True):
         ),
     )
 
-    # Remove range slider and toolbar buttons
-    fig.update(config={'displayModeBar': tools})
-
     return fig
 
 
