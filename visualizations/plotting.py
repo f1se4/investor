@@ -308,45 +308,19 @@ def plot_ma(data_in):
 
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
 
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Real', line=dict(color='dodgerblue', width=1)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA_20'], mode='lines', name='MA 20', line=dict(color='orange', width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA_50'], mode='lines', name='MA 50', line=dict(color='green', width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_10'], mode='lines', name='EMA 10', line=dict(color='green', width=2)), row=1, col=1)
 
     # Calcular Holt-Winters - Aditivo
     try:
         model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
         fitted = model.fit()
-        data['Holt_Winters'] = fitted.fittedvalues
-        ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
+        # data['Holt_Winters'] = fitted.fittedvalues
+        # ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
     except:
         print('error')
-
-
-    # Configurar gráfico
-    ax.plot(data.index, data['Close'], label='Real', color='dodgerblue', linewidth=1, alpha=0.3)
-    ax.plot(data.index, data['MA_20'], label='MA 20', color='orange', linestyle='--', linewidth=1)
-    ax.plot(data.index, data['MA_50'], label='MA 50', color='green', linestyle='--', linewidth=1)
-    ax.plot(data.index, data['EMA_10'], label='EMA_10', color='red', linestyle='--', linewidth=1)
-
-    ax.legend()
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
-    plt.xticks(rotation=45, ha='right')
-    fig.tight_layout()
-
-
-    # Añadir el gráfico del precio (arriba)
-
-    # Añadir texto de máximo y mínimo para el gráfico de precios
-    max_price = data['Close'].max()
-    min_price = data['Close'].min()
-    idx_max = data['Close'].idxmax()
-    idx_min = data['Close'].idxmin()
-    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
-    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
 
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)

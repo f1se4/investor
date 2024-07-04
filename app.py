@@ -171,7 +171,7 @@ def main():
     # Smoothing plot
     st.subheader('Smoothing')
     plot_ma_fig = plot_ma(data)
-    st.pyplot(plot_ma_fig)
+    st.plotly_chart(plot_ma_fig)
 
     # Forecasting section
     st.subheader('ForeCasting')
