@@ -41,18 +41,20 @@ def main():
         <hr style="border: 2px solid #4CAF50;">
     """, unsafe_allow_html=True)
 
-    # Ticker data from yfinance
-    ticker_data = yf.Ticker(stock)
+    tab1, tab2, tab3, tab4 = st.tabs(['Graphical Analysis', 'Information', 'Daily', 'ForeCasting'])
 
-    # Show general information
-    st.subheader('Información general')
-    with st.expander(""):
+    with tab2:
+        # Show performance plot
+        st.subheader('Performance')
+        rendimiento_plot = plot_rendimiento(stock)
+        st.plotly_chart(rendimiento_plot, use_container_width=True)
+        # Ticker data from yfinance
+        ticker_data = yf.Ticker(stock)
+
+        # Show general information
+        st.subheader('Información general')
         mostrar_informacion_general(ticker_data)
 
-    # Show performance plot
-    st.subheader('Performance')
-    rendimiento_plot = plot_rendimiento(stock)
-    st.plotly_chart(rendimiento_plot, use_container_width=True)
 
     # Historical data
     today = datetime.datetime.today().strftime('%Y-%m-%d')
