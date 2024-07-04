@@ -82,13 +82,15 @@ def main():
 
     # Graphic Analysis section
     st.subheader('Graphic Analysis')
-    plot_full_fig = plot_full(data)
-    st.plotly_chart(plot_full_fig)
-
-    plot_candlestick_fig = plot_candlestick(data)
-    st.plotly_chart(plot_candlestick_fig)
-    with st.expander("Patterns"):
-        st.image(Image.open('assets/patterns.jpg'))
+    selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
+    if selected_graph == 'Line':
+        plot_full_fig = plot_full(data)
+        st.plotly_chart(plot_full_fig)
+    elif selected_graph == 'Candle/Velas':
+        plot_candlestick_fig = plot_candlestick(data)
+        st.plotly_chart(plot_candlestick_fig)
+        with st.expander("Patterns"):
+            st.image(Image.open('assets/patterns.jpg'))
 
     # Plot volumes
     plot_volume_fig = plot_volume(data)
