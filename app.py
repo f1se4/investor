@@ -93,14 +93,14 @@ def main():
         with st.expander("Patterns"):
             st.image(Image.open('assets/patterns.jpg'))
 
-    # Plot volumes
-    plot_volume_fig = plot_volume(data)
-    st.plotly_chart(plot_volume_fig)
-    with st.expander("Volumen"):
-        st.markdown("""
-          - El volumen representa la cantidad total de acciones negociadas de un activo en un período de tiempo específico.
-          - Se utiliza para evaluar la liquidez del mercado y la intensidad de las transacciones.
-        """)
+    # # Plot volumes
+    # plot_volume_fig = plot_volume(data)
+    # st.plotly_chart(plot_volume_fig)
+    # with st.expander("Volumen"):
+    #     st.markdown("""
+    #       - El volumen representa la cantidad total de acciones negociadas de un activo en un período de tiempo específico.
+    #       - Se utiliza para evaluar la liquidez del mercado y la intensidad de las transacciones.
+    #     """)
 
     # Plot synthetic indicators
     plot_ind_sintetico = plot_with_indicators(data)

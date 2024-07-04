@@ -144,7 +144,7 @@ def plot_price_and_volume(data_in):
         data.index = data.index.astype(str)
 
     # Crear un objeto de figura de Plotly con subplots
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.3, row_heights=[0.7, 0.3])  # 2 filas, 1 columna
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
     # row_heights=[0.7, 0.3] significa que la primera fila (precio) será 0.7 veces más alta que la segunda fila (volumen)
 
     # Añadir el gráfico del precio (arriba)
@@ -163,6 +163,7 @@ def plot_price_and_volume(data_in):
 
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
+        height=600,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -175,8 +176,8 @@ def plot_price_and_volume(data_in):
     )
 
     # Configuraciones de ejes para cada subplot
-    fig.update_yaxes(title_text="Price", row=1, col=1)
-    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    fig.update_yaxes(title_text="", row=1, col=1, showticklabels=False)
+    fig.update_yaxes(title_text="", row=2, col=1, showticklabels=False)
 
     return fig
 
