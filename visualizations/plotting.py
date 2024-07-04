@@ -9,9 +9,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
 import xgboost as xgb
 from datetime import timedelta
-import plotly.tools as tls
 import plotly.graph_objects as go
-import plotly.graph_objs as go2
 from plotly.subplots import make_subplots
 
 from calculations.calculations import repulsion_alisada, tema, dema, calculate_cmf, calculate_moving_average, normalize_sma_to_range, normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels
