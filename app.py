@@ -70,9 +70,9 @@ def main():
 
     st.markdown("### Daily")
     col1, col2 = st.columns(2)
-   # with col1:
-   #     plot_candlestick_3 = plot_candlestick(historical_data)
-   #     st.pyplot(plot_candlestick_3)
+    with col1:
+        plot_candlestick_3 = plot_candlestick(historical_data)
+        st.plotly_chart(plot_candlestick_3)
     with col2:
         st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)
         st.markdown(f"**Δ Volume**: {format_value(volume_change)}", unsafe_allow_html=True)
@@ -92,7 +92,7 @@ def main():
 
     # Plot volumes
     plot_volume_fig = plot_volume(data)
-    st.pyplot(plot_volume_fig)
+    st.plotly_chart(plot_volume_fig)
     with st.expander("Volumen"):
         st.markdown("""
           - El volumen representa la cantidad total de acciones negociadas de un activo en un período de tiempo específico.

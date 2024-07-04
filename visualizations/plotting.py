@@ -63,6 +63,33 @@ def plot_volume(data):
     ax.spines['bottom'].set_visible(False)
     return fig
 
+def plot_volume(data_in):
+    data = data_in.copy()
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
+
+    # Crear un objeto de figura de Plotly con subplots
+    fig = make_subplots(rows=1, cols=1)
+
+    # Añadir el gráfico de volumen
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')))
+
+    # Configuraciones de diseño y estilo
+    fig.update_layout(
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    return fig
+
 def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
     fig, ax = plt.subplots(figsize=(14, 4))
     
@@ -231,8 +258,15 @@ def plot_full(data_in):
 
     # Configuraciones de diseño y estilo
     fig.update_layout(
-        title='Gráfico interactivo de Precio de Cierre',
         hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
     )
 
     return fig
