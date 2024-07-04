@@ -317,8 +317,8 @@ def plot_ma(data_in):
     try:
         model = ExponentialSmoothing(data['Close'], trend='add', seasonal='add', seasonal_periods=12)
         fitted = model.fit()
-        # data['Holt_Winters'] = fitted.fittedvalues
-        # ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
+        data['Holt_Winters'] = fitted.fittedvalues
+        fig.add_trace(go.Scatter(x=data.index, y=data['Holt_Winters'], mode='lines', name='Holt-Winters', line=dict(color='magenta', width=2)), row=1, col=1)
     except:
         print('error')
 
@@ -330,7 +330,7 @@ def plot_ma(data_in):
         height=600,
         margin=dict(l=20, r=20, t=0, b=0),
         hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
             domain=[0, 1],  # Ajustar la posición horizontal del eje x
         ),
@@ -338,6 +338,13 @@ def plot_ma(data_in):
             titlefont=dict(color='rgba(31,119,180,0.6)'),
             tickfont=dict(color='rgba(31,119,180,0.6)'),
         ),
+    legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1
+    )
     )
 
     # Configuraciones de ejes para cada subplot
