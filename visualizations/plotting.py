@@ -580,13 +580,34 @@ def plot_with_indicators(data):
     return fig
 
 def plot_indicators(data):
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1)
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True, vertical_spacing=0.1)
 
     # Plot RSI
     rsi = calculate_rsi(data)
     fig.add_trace(go.Scatter(x=data.index, y=rsi, name='RSI', line=dict(color='orange')), row=1, col=1)
     fig.add_trace(go.Scatter(x=[data.index[0], data.index[-1]], y=[70, 70], mode='lines', line=dict(color='red', dash='dash')), row=1, col=1)
     fig.add_trace(go.Scatter(x=[data.index[0], data.index[-1]], y=[30, 30], mode='lines', line=dict(color='green', dash='dash')), row=1, col=1)
+
+    fig.update_yaxes(title_text="RSI", row=1, col=1, showticklabels=False)
+
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    return fig
+
+def plot_indicators_macd(data):
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True, vertical_spacing=0.1)
 
     # Plot MACD
     macd_line, signal_line = calculate_macd(data)
@@ -597,7 +618,21 @@ def plot_indicators(data):
     macd_histogram = macd_line - signal_line
     fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=2, col=1)
 
-    fig.update_yaxes(title_text="Volatility", showticklabels=False)
+    fig.update_yaxes(title_text="MACD", showticklabels=False)
+
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
 
     return fig
 
