@@ -13,9 +13,9 @@ from calculations.calculations import (
 )
 from visualizations.plotting import (
     plot_forecast_hw, plot_cmf_with_moving_averages,
-    plot_with_indicators, plot_candlestick, plot_indicators,
+    plot_with_indicators, plot_candlestick,
     plot_volatility, plot_ma, plot_arima, plot_xgboost_forecast, plot_rendimiento,
-    plot_price_and_volume
+    plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd
 )
 from layout.sidebar import configure_sidebar
 
@@ -104,7 +104,7 @@ def main():
             checkbox1 = st.checkbox('Paddle Traders')
         
         with col2:
-            checkbox2 = st.checkbox('RSI/MACD')
+            checkbox2 = st.checkbox('RSI')
         
         with col3:
             checkbox3 = st.checkbox('CMF & SMA')
@@ -112,8 +112,8 @@ def main():
         with col4:
             checkbox4 = st.checkbox('Volatility & Daily Returns')
 
-        # with col5:
-        #     checkbox5 = st.checkbox('Opción 5')
+        with col5:
+            checkbox5 = st.checkbox('MACD')
 
         if checkbox1:
             # Plot synthetic indicators
@@ -121,8 +121,8 @@ def main():
             st.plotly_chart(plot_ind_sintetico)
 
         if checkbox2:
-            plot_indicator = plot_indicators(data)
-            st.plotly_chart(plot_indicator)
+            plot_indicator_rsi = plot_indicators_rsi(data)
+            st.plotly_chart(plot_indicator_rsi)
 
         if checkbox3:
             # Chaikin Money Flow & SMA
@@ -135,6 +135,10 @@ def main():
             df_vol = returns_vol(df_ret)
             plot_vol = plot_volatility(df_vol)
             st.plotly_chart(plot_vol)
+
+        if checkbox5:
+            plot_indicator_macd = plot_indicators_macd(data)
+            st.plotly_chart(plot_indicator_macd)
 
         # Smoothing plot
         st.subheader('Smoothing')

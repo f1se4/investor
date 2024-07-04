@@ -579,7 +579,7 @@ def plot_with_indicators(data):
     
     return fig
 
-def plot_indicators(data):
+def plot_indicators_rsi(data):
     fig = make_subplots(rows=1, cols=1, shared_xaxes=True, vertical_spacing=0.1)
 
     # Plot RSI
