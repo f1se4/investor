@@ -94,6 +94,33 @@ def plot_price_and_volume(data_in):
 
     return fig
 
+def plot_candlestick(data, range_slide=False, tools=True):
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
+
+    candlestick = go.Candlestick(x=data.index,
+                                 open=data['Open'],
+                                 high=data['High'],
+                                 low=data['Low'],
+                                 close=data['Close'])
+
+    fig.add_trace(go.Figure(data=[candlestick]), row=1, col=1)
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+
+    # Configuraciones de diseño y estilo
+    fig.update_layout(
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
+        xaxis_rangeslider_visible=range_slide,
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    return fig
 
 def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=20):
     fig, ax = plt.subplots(figsize=(14, 4))
@@ -179,30 +206,6 @@ def plot_with_indicators(data):
     fig.tight_layout()
     return fig
 
-def plot_candlestick(data, range_slide=True, tools=True):
-    candlestick = go.Candlestick(x=data.index,
-                                 open=data['Open'],
-                                 high=data['High'],
-                                 low=data['Low'],
-                                 close=data['Close'])
-
-    fig = go.Figure(data=[candlestick])
-
-    # Configuraciones de diseño y estilo
-    fig.update_layout(
-        hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
-        xaxis_rangeslider_visible=range_slide,
-        xaxis=dict(
-            domain=[0, 1],  # Ajustar la posición horizontal del eje x
-        ),
-        yaxis=dict(
-            titlefont=dict(color='rgba(31,119,180,0.6)'),
-            tickfont=dict(color='rgba(31,119,180,0.6)'),
-        ),
-    )
-
-    return fig
 
 
 def mostrar_grafico_precios(historical_data):
