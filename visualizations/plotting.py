@@ -148,34 +148,34 @@ def plot_with_indicators(data):
     return fig
 
 
-def plot_candlestick(data):
-    fig, ax = plt.subplots(figsize=(14, 6))
-    mpf.plot(data,type='candle', style='yahoo',ax=ax, ylabel='')
-
-    # Mover el eje y del precio al lado izquierdo
-    ax.yaxis.tick_left()
-
-    # Configurar la posición de la etiqueta del eje y del precio
-    ax.yaxis.set_label_position('left')
-
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-
-    # Quitar los ticks y etiquetas del eje y izquierdo
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-    ax.set_yticklabels([])  # Quitar las etiquetas de los ticks
-
-    ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
-    # Ajustar el margen derecho para mostrar toda la información de la fecha
-    fig.autofmt_xdate()
-    fig.tight_layout()
-
-    return fig
-
+# def plot_candlestick(data):
+#     fig, ax = plt.subplots(figsize=(14, 6))
+#     mpf.plot(data,type='candle', style='yahoo',ax=ax, ylabel='')
+#
+#     # Mover el eje y del precio al lado izquierdo
+#     ax.yaxis.tick_left()
+#
+#     # Configurar la posición de la etiqueta del eje y del precio
+#     ax.yaxis.set_label_position('left')
+#
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+#
+#     # Quitar los ticks y etiquetas del eje y izquierdo
+#     ax.yaxis.set_ticks([])  # Quitar los ticks
+#     ax.set_yticklabels([])  # Quitar las etiquetas de los ticks
+#
+#     ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
+#     plt.xticks(fontsize=10)
+#     plt.yticks(fontsize=10)
+#     # Ajustar el margen derecho para mostrar toda la información de la fecha
+#     fig.autofmt_xdate()
+#     fig.tight_layout()
+#
+#     return fig
+#
 # def plot_full(data):
 #     fig, ax = plt.subplots(figsize=(14, 6))
 #     
