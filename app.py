@@ -92,18 +92,32 @@ def main():
         with st.expander("Patterns"):
             st.image(Image.open('assets/patterns.jpg'))
 
-    # # Plot volumes
-    # plot_volume_fig = plot_volume(data)
-    # st.plotly_chart(plot_volume_fig)
-    # with st.expander("Volumen"):
-    #     st.markdown("""
-    #       - El volumen representa la cantidad total de acciones negociadas de un activo en un período de tiempo específico.
-    #       - Se utiliza para evaluar la liquidez del mercado y la intensidad de las transacciones.
-    #     """)
+    st.markdown("### Indicators")
 
-    # Plot synthetic indicators
-    plot_ind_sintetico = plot_with_indicators(data)
-    st.pyplot(plot_ind_sintetico)
+    # Crear columnas
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    # Agregar una casilla de verificación en cada columna
+    with col1:
+        checkbox1 = st.checkbox('Opción 1')
+    
+    with col2:
+        checkbox2 = st.checkbox('Opción 2')
+    
+    with col3:
+        checkbox3 = st.checkbox('Opción 3')
+
+    with col4:
+        checkbox4 = st.checkbox('Opción 3')
+
+    with col5:
+        checkbox5 = st.checkbox('Opción 3')
+
+    if checkbox1:
+        # Plot synthetic indicators
+        plot_ind_sintetico = plot_with_indicators(data)
+        st.pyplot(plot_ind_sintetico)
+
 
     plot_indicator = plot_indicators(data)
     st.pyplot(plot_indicator)
