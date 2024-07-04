@@ -509,7 +509,28 @@ def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=2
     fig.add_trace(go.Scatter(x=data.index, y=norm_ma2, name=f'SMA {ma_period2}', line=dict(color='rosybrown')))
 
     # Personalizar el gráfico
-    fig.update_layout(showlegend=True, barmode='overlay', xaxis_rangeslider_visible=False)
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1
+    )
+    )
+    #fig.update_layout(showlegend=True, barmode='overlay', xaxis_rangeslider_visible=False)
     
     return fig
 
@@ -530,6 +551,28 @@ def plot_with_indicators(data):
 
     # Rellenar el área según las condiciones
     fig.add_trace(go.Scatter(x=data.index, y=repulsion, fill='tonexty', name='Área Azul', fillcolor='rgba(0,0,255,0.3)'))
+
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1
+    )
+    )
     
     return fig
 
