@@ -94,7 +94,12 @@ def plot_price_and_volume(data_in):
 
     return fig
 
-def plot_candlestick(data, range_slide=False, tools=True):
+def plot_candlestick(data_in, range_slide=False, tools=True):
+    data = data_in.copy()
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
+
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
 
     candlestick = go.Candlestick(x=data.index,
@@ -103,11 +108,14 @@ def plot_candlestick(data, range_slide=False, tools=True):
                                  low=data['Low'],
                                  close=data['Close'])
 
-    fig.add_trace(go.Figure(data=[candlestick]), row=1, col=1)
-    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+    fig.add_trace(candlestick, row=1, col=1)
+    if tools:
+        fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
 
     # Configuraciones de diseño y estilo
     fig.update_layout(
+        height=600,
+        margin=dict(l=20, r=20, t=0, b=0),
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
         xaxis_rangeslider_visible=range_slide,
@@ -119,6 +127,10 @@ def plot_candlestick(data, range_slide=False, tools=True):
             tickfont=dict(color='rgba(31,119,180,0.6)'),
         ),
     )
+
+    # Configuraciones de ejes para cada subplot
+    fig.update_yaxes(title_text="", row=1, col=1, showticklabels=False)
+    fig.update_yaxes(title_text="", row=2, col=1, showticklabels=False)
 
     return fig
 
