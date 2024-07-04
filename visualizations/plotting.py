@@ -233,45 +233,9 @@ def plot_full(data_in):
     fig.update_layout(
         title='Gráfico interactivo de Precio de Cierre',
         hovermode='x',  # Activar el modo hover
-        plot_bgcolor='gray',
-        margin=dict(l=0, r=0, t=50, b=0),  # Ajustar márgenes
     )
 
     return fig
-
-def plot_candlestick(data):
-    # Extract data for candlestick chart
-    candlestick = go2.Candlestick(x=data.index,
-                                 open=data['Open'],
-                                 high=data['High'],
-                                 low=data['Low'],
-                                 close=data['Close'])
-
-    # Create figure and layout
-    fig = go2.Figure(data=[candlestick])
-    fig.update_layout(
-        title='Candlestick Chart',
-        yaxis=dict(
-            tickposition='left',  # Move y-axis to the left
-        ),
-        xaxis=dict(
-            rangeslider=dict(  # Add a range slider to zoom in/out
-                visible=False
-            ),
-            type='date'  # Ensure x-axis is treated as date/time
-        ),
-        yaxis_side='left',  # Ensure y-axis ticks are on the left
-        plot_bgcolor='white',  # Set plot background color
-        xaxis_showgrid=False,  # Hide x-axis grid lines
-        yaxis_showgrid=True,   # Show y-axis grid lines
-        yaxis_gridcolor='gray',  # Set color of y-axis grid lines
-        yaxis_zeroline=False,   # Hide y-axis zero line
-        margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins
-    )
-
-    return fig
-
-import plotly.graph_objs as go
 
 def plot_candlestick(data):
     candlestick = go.Candlestick(x=data.index,
@@ -281,13 +245,6 @@ def plot_candlestick(data):
                                  close=data['Close'])
 
     fig = go.Figure(data=[candlestick])
-
-    fig.update_layout(
-        title='Candlestick Chart',
-        xaxis_title='Date',
-        yaxis_title='Price',
-        margin=dict(l=50, r=50, t=50, b=50),
-    )
 
     return fig
 
