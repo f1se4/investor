@@ -218,24 +218,6 @@ def plot_with_indicators(data):
     fig.tight_layout()
     return fig
 
-
-
-def mostrar_grafico_precios(historical_data):
-    # Crear figura y ejes para el gráfico
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Graficar precios de cierre
-    ax.plot(historical_data.index, historical_data['Close'], marker='o', linestyle='-', color='b', label='Precio de cierre')
-
-    # Añadir etiquetas y título
-    ax.set_xlabel('Fecha')
-    ax.set_ylabel('Precio de cierre')
-    ax.set_title('Precio de cierre en los últimos 2 días')
-    ax.legend()
-
-    # Mostrar el gráfico en Streamlit
-    return fig
-
 def plot_indicators(data):
     plt.rcParams.update({'font.size': 10})
     levels = get_levels(data)
@@ -311,14 +293,22 @@ def plot_volatility(df_vol):
     return fig
 
 
-def plot_ma(data):
+def plot_ma(data_in):
+    data = data_in.copy()
+    # Convertir el índice a datetime si es necesario
+    if isinstance(data.index, pd.DatetimeIndex):
+        data.index = data.index.astype(str)
     # Calcular medias móviles
-    fig, ax = plt.subplots(figsize=(12, 6))
+    # fig, ax = plt.subplots(figsize=(12, 6))
     data['MA_20'] = data['Close'].rolling(window=20).mean()
     data['MA_50'] = data['Close'].rolling(window=50).mean()
 
     # Calcular media móvil exponencial (EMA)
     data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()
+
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
+
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
 
     # Calcular Holt-Winters - Aditivo
     try:
@@ -328,6 +318,7 @@ def plot_ma(data):
         ax.plot(data.index, data['Holt_Winters'], label='Holt-Winters', color='magenta', linestyle='--', linewidth=1)
     except:
         print('error')
+
 
     # Configurar gráfico
     ax.plot(data.index, data['Close'], label='Real', color='dodgerblue', linewidth=1, alpha=0.3)
@@ -345,6 +336,39 @@ def plot_ma(data):
     ax.grid(True, color='gray', linestyle='-', linewidth=0.01)
     plt.xticks(rotation=45, ha='right')
     fig.tight_layout()
+
+
+    # Añadir el gráfico del precio (arriba)
+
+    # Añadir texto de máximo y mínimo para el gráfico de precios
+    max_price = data['Close'].max()
+    min_price = data['Close'].min()
+    idx_max = data['Close'].idxmax()
+    idx_min = data['Close'].idxmin()
+    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
+    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
+
+    # Añadir el gráfico de volumen (abajo)
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        height=600,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    # Configuraciones de ejes para cada subplot
+    fig.update_yaxes(title_text="", row=1, col=1, showticklabels=False)
+    fig.update_yaxes(title_text="", row=2, col=1, showticklabels=False)
 
     return fig
 
