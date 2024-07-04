@@ -193,3 +193,11 @@ def daily_returns(df):
 def returns_vol(df):
     df['volatility'] = df.returns.rolling(12).std()
     return df
+
+# Retrieve data function
+def retrieve_data(stock, start_date, end_date):
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    end_date_str = end_date.strftime("%Y-%m-%d")
+    return get_data(stock, start_date_str, end_date_str)
+
+

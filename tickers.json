@@ -1,0 +1,22 @@
+{
+  "Indexados": {
+    "USA": ["A500.MI"],
+    "World": ["IWDA.AS", "0P0001CLDK.F"],
+    "Europe": ["UST.MI"],
+    "Artificial Int.": ["IUIT.L", "XAIX.DE", "0P00015OFP.F"]
+  },
+  "Finanzas": {
+    "Seguros": ["MAP.MC"],
+    "Bancos": ["BBVA", "SAB.MC"]
+  },
+  "HealthCare": {
+    "Grifols": ["GRFS"]
+  },
+  "Tecnología": {
+    "Telefonia": ["TEF"],
+    "Hardware": ["INTC", "NVDA"]
+  },
+  "Materias Primas": {
+    "Metales": ["SGLN.L"]
+  }
+}
