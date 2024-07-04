@@ -9,7 +9,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 from calculations.calculations import (
     format_value, mostrar_informacion_general, arima_forecasting,
-    get_company_name, get_data, daily_returns, returns_vol, retrieve_data
+    get_company_name,daily_returns, returns_vol, retrieve_data
 )
 from visualizations.plotting import (
     plot_forecast_hw, plot_volume, plot_cmf_with_moving_averages,
@@ -70,9 +70,9 @@ def main():
 
     st.markdown("### Daily")
     col1, col2 = st.columns(2)
-    with col1:
-        plot_candlestick_3 = plot_candlestick(historical_data)
-        st.pyplot(plot_candlestick_3)
+   # with col1:
+   #     plot_candlestick_3 = plot_candlestick(historical_data)
+   #     st.pyplot(plot_candlestick_3)
     with col2:
         st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)
         st.markdown(f"**Δ Volume**: {format_value(volume_change)}", unsafe_allow_html=True)

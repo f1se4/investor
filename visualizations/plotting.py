@@ -11,6 +11,7 @@ import xgboost as xgb
 from datetime import timedelta
 import plotly.tools as tls
 import plotly.graph_objects as go
+import plotly.graph_objs as go2
 from plotly.subplots import make_subplots
 
 from calculations.calculations import repulsion_alisada, tema, dema, calculate_cmf, calculate_moving_average, normalize_sma_to_range, normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels
@@ -232,7 +233,7 @@ def plot_full(data_in):
     fig.update_layout(
         title='Gráfico interactivo de Precio de Cierre',
         hovermode='x',  # Activar el modo hover
-        plot_bgcolor='black',
+        plot_bgcolor='gray',
         margin=dict(l=0, r=0, t=50, b=0),  # Ajustar márgenes
     )
 
@@ -240,18 +241,16 @@ def plot_full(data_in):
 
 def plot_candlestick(data):
     # Extract data for candlestick chart
-    candlestick = go.Candlestick(x=data.index,
+    candlestick = go2.Candlestick(x=data.index,
                                  open=data['Open'],
                                  high=data['High'],
                                  low=data['Low'],
                                  close=data['Close'])
 
     # Create figure and layout
-    fig = go.Figure(data=[candlestick])
+    fig = go2.Figure(data=[candlestick])
     fig.update_layout(
         title='Candlestick Chart',
-        xaxis_title='Date',
-        yaxis_title='Price',
         yaxis=dict(
             tickposition='left',  # Move y-axis to the left
         ),
@@ -271,6 +270,27 @@ def plot_candlestick(data):
     )
 
     return fig
+
+import plotly.graph_objs as go
+
+def plot_candlestick(data):
+    candlestick = go.Candlestick(x=data.index,
+                                 open=data['Open'],
+                                 high=data['High'],
+                                 low=data['Low'],
+                                 close=data['Close'])
+
+    fig = go.Figure(data=[candlestick])
+
+    fig.update_layout(
+        title='Candlestick Chart',
+        xaxis_title='Date',
+        yaxis_title='Price',
+        margin=dict(l=50, r=50, t=50, b=50),
+    )
+
+    return fig
+
 
 def mostrar_grafico_precios(historical_data):
     # Crear figura y ejes para el gráfico
