@@ -638,40 +638,7 @@ def plot_indicators_macd(data):
 def plot_volatility(df_vol):
     fig = make_subplots(rows=1, cols=1, shared_xaxes=True)
 
-    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol.returns, name='Returns', line=dict(color='dodgerblue')))
-    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol.volatility, name='Volatility', line=dict(color='darkorange')))
-
-    max_vol = df_vol['volatility'].max()
-    min_vol = df_vol['volatility'].min()
-    idx_max = df_vol['volatility'].idxmax()
-    idx_min = df_vol['volatility'].idxmin()
-
-    fig.add_annotation(x=idx_max, y=max_vol, text=f'{max_vol:.3f}', showarrow=True, arrowhead=1)
-    fig.add_annotation(x=idx_min, y=min_vol, text=f'{min_vol:.3f}', showarrow=True, arrowhead=1)
-
-    # Configuraciones de diseño y estilo para el gráfico completo
-    fig.update_layout(
-        height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
-        hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
-        xaxis=dict(
-            domain=[0, 1],  # Ajustar la posición horizontal del eje x
-        ),
-        yaxis=dict(
-            titlefont=dict(color='rgba(31,119,180,0.6)'),
-            tickfont=dict(color='rgba(31,119,180,0.6)'),
-        ),
-    )
-
-    fig.update_yaxes(title_text="Volatility", showticklabels=False)
-
-    return fig
-
-def plot_volatility(df_vol):
-    fig = make_subplots(rows=1, cols=1, shared_xaxes=True)
-
-    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol['returns'], name='Returns', line=dict(color='dodgerblue')))
+    fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol['returns'], name='Returns', line=dict(color='rgba(30, 144, 255, 0.2)')))
     fig.add_trace(go.Scatter(x=df_vol.index, y=df_vol['volatility'], name='Volatility', line=dict(color='darkorange')))
 
     max_vol = df_vol['volatility'].max()
@@ -721,5 +688,6 @@ def plot_volatility(df_vol):
             zerolinecolor='white'
         ),
     )
+    fig.update_yaxes(title_text="Volatility", showticklabels=False)
 
     return fig
