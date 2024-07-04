@@ -531,6 +531,7 @@ def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=2
     )
     )
     #fig.update_layout(showlegend=True, barmode='overlay', xaxis_rangeslider_visible=False)
+    fig.update_yaxes(title_text="CMF & SMA", showticklabels=False)
     
     return fig
 
@@ -573,6 +574,8 @@ def plot_with_indicators(data):
     x=1
     )
     )
+
+    fig.update_yaxes(title_text="Paddle Traders", showticklabels=False)
     
     return fig
 
@@ -594,6 +597,8 @@ def plot_indicators(data):
     macd_histogram = macd_line - signal_line
     fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=2, col=1)
 
+    fig.update_yaxes(title_text="Volatility", showticklabels=False)
+
     return fig
 
 def plot_volatility(df_vol):
@@ -609,5 +614,22 @@ def plot_volatility(df_vol):
 
     fig.add_annotation(x=idx_max, y=max_vol, text=f'{max_vol:.3f}', showarrow=True, arrowhead=1)
     fig.add_annotation(x=idx_min, y=min_vol, text=f'{min_vol:.3f}', showarrow=True, arrowhead=1)
+
+    # Configuraciones de diseño y estilo para el gráfico completo
+    fig.update_layout(
+        height=200,
+        margin=dict(l=20, r=20, t=0, b=0),
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+    fig.update_yaxes(title_text="Volatility", showticklabels=False)
 
     return fig
