@@ -164,6 +164,7 @@ def plot_price_and_volume(data_in):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
+        margin=dict(l=20, r=20, t=20, b=20),
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
