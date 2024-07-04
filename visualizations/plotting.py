@@ -280,6 +280,20 @@ def plot_candlestick(data):
 
     fig = go.Figure(data=[candlestick])
 
+    # Configuraciones de diseño y estilo
+    fig.update_layout(
+        hovermode='x',  # Activar el modo hover
+        showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
+        xaxis=dict(
+            domain=[0, 1],  # Ajustar la posición horizontal del eje x
+        ),
+        yaxis=dict(
+            titlefont=dict(color='rgba(31,119,180,0.6)'),
+            tickfont=dict(color='rgba(31,119,180,0.6)'),
+        ),
+    )
+
+
     return fig
 
 
