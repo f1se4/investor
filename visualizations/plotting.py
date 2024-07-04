@@ -9,6 +9,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
 import xgboost as xgb
 from datetime import timedelta
+import plotly.tools as tls
 
 from calculations.calculations import repulsion_alisada, tema, dema, calculate_cmf, calculate_moving_average, normalize_sma_to_range, normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels
 
@@ -200,7 +201,9 @@ def plot_full(data):
 
     fig.tight_layout()
 
-    return fig
+    plotly_fig = tls.mpl_to_plotly(fig)
+
+    return plotly_fig
 
 def mostrar_grafico_precios(historical_data):
     # Crear figura y ejes para el gráfico
