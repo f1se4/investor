@@ -68,7 +68,6 @@ def main():
     min_diff = last_day_data['Close'] - prev_day_data['Close']
     open_close = last_day_data['Open'] - prev_day_data['Close']
 
-
     st.markdown("### Daily")
     col1, col2 = st.columns(2)
     with col1:
