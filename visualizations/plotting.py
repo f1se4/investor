@@ -175,39 +175,40 @@ def plot_candlestick(data):
 
     return fig
 
-def plot_full(data):
-    fig, ax = plt.subplots(figsize=(14, 6))
-    
-    # Gráfico del Precio
-    ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
-    ax.set_ylabel('')
-    ax.tick_params(axis='x', rotation=45, which='both')
-    ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
+# def plot_full(data):
+#     fig, ax = plt.subplots(figsize=(14, 6))
+#     
+#     # Gráfico del Precio
+#     ax.plot(data.index, data.Close, color='dodgerblue', linewidth=1)
+#     ax.set_ylabel('')
+#     ax.tick_params(axis='x', rotation=45, which='both')
+#     ax.grid(True,color='gray', linestyle='-', linewidth=0.01)
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+#
+#     ax.yaxis.set_ticks([])  # Quitar los ticks
+#
+#     # Añadir texto de máximo y mínimo
+#     max_price = data['Close'].max()
+#     min_price = data['Close'].min()
+#     
+#     # Encontrar el índice correspondiente al máximo y mínimo
+#     idx_max = data['Close'].idxmax()
+#     idx_min = data['Close'].idxmin()
+#     
+#     plt.text(idx_max, max_price, f'{max_price:.3f}', va='bottom', ha='center', color='dodgerblue')
+#     plt.text(idx_min, min_price, f'{min_price:.3f}', va='top', ha='center', color='dodgerblue')
+#
+#     fig.tight_layout()
+#
+#     plotly_fig = tls.mpl_to_plotly(fig)
+#
+#     return plotly_fig
 
-    ax.yaxis.set_ticks([])  # Quitar los ticks
-
-    # Añadir texto de máximo y mínimo
-    max_price = data['Close'].max()
-    min_price = data['Close'].min()
-    
-    # Encontrar el índice correspondiente al máximo y mínimo
-    idx_max = data['Close'].idxmax()
-    idx_min = data['Close'].idxmin()
-    
-    plt.text(idx_max, max_price, f'{max_price:.3f}', va='bottom', ha='center', color='dodgerblue')
-    plt.text(idx_min, min_price, f'{min_price:.3f}', va='top', ha='center', color='dodgerblue')
-
-    fig.tight_layout()
-
-    plotly_fig = tls.mpl_to_plotly(fig)
-
-    return plotly_fig
-
-def plot_full(data):
+def plot_full(data_in):
+    data = data_in.copy()
     # Convertir el índice a datetime si es necesario
     if isinstance(data.index, pd.DatetimeIndex):
         data.index = data.index.astype(str)
@@ -230,13 +231,9 @@ def plot_full(data):
     # Configuraciones de diseño y estilo
     fig.update_layout(
         title='Gráfico interactivo de Precio de Cierre',
-        #xaxis=dict(title='Fecha'),
-        #yaxis=dict(title='Precio de Cierre'),
         hovermode='x',  # Activar el modo hover
-        #showlegend=True,
-        plot_bgcolor='white',
+        plot_bgcolor='black',
         margin=dict(l=0, r=0, t=50, b=0),  # Ajustar márgenes
-        height=600,  # Altura del gráfico
     )
 
     return fig
