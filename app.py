@@ -170,7 +170,27 @@ def main():
 
     # Smoothing plot
     st.subheader('Smoothing')
-    plot_ma_fig = plot_ma(data)
+
+    # Crear columnas
+    cols1, cols2, cols3, cols4, cols5 = st.columns(5)
+    
+    # Agregar una casilla de verificación en cada columna
+    with cols1:
+        chckbx1 = st.checkbox('Real', value=True)
+    
+    with cols2:
+        chckbx2 = st.checkbox('Holt-Winters', value=True)
+    
+    with cols3:
+        chckbx3 = st.checkbox('MA 20', value=True)
+
+    with cols4:
+        chckbx4 = st.checkbox('MA 50', value=True)
+
+    with cols5:
+         chckbx5 = st.checkbox('EMA 10', value=True)
+
+    plot_ma_fig = plot_ma(data, [chckbx1, chckbx2, chckbx3, chckbx4, chckbx5])
     st.plotly_chart(plot_ma_fig)
 
     # Forecasting section

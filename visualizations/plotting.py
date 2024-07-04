@@ -67,8 +67,8 @@ def plot_price_and_volume(data_in):
     min_price = data['Close'].min()
     idx_max = data['Close'].idxmax()
     idx_min = data['Close'].idxmin()
-    fig.add_annotation(x=idx_max, y=max_price, text=f'Máximo: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
-    fig.add_annotation(x=idx_min, y=min_price, text=f'Mínimo: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
+    fig.add_annotation(x=idx_max, y=max_price, text=f'Max: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
+    fig.add_annotation(x=idx_min, y=min_price, text=f'Min: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
 
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
