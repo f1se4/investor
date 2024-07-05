@@ -29,10 +29,10 @@ def main():
     # Render main title
     company_name = get_company_name(stock)
     st.markdown(f"""
-        <div style="text-align: center; color: #4CAF50; font-size: 28px; font-weight: bold; padding: 10px 0;">
+        <div style="text-align: center; color: #2271B3; font-size: 28px; font-weight: bold; padding: 10px 0;">
                 {stock} - {company_name}
         </div>
-        <hr style="border: 2px solid #4CAF50;">
+        <hr style="border: 2px solid #3B83BD;">
     """, unsafe_allow_html=True)
 
     tab1, tab2, tab3, tab4 = st.tabs(['Graphical Analysis', 'Information', 'Daily', 'ForeCasting'])
