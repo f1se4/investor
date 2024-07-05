@@ -312,7 +312,7 @@ def plot_ma(data_in, check_list):
     if check_list[3]:
         fig.add_trace(go.Scatter(x=data.index, y=data['MA_50'], mode='lines', name='MA 50', line=dict(color='green', width=2)), row=1, col=1)
     if check_list[4]:
-        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_10'], mode='lines', name='EMA 10', line=dict(color='green', width=2)), row=1, col=1)
+        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_10'], mode='lines', name='EMA 10', line=dict(color='yellow', width=2)), row=1, col=1)
 
     # Calcular Holt-Winters - Aditivo
     if check_list[1]:
