@@ -14,7 +14,7 @@ def read_tickers():
 
 # Function to configure sidebar
 def configure_sidebar():
-    st.markdown("""
+    st.sidebar.markdown("""
     <style>
     .link-text {
         color: #b0bec5; /* Color metalizado */
@@ -55,10 +55,10 @@ def configure_sidebar():
     end_time = st.sidebar.date_input("Fecha Final",
                                      datetime.datetime.today(),
                                      format="DD/MM/YYYY")
+    st.sidebar.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">By: www.fisoft.es</a>', unsafe_allow_html=True)
     st.sidebar.header("Help")
     st.sidebar.image(Image.open('assets/velas.jpg'))
 
-    st.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">Visita Fisoft</a>', unsafe_allow_html=True)
 
     return stock, start_time, end_time
 
