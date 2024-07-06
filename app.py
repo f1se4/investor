@@ -4,7 +4,8 @@ import yfinance as yf
 
 from calculations.calculations import (
     mostrar_informacion_general,
-    get_company_name, retrieve_data
+    get_company_name,
+    obtener_constituyentes_y_pesos, retrieve_data
 )
 from visualizations.plotting import plot_rendimiento
 from layout.sidebar          import configure_sidebar
@@ -22,7 +23,7 @@ st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./as
 
 # Main function to run the app
 def main():
-    stock, start_time, end_time = configure_sidebar()
+    stock, start_time, end_time, category, subcategory = configure_sidebar()
 
     # Get data
     data = retrieve_data(stock, start_time, end_time)
@@ -50,7 +51,10 @@ def main():
         st.subheader('General Information')
         mostrar_informacion_general(ticker_data)
 
-        obtener_pesos_constrituyentes(stock)
+        if category == 'Indexados':
+            st.subheader('Constituents')
+            st.dataframe(obtener_constituyentes_y_pesos(stock))
+
 
     with tab3:
         daily(ticker_data)

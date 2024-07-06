@@ -60,5 +60,5 @@ def configure_sidebar():
 
     st.sidebar.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">By: www.fisoft.es</a>', unsafe_allow_html=True)
 
-    return stock, start_time, end_time
+    return stock, start_time, end_time, category, subcategory
 
