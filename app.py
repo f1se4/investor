@@ -12,6 +12,7 @@ from layout.analysis         import analysis
 from layout.daily            import daily
 from layout.forecasting      import forecasting
 from layout.faqs             import faqs
+from layout.information      import obtener_pesos_constrituyentes
 
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
@@ -48,6 +49,8 @@ def main():
         # Show general information
         st.subheader('General Information')
         mostrar_informacion_general(ticker_data)
+
+        obtener_pesos_constrituyentes(stock)
 
     with tab3:
         daily(ticker_data)
