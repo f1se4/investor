@@ -18,7 +18,7 @@ from layout.information      import obtener_pesos_constrituyentes
 warnings.filterwarnings("ignore")
 
 # Set page configuration
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title='FiserFinance Pro')
 
 # Main function to run the app
 def main():

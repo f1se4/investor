@@ -7,8 +7,7 @@
     "Artificial Int.": ["IUIT.L", "XAIX.DE", "0P00015OFP.F"]
   },
   "Renta Fija": {
-    "Seguros": ["Bonos ETF"],
-    "Bancos": ["IBGS", "IBCX", "IBCI"]
+    "Bonos": ["IBGS.AS", "IBCX.L", "IBCI.AS"]
   },
   "Finanzas": {
     "Seguros": ["MAP.MC"],
