@@ -99,6 +99,9 @@ def plot_price_and_volume(data_in, markers):
                 align='left'
             )
 
+    if markers['bollinger']:
+        plot_bollinger_bands(data, fig)
+
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
@@ -124,7 +127,7 @@ def plot_price_and_volume(data_in, markers):
 
     return fig
 
-def plot_candlestick(data_in, range_slide=False, tools=True):
+def plot_candlestick(data_in, markers):
     data = data_in.copy()
     # Convertir el índice a datetime si es necesario
     if isinstance(data.index, pd.DatetimeIndex):
@@ -138,9 +141,33 @@ def plot_candlestick(data_in, range_slide=False, tools=True):
                                  low=data['Low'],
                                  close=data['Close'])
 
+    if markers['kendall']:
+        tau, p_value, trend = get_mann_kendall(data)
+            # Añadir anotaciones para mostrar el resultado de la prueba de Mann-Kendall
+        if trend == 'Bearish':
+            fig.add_annotation(
+                x=0.05, y=0.95,
+                xref='paper', yref='paper',
+                text=f"Coeficiente de Kendall: {tau:.2f}<br>Tendencia: {trend}<br>P-valor: {p_value:.2f}",
+                showarrow=False,
+                font=dict(size=12, color='#A45A52'),
+                align='left'
+            )
+        else:
+            fig.add_annotation(
+                x=0.05, y=0.95,
+                xref='paper', yref='paper',
+                text=f"Coeficiente de Kendall: {tau:.2f}<br>Tendencia: {trend}<br>P-valor: {p_value:.2f}",
+                showarrow=False,
+                font=dict(size=12, color='#29AB87'),
+                align='left'
+            )
+
     fig.add_trace(candlestick, row=1, col=1)
-    if tools:
-        fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
+
+    if markers['bollinger']:
+        plot_bollinger_bands(data, fig)
 
     # Configuraciones de diseño y estilo
     fig.update_layout(
@@ -148,7 +175,7 @@ def plot_candlestick(data_in, range_slide=False, tools=True):
         margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
-        xaxis_rangeslider_visible=range_slide,
+        xaxis_rangeslider_visible=False,
         xaxis=dict(
             domain=[0, 1],  # Ajustar la posición horizontal del eje x
         ),
@@ -561,5 +588,97 @@ def plot_volatility(df_vol):
         ),
     )
     fig.update_yaxes(title_text="Volatility", showticklabels=False)
+
+    return fig
+
+def plot_bollinger_bands(df, fig, window=20, num_std_dev=2):
+    """
+    Plotea las Bandas de Bollinger a partir de un DataFrame que contiene los datos históricos.
+
+    :param df: DataFrame que contiene los datos históricos con columnas ['Open', 'High', 'Low', 'Close'].
+    :param window: Ventana de tiempo para calcular la media móvil simple (SMA).
+    :param num_std_dev: Número de desviaciones estándar para calcular las bandas superior e inferior.
+    :return: Figura de Plotly con el gráfico de velas y las Bandas de Bollinger.
+    """
+    
+    # Calcular la Media Móvil Simple (SMA)
+    df['SMA'] = df['Close'].rolling(window=window).mean()
+    
+    # Calcular la Desviación Estándar
+    df['STD'] = df['Close'].rolling(window=window).std()
+    
+    # Calcular las Bandas de Bollinger
+    df['Upper Band'] = df['SMA'] + (df['STD'] * num_std_dev)
+    df['Lower Band'] = df['SMA'] - (df['STD'] * num_std_dev)
+    
+    # Añadir la media móvil
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df['SMA'],
+        line=dict(color='orange', width=2),
+        name='SMA'
+    ))
+
+    # Añadir las bandas de Bollinger
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df['Upper Band'],
+        line=dict(color='red', width=1),
+        name='Upper Band',
+        opacity=0.5
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df['Lower Band'],
+        line=dict(color='green', width=1),
+        name='Lower Band',
+        opacity=0.5
+    ))
+
+    # Rellenar el área entre las bandas
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df['Upper Band'],
+        line=dict(color='red', width=0),
+        showlegend=False
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df['Lower Band'],
+        line=dict(color='rgba(0,100,80,0.2)', width=0),
+        fill='tonexty',
+        showlegend=False
+    ))
+
+def plot_per_gauge(per_actual):
+    # Definir los rangos para la interpretación del PER
+    valoracion_baja = 10
+    valoracion_media = 20
+    valoracion_alta = 30
+    
+    # Crear el gráfico gauge
+    fig = go.Figure()
+    
+    fig.add_trace(go.Indicator(
+        mode = "gauge+number",
+        value = per_actual,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Price-to-Earnings Ratio (PER)"},
+        gauge = {
+            'axis': {'range': [None, valoracion_alta + 5]},
+            'bar': {'color': "darkblue"},
+            'steps' : [
+                {'range': [0, valoracion_baja], 'color': "lightgreen"},
+                {'range': [valoracion_baja, valoracion_media], 'color': "yellow"},
+                {'range': [valoracion_media, valoracion_alta], 'color': "orange"},
+                {'range': [valoracion_alta, valoracion_alta + 5], 'color': "red"}],
+            'threshold': {
+                'line': {'color': "black", 'width': 2},
+                'thickness': 0.75,
+                'value': per_actual}
+        }
+    ))
 
     return fig

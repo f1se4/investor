@@ -1,11 +1,9 @@
 import warnings
 import streamlit as st
-import yfinance as yf
 
 from calculations.calculations import (
-    mostrar_informacion_general,
     get_company_name,
-    obtener_constituyentes_y_pesos, retrieve_data
+    retrieve_data
 )
 from visualizations.plotting import plot_rendimiento
 from layout.sidebar          import configure_sidebar
@@ -13,6 +11,7 @@ from layout.analysis         import analysis
 from layout.daily            import daily
 from layout.forecasting      import forecasting
 from layout.faqs             import faqs
+from layout.information     import information
 
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
@@ -39,21 +38,7 @@ def main():
     tab1, tab2, tab3, tab4 = st.tabs(['Graphical Analysis', 'Information', 'Daily', 'ForeCasting'])
 
     with tab2:
-        # Show performance plot
-        st.subheader('Performance')
-        rendimiento_plot = plot_rendimiento(stock)
-        st.plotly_chart(rendimiento_plot, use_container_width=True)
-        # Ticker data from yfinance
-        ticker_data = yf.Ticker(stock)
-
-        # Show general information
-        st.subheader('General Information')
-        mostrar_informacion_general(ticker_data)
-
-        if category == 'Indexados':
-            st.subheader('Constituents')
-            st.dataframe(obtener_constituyentes_y_pesos(stock))
-
+        ticker_data = information(stock, category)
 
     with tab3:
         daily(ticker_data)

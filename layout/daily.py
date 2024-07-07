@@ -26,7 +26,7 @@ def daily(ticker_data):
 
     col1, col2 = st.columns(2)
     with col1:
-        plot_candlestick_3 = plot_candlestick(historical_data,False, False)
+        plot_candlestick_3 = plot_candlestick(historical_data, {'kendall':False,'bollinger':False})
         st.plotly_chart(plot_candlestick_3)
     with col2:
         st.markdown(f"**Performance**: {format_value(price_change_percent)}%", unsafe_allow_html=True)

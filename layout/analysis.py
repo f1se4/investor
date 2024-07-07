@@ -8,7 +8,7 @@ from visualizations.plotting import (
     plot_cmf_with_moving_averages,
     plot_with_indicators, plot_candlestick,
     plot_volatility, plot_ma, 
-    plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd,
+    plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd
 )
 
 def analysis(data):
@@ -19,21 +19,23 @@ def analysis(data):
     with colp1:
         selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
 
+    with colp2:
+        kendall = st.checkbox("Mann-Kendall")
+        bollinger = st.checkbox('Bollinger Bands')
+
+    markers = {
+        'kendall' : kendall,
+        'bollinger': bollinger
+    }
+
     if selected_graph == 'Line':
-        with colp2:
-            kendall = st.checkbox("Mann-Kendall")
-
-        markers = {
-            'kendall' : kendall,
-        }
-
         plot_full_fig = plot_price_and_volume(data, markers)
         st.plotly_chart(plot_full_fig)
     elif selected_graph == 'Candle/Velas':
-        plot_candlestick_fig = plot_candlestick(data)
+        plot_candlestick_fig = plot_candlestick(data, markers)
         st.plotly_chart(plot_candlestick_fig)
-        with st.expander("Patterns"):
-            st.image(Image.open('assets/patterns.jpg'))
+        # with st.expander("Patterns"):
+        #     st.image(Image.open('assets/patterns.jpg'))
 
     # Crear columnas
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -103,3 +105,6 @@ def analysis(data):
 
     plot_ma_fig = plot_ma(data, [chckbx1, chckbx2, chckbx3, chckbx4, chckbx5])
     st.plotly_chart(plot_ma_fig)
+
+    # bollinger = plot_bollinger_bands(data) 
+    # st.plotly_chart(bollinger)
