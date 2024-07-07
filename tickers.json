@@ -5,6 +5,9 @@
     "Emergentes": ["IE0031786142.IR"],
     "AI or IT": ["UST.MI", "UST.MI", "IUIT.L", "XAIX.DE", "0P00015OFP.F"]
   },
+  "Divisas": {
+    "Crypto": ["BTC-USD"]
+  },
   "Renta Fija": {
     "Bonos": ["IBGS.AS", "IBCX.L", "IBCI.AS"]
   },
