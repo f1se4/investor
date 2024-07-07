@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/root/investor
-ExecStart=/usr/local/bin/streamlit run app.py
+ExecStart=/bin/bash -c 'source /root/investor/.venv/bin/activate && exec streamlit run app.py'
 Restart=always
 
 [Install]

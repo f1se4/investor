@@ -8,7 +8,8 @@ from visualizations.plotting import (
     plot_cmf_with_moving_averages,
     plot_with_indicators, plot_candlestick,
     plot_volatility, plot_ma, 
-    plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd
+    plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd,
+    plot_indicators_macd_with_divergences
 )
 
 def analysis(data):
@@ -67,6 +68,9 @@ def analysis(data):
     if checkbox5:
         plot_indicator_macd = plot_indicators_macd(data)
         st.plotly_chart(plot_indicator_macd)
+
+    plot_mac_div = plot_indicators_macd_with_divergences(data)
+    st.plotly_chart(plot_mac_div)
 
     # Smoothing plot
     st.subheader('Smoothing')
