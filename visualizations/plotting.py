@@ -4,7 +4,6 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
-import mplfinance as mpf
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.graph_objects as go
 import xgboost as xgb
@@ -15,8 +14,8 @@ from plotly.subplots import make_subplots
 from calculations.calculations import (
 repulsion_alisada, tema, dema, calculate_cmf,
 calculate_moving_average, normalize_sma_to_range, 
-normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels,
-find_divergences
+normalize_cmf_to_range, calculate_rsi, calculate_macd,
+get_mann_kendall,
 )
 
 # Configuración global de tamaño de fuente para matplotlib
@@ -24,6 +23,8 @@ mpl.rcParams.update({'font.size': 10})
 plt.rcParams.update({'font.size': 10})
 
 plt.style.use("dark_background")
+
+all_margins=dict(l=20, r=20, t=30, b=0)
 
 #########################################################################################
 #### Funciones para gráficos
@@ -52,7 +53,7 @@ def plot_forecast_hw(data, forecast):
 
     return fig
 
-def plot_price_and_volume(data_in):
+def plot_price_and_volume(data_in, markers):
     data = data_in.copy()
     # Convertir el índice a datetime si es necesario
     if isinstance(data.index, pd.DatetimeIndex):
@@ -76,12 +77,36 @@ def plot_price_and_volume(data_in):
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
 
+    if markers['kendall']:
+        tau, p_value, trend = get_mann_kendall(data)
+            # Añadir anotaciones para mostrar el resultado de la prueba de Mann-Kendall
+        if trend == 'Bearish':
+            fig.add_annotation(
+                x=0.05, y=0.95,
+                xref='paper', yref='paper',
+                text=f"Coeficiente de Kendall: {tau:.2f}<br>Tendencia: {trend}<br>P-valor: {p_value:.2f}",
+                showarrow=False,
+                font=dict(size=12, color='#A45A52'),
+                align='left'
+            )
+        else:
+            fig.add_annotation(
+                x=0.05, y=0.95,
+                xref='paper', yref='paper',
+                text=f"Coeficiente de Kendall: {tau:.2f}<br>Tendencia: {trend}<br>P-valor: {p_value:.2f}",
+                showarrow=False,
+                font=dict(size=12, color='#29AB87'),
+                align='left'
+            )
+
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
-        showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
+        showlegend=False,  # Ocultar la     
+        dragmode='drawline',  # Habilitar el modo de dibujo de líneas
+        shapes=[],  # Inicializar lista vacía para las líneas dibujadasleyenda, ya que solo hay dos gráficos
         xaxis=dict(
             domain=[0, 1],  # Ajustar la posición horizontal del eje x
         ),
@@ -89,6 +114,8 @@ def plot_price_and_volume(data_in):
             titlefont=dict(color='rgba(31,119,180,0.6)'),
             tickfont=dict(color='rgba(31,119,180,0.6)'),
         ),
+        newshape=dict(line=dict(color="red")),
+        modebar_add=['drawline','eraseshape']
     )
 
     # Configuraciones de ejes para cada subplot
@@ -118,7 +145,7 @@ def plot_candlestick(data_in, range_slide=False, tools=True):
     # Configuraciones de diseño y estilo
     fig.update_layout(
         height=600,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
         xaxis_rangeslider_visible=range_slide,
@@ -177,7 +204,7 @@ def plot_ma(data_in, check_list):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=dict(l=20, r=20, t=80, b=0),
         hovermode='x',  # Activar el modo hover
         showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -356,7 +383,7 @@ def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=2
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -400,7 +427,7 @@ def plot_with_indicators(data):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -436,7 +463,7 @@ def plot_indicators_rsi(data):
 
     fig.update_layout(
         height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -466,7 +493,7 @@ def plot_indicators_macd(data):
 
     fig.update_layout(
         height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -516,7 +543,7 @@ def plot_volatility(df_vol):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=200,
-        margin=dict(l=20, r=20, t=0, b=0),
+        margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,
         legend=dict(x=0.05, y=0.95, bgcolor='rgba(255, 255, 255, 0.5)', bordercolor='rgba(0, 0, 0, 0.5)'),  # Mostrar leyenda

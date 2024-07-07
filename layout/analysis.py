@@ -14,9 +14,20 @@ from visualizations.plotting import (
 def analysis(data):
     # Graphic Analysis section
     st.subheader('Graphical Analysis (Selected Period)')
-    selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
+    colp1, colp2 = st.columns(2)
+
+    with colp1:
+        selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
+
     if selected_graph == 'Line':
-        plot_full_fig = plot_price_and_volume(data)
+        with colp2:
+            kendall = st.checkbox("Mann-Kendall")
+
+        markers = {
+            'kendall' : kendall,
+        }
+
+        plot_full_fig = plot_price_and_volume(data, markers)
         st.plotly_chart(plot_full_fig)
     elif selected_graph == 'Candle/Velas':
         plot_candlestick_fig = plot_candlestick(data)

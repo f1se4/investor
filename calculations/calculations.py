@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import numpy as np
+from scipy.stats import kendalltau
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 
@@ -245,4 +246,52 @@ def retrieve_data(stock, start_date, end_date):
     end_date_str = end_date.strftime("%Y-%m-%d")
     return get_data(stock, start_date_str, end_date_str)
 
+def get_mann_kendall(data):
+    """
+    Función para graficar datos de Yahoo Finance y mostrar el resultado de la prueba de Mann-Kendall.
+    """
+    # Calcular el coeficiente de correlación de Kendall y el p-valor
+    tau, p_value = kendalltau(y=data['Close'], x=data.index, method='auto')
+    trend = "Bullish" if tau > 0 else "Bearish"
 
+    return tau, p_value, trend
+
+# Definir función para encontrar 3 máximos o mínimos consecutivos
+def find_extremes(series, n=3, direction='max'):
+    if direction == 'max':
+        condition = (series.shift(1) < series) & (series.shift(-1) < series)
+    elif direction == 'min':
+        condition = (series.shift(1) > series) & (series.shift(-1) > series)
+    else:
+        raise ValueError("Direction must be 'max' or 'min'.")
+    
+    extreme_indices = condition.rolling(window=n).sum() == (n - 1)
+    return extreme_indices
+
+def detect_HnS_patterns(data):
+    patterns = []
+    peaks, valleys = [], []
+    
+    # Identificar picos y valles
+    for i in range(1, len(data)-1):
+        if data[i] > data[i-1] and data[i] > data[i+1]:
+            peaks.append(i)
+        elif data[i] < data[i-1] and data[i] < data[i+1]:
+            valleys.append(i)
+    
+    # Buscar patrones HCH
+    for i in range(1, len(peaks)-1):
+        for j in range(len(valleys)-1):
+            if valleys[j] < peaks[i] < valleys[j+1]:
+                if data[peaks[i-1]] > data[peaks[i]] < data[peaks[i+1]]:
+                    head = peaks[i]
+                    left_shoulder = peaks[i-1]
+                    right_shoulder = peaks[i+1]
+                    
+                    if valleys[j] < left_shoulder < head and valleys[j+1] > right_shoulder:
+                        patterns.append((left_shoulder, head, right_shoulder))
+                        
+
+    print(patterns)
+    
+    return patterns
