@@ -92,4 +92,3 @@ def analysis(data):
 
     plot_ma_fig = plot_ma(data, [chckbx1, chckbx2, chckbx3, chckbx4, chckbx5])
     st.plotly_chart(plot_ma_fig)
-
