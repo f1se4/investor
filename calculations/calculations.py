@@ -8,6 +8,19 @@ from statsmodels.tsa.arima.model import ARIMA
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+# Función para detectar divergencias
+def find_divergences(data, macd_line):
+    divergences = []
+    for i in range(1, len(data)-1):
+        # Buscando puntos bajos y altos en el precio y MACD
+        if data['Close'][i] > data['Close'][i-1] and data['Close'][i] > data['Close'][i+1]:
+            if macd_line[i] < macd_line[i-1] and macd_line[i] < macd_line[i+1]:
+                divergences.append(('Bearish', data.index[i]))
+        elif data['Close'][i] < data['Close'][i-1] and data['Close'][i] < data['Close'][i+1]:
+            if macd_line[i] > macd_line[i-1] and macd_line[i] > macd_line[i+1]:
+                divergences.append(('Bullish', data.index[i]))
+    return divergences
+    
 # Función para formatear valores con color
 def crear_barra(porcentaje, max_longitud=80):
     longitud_llena = int((porcentaje / 100) * max_longitud)
