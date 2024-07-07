@@ -410,7 +410,7 @@ def plot_cmf_with_moving_averages(data, cmf_period=8, ma_period1=5, ma_period2=2
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=200,
-        margin=all_margins,
+        margin=dict(l=20, r=20, t=80, b=0),
         hovermode='x',  # Activar el modo hover
         showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
