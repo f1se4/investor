@@ -12,7 +12,12 @@ from datetime import timedelta
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from calculations.calculations import repulsion_alisada, tema, dema, calculate_cmf, calculate_moving_average, normalize_sma_to_range, normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels
+from calculations.calculations import (
+repulsion_alisada, tema, dema, calculate_cmf,
+calculate_moving_average, normalize_sma_to_range, 
+normalize_cmf_to_range, calculate_rsi, calculate_macd, get_levels,
+find_divergences
+)
 
 # Configuración global de tamaño de fuente para matplotlib
 mpl.rcParams.update({'font.size': 10})
@@ -689,3 +694,41 @@ def plot_volatility(df_vol):
     fig.update_yaxes(title_text="Volatility", showticklabels=False)
 
     return fig
+# Función para graficar MACD y divergencias
+def plot_indicators_macd_with_divergences(data):
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1)
+
+    # Plot Close Price
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], name='Close Price', line=dict(color='black')), row=1, col=1)
+
+    # Calculate MACD and Signal Line
+    macd_line, signal_line = calculate_macd(data)
+    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD', line=dict(color='dodgerblue')), row=2, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=signal_line, name='Signal', line=dict(color='magenta', dash='dash')), row=2, col=1)
+
+    # Plot MACD Histogram
+    macd_histogram = macd_line - signal_line
+    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=2, col=1)
+
+    # Find and plot divergences
+    divergences = find_divergences(data, macd_line)
+    for div_type, date in divergences:
+        if div_type == 'Bullish':
+            fig.add_vline(x=date, line=dict(color='green', width=1, dash='dash'), row=1, col=1)
+            fig.add_vline(x=date, line=dict(color='green', width=1, dash='dash'), row=2, col=1)
+        elif div_type == 'Bearish':
+            fig.add_vline(x=date, line=dict(color='red', width=1, dash='dash'), row=1, col=1)
+            fig.add_vline(x=date, line=dict(color='red', width=1, dash='dash'), row=2, col=1)
+
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="MACD", row=2, col=1)
+
+    fig.update_layout(
+        height=600,
+        margin=dict(l=20, r=20, t=40, b=20),
+        hovermode='x',
+        title="MACD and Price Indicators with Divergences",
+    )
+
+    return fig
+
