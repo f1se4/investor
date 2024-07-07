@@ -454,7 +454,7 @@ def plot_with_indicators(data):
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=200,
-        margin=all_margins,
+        margin=dict(l=20, r=20, t=80, b=0),
         hovermode='x',  # Activar el modo hover
         showlegend=True,  # Ocultar la leyenda, ya que solo hay dos gráficos
         xaxis=dict(
@@ -509,7 +509,7 @@ def plot_indicators_macd(data):
 
     # Plot MACD
     macd_line, signal_line = calculate_macd(data)
-    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD', line=dict(color='dodgerblue')), row=1, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=macd_line, name='MACD 12/26', line=dict(color='dodgerblue')), row=1, col=1)
     fig.add_trace(go.Scatter(x=data.index, y=signal_line, name='Signal', line=dict(color='magenta', dash='dash')), row=1, col=1)
 
     # Plot Histograma del MACD
