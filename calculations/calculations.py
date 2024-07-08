@@ -9,6 +9,15 @@ from statsmodels.tsa.arima.model import ARIMA
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+def calculate_ahimud(data):
+    # Calcular el indicador de Amihud
+    data['Return'] = data['Adj Close'].pct_change()
+    data['Amihud'] = data['Return'].abs() / data['Volume']
+
+    # Llenar valores NaN en el volumen con la media (opcional, para evitar NaN en el gráfico)
+    data['Amihud'] = data['Amihud'].fillna(method='bfill')
+    return data
+
 # Función para detectar divergencias
 def find_divergences(data, macd_line):
     divergences = []

@@ -15,7 +15,7 @@ from calculations.calculations import (
 repulsion_alisada, tema, dema, calculate_cmf,
 calculate_moving_average, normalize_sma_to_range, 
 normalize_cmf_to_range, calculate_rsi, calculate_macd,
-get_mann_kendall,
+get_mann_kendall, calculate_ahimud
 )
 
 # Configuración global de tamaño de fuente para matplotlib
@@ -60,7 +60,10 @@ def plot_price_and_volume(data_in, markers):
         data.index = data.index.astype(str)
 
     # Crear un objeto de figura de Plotly con subplots
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.8, 0.2])  # 2 filas, 1 columna
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, 
+                        row_heights=[0.8, 0.2],
+                        specs=[[{"secondary_y": False}], [{"secondary_y": True}]]  # Añadir un segundo eje Y solo al subplot inferior
+                        )  # 2 filas, 1 columna
     # row_heights=[0.7, 0.3] significa que la primera fila (precio) será 0.7 veces más alta que la segunda fila (volumen)
 
     # Añadir el gráfico del precio (arriba)
@@ -76,7 +79,21 @@ def plot_price_and_volume(data_in, markers):
 
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
-
+    # Agregar el indicador de Amihud al subplot inferior
+    if markers['liquidity']:
+        data = calculate_ahimud(data)
+        fig.add_trace(
+        go.Scatter(
+            x=data.index,
+            y=data['Amihud'],
+            mode='lines',
+            name='Amihud',
+            line=dict(color='rgba(0, 255, 0, 0.2)'),
+            yaxis="y2"
+        ),
+        row=2, col=1,
+        secondary_y=True
+    )
     if markers['kendall']:
         tau, p_value, trend = get_mann_kendall(data)
             # Añadir anotaciones para mostrar el resultado de la prueba de Mann-Kendall

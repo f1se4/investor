@@ -22,10 +22,12 @@ def analysis(data):
     with colp2:
         kendall = st.checkbox("Mann-Kendall")
         bollinger = st.checkbox('Bollinger Bands')
+        liquidity = st.checkbox('Liquidity (Volume)')
 
     markers = {
         'kendall' : kendall,
-        'bollinger': bollinger
+        'bollinger': bollinger,
+        'liquidity' : liquidity
     }
 
     if selected_graph == 'Line':
