@@ -50,7 +50,7 @@ def configure_sidebar():
 
     st.sidebar.header("Analysis Period")
     start_time = st.sidebar.date_input("Fecha de Inicio",
-                                       datetime.datetime.today() - timedelta(days=182),
+                                       datetime.datetime.today() - timedelta(days=365),
                                        format="DD/MM/YYYY")
     end_time = st.sidebar.date_input("Fecha Final",
                                      datetime.datetime.today(),
