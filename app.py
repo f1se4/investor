@@ -12,6 +12,7 @@ from layout.daily            import daily
 from layout.forecasting      import forecasting
 from layout.faqs             import faqs
 from layout.information     import information
+from layout.calculadora     import calculadora
 
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
@@ -35,7 +36,12 @@ def main():
         <hr style="border: 2px solid #3B83BD;">
     """, unsafe_allow_html=True)
 
-    tab1, tab2, tab3, tab4 = st.tabs(['Graphical Analysis', 'Information', 'Daily', 'ForeCasting'])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(['Graphical Analysis', 
+                                            'Information', 
+                                            'Daily', 
+                                            'ForeCasting',
+                                            'Calculator'
+                                            ])
 
     with tab2:
         ticker_data = information(stock, category)
@@ -48,6 +54,9 @@ def main():
         
     with tab4:
         forecasting(data, end_time, start_time)
+
+    with tab5:
+        calculadora()
 
     st.divider()
 
