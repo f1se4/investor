@@ -14,20 +14,24 @@ from visualizations.plotting import (
 def analysis(data):
     # Graphic Analysis section
     st.subheader('Graphical Analysis (Selected Period)')
-    colp1, colp2 = st.columns(2)
+    colp1, colp2, colp3 = st.columns(3)
 
     with colp1:
         selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
 
     with colp2:
         kendall = st.checkbox("Mann-Kendall")
-        bollinger = st.checkbox('Bollinger Bands')
         liquidity = st.checkbox('Liquidity Amihud')
+
+    with colp3:
+        fibonacci = st.checkbox('Fibonacci')
+        bollinger = st.checkbox('Bollinger Bands')
 
     markers = {
         'kendall' : kendall,
         'bollinger': bollinger,
-        'liquidity' : liquidity
+        'liquidity' : liquidity,
+        'fibonacci' : fibonacci
     }
 
     if selected_graph == 'Line':

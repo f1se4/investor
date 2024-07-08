@@ -9,6 +9,18 @@ from statsmodels.tsa.arima.model import ARIMA
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+def calcular_fibonacci(data):
+    # Calcular los niveles de Fibonacci
+    max_price = data['Adj Close'].max()
+    min_price = data['Adj Close'].min()
+
+    fib_levels = [0, 0.236, 0.382, 0.5, 0.618, 1]
+
+    fibonacci_values = []
+    for level in fib_levels:
+        fibonacci_values.append(min_price + level * (max_price - min_price))
+    return fib_levels, fibonacci_values
+
 def calcular_impuesto(beneficio):
     if beneficio <= 6000:
         impuesto = beneficio * 0.19

@@ -15,7 +15,7 @@ from calculations.calculations import (
 repulsion_alisada, tema, dema, calculate_cmf,
 calculate_moving_average, normalize_sma_to_range, 
 normalize_cmf_to_range, calculate_rsi, calculate_macd,
-get_mann_kendall, calculate_ahimud
+get_mann_kendall, calculate_ahimud, calcular_fibonacci
 )
 
 # Configuración global de tamaño de fuente para matplotlib
@@ -119,6 +119,18 @@ def plot_price_and_volume(data_in, markers):
     if markers['bollinger']:
         plot_bollinger_bands(data, fig)
 
+    if markers['fibonacci']:
+        # Agregar líneas para los niveles de Fibonacci
+        fib_levels, fibonacci_values = calcular_fibonacci(data)
+        # Agregar líneas para los niveles de Fibonacci con colores
+        colors = ['blue', 'green', 'red', 'red', 'green', 'gray']
+        for i, (level, value) in enumerate(zip(fib_levels, fibonacci_values)):
+            fig.add_shape(type="line",
+                  x0=data.index[0], y0=value, x1=data.index[-1], y1=value,
+                  line=dict(color=colors[i], width=1, dash="dash"),
+                  opacity=0.7,
+                  name=f'Fib {level}')
+
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
         height=600,
@@ -158,6 +170,21 @@ def plot_candlestick(data_in, markers):
                                  low=data['Low'],
                                  close=data['Close'])
 
+    # Agregar el indicador de Amihud al subplot inferior
+    if markers['liquidity']:
+        data = calculate_ahimud(data)
+        fig.add_trace(
+        go.Scatter(
+            x=data.index,
+            y=data['Amihud'],
+            mode='lines',
+            name='Amihud',
+            line=dict(color='rgba(0, 255, 0, 0.2)'),
+            yaxis="y2"
+        ),
+        row=2, col=1,
+        secondary_y=True
+    )
     if markers['kendall']:
         tau, p_value, trend = get_mann_kendall(data)
             # Añadir anotaciones para mostrar el resultado de la prueba de Mann-Kendall
@@ -179,6 +206,21 @@ def plot_candlestick(data_in, markers):
                 font=dict(size=12, color='#29AB87'),
                 align='left'
             )
+
+    if markers['bollinger']:
+        plot_bollinger_bands(data, fig)
+
+    if markers['fibonacci']:
+        # Agregar líneas para los niveles de Fibonacci
+        fib_levels, fibonacci_values = calcular_fibonacci(data)
+        # Agregar líneas para los niveles de Fibonacci con colores
+        colors = ['blue', 'green', 'red', 'red', 'green', 'gray']
+        for i, (level, value) in enumerate(zip(fib_levels, fibonacci_values)):
+            fig.add_shape(type="line",
+                  x0=data.index[0], y0=value, x1=data.index[-1], y1=value,
+                  line=dict(color=colors[i], width=1, dash="dash"),
+                  opacity=0.7,
+                  name=f'Fib {level}')
 
     fig.add_trace(candlestick, row=1, col=1)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
