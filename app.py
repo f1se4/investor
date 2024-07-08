@@ -40,7 +40,7 @@ def main():
                                             'Information', 
                                             'Daily', 
                                             'ForeCasting',
-                                            'Calculator'
+                                            'Compound Interest Calculator'
                                             ])
 
     with tab2:
