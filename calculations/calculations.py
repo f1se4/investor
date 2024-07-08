@@ -9,6 +9,16 @@ from statsmodels.tsa.arima.model import ARIMA
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+def calcular_impuesto(beneficio):
+    if beneficio <= 6000:
+        impuesto = beneficio * 0.19
+    elif beneficio <= 50000:
+        impuesto = 6000 * 0.19 + (beneficio - 6000) * 0.21
+    else:
+        impuesto = 6000 * 0.19 + (50000 - 6000) * 0.21 + (beneficio - 50000) * 0.23
+
+    return impuesto
+
 def calculate_ahimud(data):
     # Calcular el indicador de Amihud
     data['Return'] = data['Adj Close'].pct_change()

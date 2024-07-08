@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+from calculations.calculations import calcular_impuesto
 
 def calculadora():
 
@@ -45,11 +46,16 @@ def calculadora():
     total_balance = balances[-1]
     total_gain = total_balance - total_invested_amount
 
+    impuesto = calcular_impuesto(total_gain) 
+    beneficio = total_gain - impuesto
+
     with colc2:
         st.header("Summary")
-        st.markdown(f"**Total Gain**: <span style='color: green;'>{total_gain:,.2f}€</span>", unsafe_allow_html=True)
-        st.markdown(f"**Final Capital**: <span style='color: #b4ac85;'>{total_balance:,.2f}€</span>", unsafe_allow_html=True)
+        st.markdown(f"**Total Gain**: <span style='color: darkgreen;'>{total_gain:,.2f}€</span>", unsafe_allow_html=True)
         st.markdown(f"**Total Investment**: <span style='color: orange;'>{total_invested_amount:,.2f}€</span>", unsafe_allow_html=True)
+        st.markdown(f"**Taxes**: <span style='color: red;'>{impuesto:,.2f}€</span>", unsafe_allow_html=True)
+        st.markdown(f"**Total Gain - Taxes**: <span style='color: green;'>{beneficio:,.2f}€</span>", unsafe_allow_html=True)
+        st.markdown(f"**Final Capital**: <span style='color: #b4ac85;'>{total_balance - impuesto:,.2f}€</span>", unsafe_allow_html=True)
 
     # Create a DataFrame for the chart
     df = pd.DataFrame({
