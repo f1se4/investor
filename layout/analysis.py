@@ -22,7 +22,7 @@ def analysis(data):
     with colp2:
         kendall = st.checkbox("Mann-Kendall")
         bollinger = st.checkbox('Bollinger Bands')
-        liquidity = st.checkbox('Liquidity (Volume)')
+        liquidity = st.checkbox('Liquidity Amihud')
 
     markers = {
         'kendall' : kendall,
