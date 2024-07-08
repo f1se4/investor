@@ -130,6 +130,8 @@ def plot_price_and_volume(data_in, markers):
                   line=dict(color=colors[i], width=1, dash="dash"),
                   opacity=0.7,
                   name=f'Fib {level}')
+    if markers['SMA200']:
+        data['SMA'] = data['Close'].rolling(window=200).mean()
 
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(

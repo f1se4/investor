@@ -15,8 +15,9 @@ def analysis(data):
     # Graphic Analysis section
     st.subheader('Graphical Analysis (Selected Period)')
     selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
-    colp1, colp2, colp3 = st.columns(3)
 
+    st.markdown("**Overlapping Indicators**")
+    colp1, colp2, colp3 = st.columns(3)
     with colp1:
         fibonacci = st.checkbox('Fibonacci')
         bollinger = st.checkbox('Bollinger Bands')
@@ -26,7 +27,7 @@ def analysis(data):
         kendall = st.checkbox("Mann-Kendall")
 
     with colp3:
-        sma20 = st.checkbox('SMA (20)')
+        sma200 = st.checkbox('SMA (200)')
         sma5  = st.checkbox('SMA (5)')
 
     markers = {
@@ -34,7 +35,7 @@ def analysis(data):
         'bollinger': bollinger,
         'liquidity' : liquidity,
         'fibonacci' : fibonacci,
-        'SMA20'     : sma20,
+        'SMA200'     : sma200,
         'SMA5'      : sma5
     }
 
