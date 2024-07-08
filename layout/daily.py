@@ -28,6 +28,8 @@ def daily(ticker_data):
     with col1:
         plot_candlestick_3 = plot_candlestick(historical_data, {'kendall':False,
                                                                 'fibonacci':False,
+                                                                'SMA200':False,
+                                                                'SMA5':False,
                                                                 'liquidity':False,
                                                                 'bollinger':False})
         st.plotly_chart(plot_candlestick_3)

@@ -131,7 +131,11 @@ def plot_price_and_volume(data_in, markers):
                   opacity=0.7,
                   name=f'Fib {level}')
     if markers['SMA200']:
-        data['SMA'] = data['Close'].rolling(window=200).mean()
+        data['SMA200'] = data['Close'].rolling(window=200).mean()
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMA200'], mode='lines', line=dict(color='darkblue', width=2)), row=1, col=1)
+    if markers['SMA5']:
+        data['SMA5'] = data['Close'].rolling(window=5).mean()
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMA5'], mode='lines', line=dict(color='cyan', width=2)), row=1, col=1)
 
     # Configuraciones de diseño y estilo para el gráfico completo
     fig.update_layout(
@@ -223,6 +227,14 @@ def plot_candlestick(data_in, markers):
                   line=dict(color=colors[i], width=1, dash="dash"),
                   opacity=0.7,
                   name=f'Fib {level}')
+
+    if markers['SMA200']:
+        data['SMA200'] = data['Close'].rolling(window=200).mean()
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMA200'], mode='lines', line=dict(color='darkblue', width=2)), row=1, col=1)
+
+    if markers['SMA5']:
+        data['SMA5'] = data['Close'].rolling(window=5).mean()
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMA5'], mode='lines', line=dict(color='cyan', width=2)), row=1, col=1)
 
     fig.add_trace(candlestick, row=1, col=1)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
