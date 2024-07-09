@@ -53,29 +53,8 @@ def main():
         ticker_data = information(stock, category)
 
     with tab1:# Crear un contenedor para los radiobuttons en horizontal
-        options = ['1m','2m','5m','15m','90m','1h']
-        radio_buttons = st.empty()
-        
-        # Generar el HTML y CSS para los radiobuttons en horizontal
-        radio_html = """
-<div style="display: flex; align-items: center;">
-  {buttons}
-</div>
-"""
-        # Crear los botones de radio en HTML
-        buttons_html = ""
-        for option in options:
-            buttons_html += f'<label style="margin-right: 10px;"><input type="radio" name="radio_horizontal" value="{option}" style="margin-right: 5px;">{option}</label>'
-        # Insertar los botones de radio en el HTML
-        radio_html = radio_html.format(buttons=buttons_html)
-
-        radio_buttons.markdown(radio_html, unsafe_allow_html=True)        
-
-        # Obtener el valor seleccionado
-        query_params = st.query_params
-        selected_value = query_params.get("selected_radio", '15m')
-        st.write(f"Has seleccionado: {selected_value}")
-        selected_interval = st.radio("Interval", options )
+        options = ['1m','2m','5m','15m','30m','1h','90m']
+        selected_value = st.radio("Interval", options )
         placeholder = st.empty()
         with placeholder:
             daily(ticker_data, selected_value)
