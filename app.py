@@ -1,5 +1,6 @@
 import warnings
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 
 from calculations.calculations import (
     get_company_name,
@@ -15,6 +16,9 @@ from layout.calculadora     import calculadora
 
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
+
+refresh_interval = 60000
+st_autorefresh(interval=refresh_interval,key='datarefresh')
 
 # Set page configuration
 st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./assets/icon.jpg')

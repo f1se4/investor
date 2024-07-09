@@ -7,3 +7,4 @@ numpy
 mplfinance
 statsmodels
 xgboost
+streamlit_autorefresh
