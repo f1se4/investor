@@ -11,7 +11,7 @@ from visualizations.plotting import (
     plot_price_and_volume, plot_indicators_rsi, plot_indicators_macd
 )
 
-def analysis(data):
+def analysis(data, full_data):
     # Graphic Analysis section
     st.subheader('Graphical Analysis (Selected Period)')
     selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])

@@ -25,6 +25,10 @@ def main():
 
     # Get data
     data = retrieve_data(stock, start_time, end_time)
+    start_date_str = start_time.strftime("%Y-%m-%d")
+    end_date_str = end_time.strftime("%Y-%m-%d")
+    full_data = data.copy()
+    data = data[start_date_str:end_date_str]
 
     # Render main title
     company_name = get_company_name(stock)
@@ -49,7 +53,7 @@ def main():
         daily(ticker_data)
 
     with tab1:
-        analysis(data)
+        analysis(data, full_data)
         
     with tab4:
         forecasting(data, end_time, start_time)
