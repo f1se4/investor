@@ -174,7 +174,7 @@ def get_company_name(ticker):
     return company_name
 
 def get_data(stock, start_time, end_time):
-    df = yf.download(stock, start=start_time, end=end_time)
+    df = yf.download(stock, period='max')#start=start_time, end='1900-01-01')
     return df
 
 def normalize_sma(data, sma, window):
