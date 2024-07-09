@@ -5,7 +5,6 @@ from calculations.calculations import (
     get_company_name,
     retrieve_data
 )
-from visualizations.plotting import plot_rendimiento
 from layout.sidebar          import configure_sidebar
 from layout.analysis         import analysis
 from layout.daily            import daily
