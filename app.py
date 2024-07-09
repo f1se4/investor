@@ -76,14 +76,10 @@ def main():
         # Crear los botones de radio en HTML
         buttons_html = ""
         for option in options:
-            buttons_html += f"<label style="margin-right: 10px;"><input type="radio" name="radio_horizontal" value="{option}" style="margin-right: 5px;">{option}
-
-
-                                        
-            </label>
+            buttons_html += f'<label style="margin-right: 10px;"><input type="radio" name="radio_horizontal" value="{option}" style="margin-right: 5px;">{option}</label>'
         # Insertar los botones de radio en el HTML
         radio_html = radio_html.format(buttons=buttons_html)
-        # Mostrar los botones de radio en Streamlit
+
         radio_buttons.markdown(radio_html, unsafe_allow_html=True)        
         # Obtener el valor seleccionado (este valor se actualizará al seleccionar un radiobutton)
         selected_value = st.experimental_get_query_params().get("selected_radio", [None])[0]
