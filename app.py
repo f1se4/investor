@@ -23,8 +23,6 @@ st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./as
 refresh_interval = 60000
 st_autorefresh(interval=refresh_interval,key='datarefresh')
 
-placeholder = st.empty()
-
 # Main function to run the app
 def main():
     stock, start_time, end_time, category, subcategory = configure_sidebar()
@@ -56,6 +54,7 @@ def main():
         ticker_data = information(stock, category)
 
     with tab3:
+        placeholder = st.empty()
         with placeholder:
             daily(ticker_data)
 
