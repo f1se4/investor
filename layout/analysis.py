@@ -14,7 +14,7 @@ from visualizations.plotting import (
 def analysis(data, full_data):
     # Graphic Analysis section
     st.subheader('Graphical Analysis (Selected Period)')
-    selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'])
+    selected_graph = st.radio("Graph Type", ['Line','Candle/Velas'], horizontal=True)
 
     st.markdown("**Overlapping Indicators**")
     colp1, colp2, colp3 = st.columns(3)

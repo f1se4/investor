@@ -43,23 +43,24 @@ def main():
         <hr style="border: 2px solid #3B83BD;">
     """, unsafe_allow_html=True)
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(['Daily','Graphical Analysis', 
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(['Daily',
+                                            'Graphical Analysis', 
                                             'Information', 
                                             'ForeCasting',
                                             'Compound Interest Calculator'
                                             ])
 
-    with tab2:
+    with tab3:
         ticker_data = information(stock, category)
 
     with tab1:# Crear un contenedor para los radiobuttons en horizontal
         options = ['1m','2m','5m','15m','30m','1h','90m']
-        selected_value = st.radio("Interval", options )
+        selected_value = st.radio("Interval", options ,horizontal=True)
         placeholder = st.empty()
         with placeholder:
             daily(ticker_data, selected_value)
 
-    with tab3:
+    with tab2:
         analysis(data, full_data)
         
     with tab4:
