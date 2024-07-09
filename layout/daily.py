@@ -1,6 +1,5 @@
 import streamlit as st
 import yfinance as yf
-from pytz import timezone, utc
 
 from visualizations.plotting import (
     plot_candlestick_daily,
@@ -8,12 +7,10 @@ from visualizations.plotting import (
 
 def daily(ticker_data, selected_interval):
     # Historical data
-    utc_tz = utc
-    cest_tz = timezone('Europe/Paris')  # Assuming CEST is Europe/Paris time zone
     daily_data = yf.download(ticker_data.get_info()['symbol'],period='1d',interval=selected_interval)
 
     # # Convert index (date) to CEST
-    # daily_data.index = daily_data.index.tz_localize(utc_tz).tz_convert(cest_tz)
+    daily_data.index = daily_data.index.tz_convert('CET')
 
     plot_daily = plot_candlestick_daily(daily_data)
     st.plotly_chart(plot_daily)
