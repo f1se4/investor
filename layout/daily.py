@@ -1,6 +1,7 @@
 import datetime
 from datetime import timedelta
 import streamlit as st
+import yfinance as yf
 
 from calculations.calculations import (
     format_value
@@ -11,9 +12,7 @@ from visualizations.plotting import (
 
 def daily(ticker_data):
     # Historical data
-    today = datetime.datetime.today().strftime('%Y-%m-%d')
-    five_days_ago = (datetime.datetime.today() - timedelta(days=5)).strftime('%Y-%m-%d')
-    historical_data = ticker_data.history(start=five_days_ago, end=today)
+    daily_data = yf.download(ticker_data.get_info()['symbol'],period='1d',interval='1m')
 
     # # Calculate KPIs
     # last_day_data = historical_data.iloc[-1]
