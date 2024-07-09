@@ -10,7 +10,10 @@ def daily(ticker_data, selected_interval):
     daily_data = yf.download(ticker_data.get_info()['symbol'],period='1d',interval=selected_interval)
 
     # # Convert index (date) to CEST
-    daily_data.index = daily_data.index.tz_convert('CET')
+    try:
+        daily_data.index = daily_data.index.tz_convert('CET')
+    except:
+        pass
 
     plot_daily = plot_candlestick_daily(daily_data)
     st.plotly_chart(plot_daily)

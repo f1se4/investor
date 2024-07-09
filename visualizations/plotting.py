@@ -186,7 +186,7 @@ def plot_candlestick_daily(data_in):
         margin=all_margins,
         hovermode='x',  # Activar el modo hover
         showlegend=False,  # Ocultar la leyenda, ya que solo hay un gráfico
-        xaxis_rangeslider_visible=False,
+        xaxis_rangeslider_visible=True,
         xaxis=dict(
             domain=[0, 1],  # Ajustar la posición horizontal del eje x
         ),
