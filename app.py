@@ -53,35 +53,41 @@ def main():
         ticker_data = information(stock, category)
 
     with tab1:# Crear un contenedor para los radiobuttons en horizontal
-    radio_buttons = st.empty()
-    
-    # Generar el HTML y CSS para los radiobuttons en horizontal
-    radio_html = """
-    <div style="display: flex; align-items: center;">
-      {buttons}
-    </div>
-    <script>
-      // Añadir un event listener para actualizar el valor de los radiobuttons
-      const radios = document.querySelectorAll('input[name="radio_horizontal"]');
-      radios.forEach(radio => {
-        radio.addEventListener('change', (event) => {
-          const selectedValue = event.target.value;
-          Streamlit.setComponentValue(selectedValue);
-        });
-      });
-    </script>
-    """
-    
-    # Crear los botones de radio en HTML
-    buttons_html = ""
-    for option in options:
-        buttons_html += f"""
-        <label style="margin-right: 10px;">
-          <input type="radio" name="radio_horizontal" value="{option}" style="margin-right: 5px;">
-          {option}
-        </label>
+        options = ['1m','2m','5m','15m','90m','1h']
+        radio_buttons = st.empty()
+        
+        # Generar el HTML y CSS para los radiobuttons en horizontal
+        radio_html = """
+        <div style="display: flex; align-items: center;">
+          {buttons}
+        </div>
+        <script>
+          // Añadir un event listener para actualizar el valor de los radiobuttons
+          const radios = document.querySelectorAll('input[name="radio_horizontal"]');
+          radios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+              const selectedValue = event.target.value;
+              Streamlit.setComponentValue(selectedValue);
+            });
+          });
+        </script>
         """
-        selected_interval = st.radio("Interval", ['1m','2m','5m','15m','90m','1h'])
+        
+        # Crear los botones de radio en HTML
+        buttons_html = ""
+        for option in options:
+            buttons_html += f"<label style="margin-right: 10px;"><input type="radio" name="radio_horizontal" value="{option}" style="margin-right: 5px;">{option}
+
+
+                                        
+            </label>
+        # Insertar los botones de radio en el HTML
+        radio_html = radio_html.format(buttons=buttons_html)
+        # Mostrar los botones de radio en Streamlit
+        radio_buttons.markdown(radio_html, unsafe_allow_html=True)        
+        # Obtener el valor seleccionado (este valor se actualizará al seleccionar un radiobutton)
+        selected_value = st.experimental_get_query_params().get("selected_radio", [None])[0]
+        selected_interval = st.radio("Interval", options )
         placeholder = st.empty()
         with placeholder:
             daily(ticker_data, selected_interval)
