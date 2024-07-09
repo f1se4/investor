@@ -53,7 +53,7 @@ def plot_forecast_hw(data, forecast):
 
     return fig
 
-def plot_price_and_volume(data_in, markers):
+def plot_price_and_volume(data_in, markers, full_data):
     data = data_in.copy()
     # Convertir el índice a datetime si es necesario
     if isinstance(data.index, pd.DatetimeIndex):
@@ -70,12 +70,12 @@ def plot_price_and_volume(data_in, markers):
     fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price', line=dict(color='dodgerblue', width=2)), row=1, col=1)
 
     # Añadir texto de máximo y mínimo para el gráfico de precios
-    max_price = data['Close'].max()
-    min_price = data['Close'].min()
-    idx_max = data['Close'].idxmax()
-    idx_min = data['Close'].idxmin()
-    fig.add_annotation(x=idx_max, y=max_price, text=f'Max: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
-    fig.add_annotation(x=idx_min, y=min_price, text=f'Min: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
+    # max_price = data['Close'].max()
+    # min_price = data['Close'].min()
+    # idx_max = data['Close'].idxmax()
+    # idx_min = data['Close'].idxmin()
+    # fig.add_annotation(x=idx_max, y=max_price, text=f'Max: {max_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=-40, row=1, col=1)
+    # fig.add_annotation(x=idx_min, y=min_price, text=f'Min: {min_price:.3f}', showarrow=True, arrowhead=1, ax=0, ay=40, row=1, col=1)
 
     # Añadir el gráfico de volumen (abajo)
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker=dict(color='rgba(31,119,180,0.6)')), row=2, col=1)
@@ -131,7 +131,7 @@ def plot_price_and_volume(data_in, markers):
                   opacity=0.7,
                   name=f'Fib {level}')
     if markers['SMA200']:
-        data['SMA200'] = data['Close'].rolling(window=200).mean()
+        full_data['SMA200'] = full_data['Close'].rolling(window=200).mean()
         fig.add_trace(go.Scatter(x=data.index, y=data['SMA200'], mode='lines', line=dict(color='darkblue', width=2)), row=1, col=1)
     if markers['SMA5']:
         data['SMA5'] = data['Close'].rolling(window=5).mean()

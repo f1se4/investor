@@ -40,10 +40,10 @@ def analysis(data, full_data):
     }
 
     if selected_graph == 'Line':
-        plot_full_fig = plot_price_and_volume(data, markers)
+        plot_full_fig = plot_price_and_volume(data, markers, full_data)
         st.plotly_chart(plot_full_fig)
     elif selected_graph == 'Candle/Velas':
-        plot_candlestick_fig = plot_candlestick(data, markers)
+        plot_candlestick_fig = plot_candlestick(data, markers, full_data)
         st.plotly_chart(plot_candlestick_fig)
         # with st.expander("Patterns"):
         #     st.image(Image.open('assets/patterns.jpg'))
@@ -69,27 +69,27 @@ def analysis(data, full_data):
 
     if checkbox1:
         # Plot synthetic indicators
-        plot_ind_sintetico = plot_with_indicators(data)
+        plot_ind_sintetico = plot_with_indicators(data, full_data)
         st.plotly_chart(plot_ind_sintetico)
 
     if checkbox2:
-        plot_indicator_rsi = plot_indicators_rsi(data)
+        plot_indicator_rsi = plot_indicators_rsi(data, full_data)
         st.plotly_chart(plot_indicator_rsi)
 
     if checkbox3:
         # Chaikin Money Flow & SMA
-        fig_cmf_ma = plot_cmf_with_moving_averages(data)
+        fig_cmf_ma = plot_cmf_with_moving_averages(data, full_data)
         st.plotly_chart(fig_cmf_ma)
 
     if checkbox4:
         # Daily Returns & Volatility
         df_ret = daily_returns(data)
         df_vol = returns_vol(df_ret)
-        plot_vol = plot_volatility(df_vol)
-        st.plotly_chart(plot_vol)
+        #plot_vol = plot_volatility(df_vol)
+        st.plotly_chart(plot_volatility(df_vol))
 
     if checkbox5:
-        plot_indicator_macd = plot_indicators_macd(data)
+        plot_indicator_macd = plot_indicators_macd(data, full_data)
         st.plotly_chart(plot_indicator_macd)
 
     # Smoothing plot
