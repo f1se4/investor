@@ -58,21 +58,10 @@ def main():
         
         # Generar el HTML y CSS para los radiobuttons en horizontal
         radio_html = """
-        <div style="display: flex; align-items: center;">
-          {buttons}
-        </div>
-        <script>
-          // Añadir un event listener para actualizar el valor de los radiobuttons
-          const radios = document.querySelectorAll('input[name="radio_horizontal"]');
-          radios.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-              const selectedValue = event.target.value;
-              Streamlit.setComponentValue(selectedValue);
-            });
-          });
-        </script>
-        """
-        
+<div style="display: flex; align-items: center;">
+  {buttons}
+</div>
+"""
         # Crear los botones de radio en HTML
         buttons_html = ""
         for option in options:
