@@ -17,11 +17,13 @@ from layout.calculadora     import calculadora
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
 
+# Set page configuration
+st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./assets/icon.jpg')
+
 refresh_interval = 60000
 st_autorefresh(interval=refresh_interval,key='datarefresh')
 
-# Set page configuration
-st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./assets/icon.jpg')
+placeholder = st.empty()
 
 # Main function to run the app
 def main():
@@ -54,7 +56,8 @@ def main():
         ticker_data = information(stock, category)
 
     with tab3:
-        daily(ticker_data)
+        with placeholder:
+            daily(ticker_data)
 
     with tab1:
         analysis(data, full_data)
