@@ -69,16 +69,16 @@ def analysis(data, full_data):
 
     if checkbox1:
         # Plot synthetic indicators
-        plot_ind_sintetico = plot_with_indicators(data, full_data)
+        plot_ind_sintetico = plot_with_indicators(data)
         st.plotly_chart(plot_ind_sintetico)
 
     if checkbox2:
-        plot_indicator_rsi = plot_indicators_rsi(data, full_data)
+        plot_indicator_rsi = plot_indicators_rsi(data)
         st.plotly_chart(plot_indicator_rsi)
 
     if checkbox3:
         # Chaikin Money Flow & SMA
-        fig_cmf_ma = plot_cmf_with_moving_averages(data, full_data)
+        fig_cmf_ma = plot_cmf_with_moving_averages(data)
         st.plotly_chart(fig_cmf_ma)
 
     if checkbox4:
@@ -89,7 +89,7 @@ def analysis(data, full_data):
         st.plotly_chart(plot_volatility(df_vol))
 
     if checkbox5:
-        plot_indicator_macd = plot_indicators_macd(data, full_data)
+        plot_indicator_macd = plot_indicators_macd(data)
         st.plotly_chart(plot_indicator_macd)
 
     # Smoothing plot

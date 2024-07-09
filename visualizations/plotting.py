@@ -132,7 +132,8 @@ def plot_price_and_volume(data_in, markers, full_data):
                   name=f'Fib {level}')
     if markers['SMA200']:
         full_data['SMA200'] = full_data['Close'].rolling(window=200).mean()
-        fig.add_trace(go.Scatter(x=data.index, y=data['SMA200'], mode='lines', line=dict(color='darkblue', width=2)), row=1, col=1)
+        full_data = full_data[data.index[0]:data.index[-1]]
+        fig.add_trace(go.Scatter(x=full_data.index, y=full_data['SMA200'], mode='lines', line=dict(color='darkblue', width=2)), row=1, col=1)
     if markers['SMA5']:
         data['SMA5'] = data['Close'].rolling(window=5).mean()
         fig.add_trace(go.Scatter(x=data.index, y=data['SMA5'], mode='lines', line=dict(color='cyan', width=2)), row=1, col=1)
