@@ -12,7 +12,8 @@ from visualizations.plotting import (
 
 def daily(ticker_data):
     # Historical data
-    daily_data = yf.download(ticker_data.get_info()['symbol'],period='1d',interval='1m')
+    selected_interval = st.radio("Interval", ['1m','2m','5m','15m','90m','1h'])
+    daily_data = yf.download(ticker_data.get_info()['symbol'],period='1d',interval=selected_interval)
     plot_daily = plot_candlestick_daily(daily_data)
     st.plotly_chart(plot_daily)
 
