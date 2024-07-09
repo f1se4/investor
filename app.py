@@ -70,12 +70,15 @@ def main():
         radio_html = radio_html.format(buttons=buttons_html)
 
         radio_buttons.markdown(radio_html, unsafe_allow_html=True)        
-        # Obtener el valor seleccionado (este valor se actualizará al seleccionar un radiobutton)
-        selected_value = st.experimental_get_query_params().get("selected_radio", [None])[0]
+
+        # Obtener el valor seleccionado
+        query_params = st.query_params
+        selected_value = query_params.get("selected_radio", '15m')
+        st.write(f"Has seleccionado: {selected_value}")
         selected_interval = st.radio("Interval", options )
         placeholder = st.empty()
         with placeholder:
-            daily(ticker_data, selected_interval)
+            daily(ticker_data, selected_value)
 
     with tab3:
         analysis(data, full_data)
