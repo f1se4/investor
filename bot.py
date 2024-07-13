@@ -145,7 +145,8 @@ def plot_data(data, ticker):
 def bot_main():
     st.title("TradeBot")
 
-    acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
+    #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
+    acciones_evaluar = "AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
     
     tickers = st.text_area("Introduce los símbolos de los tickers separados por comas", acciones_evaluar)
     tickers = [ticker.strip() for ticker in tickers.split(',')]
