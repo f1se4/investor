@@ -33,6 +33,8 @@ def configure_sidebar():
     # Read tickers from file
     tickers_data = read_tickers()
 
+    refresh_data = st.sidebar.checkbox('Refresh Data', value=True)
+
     # Select category
     category = st.sidebar.selectbox("Category", list(tickers_data.keys()))
     
@@ -49,18 +51,34 @@ def configure_sidebar():
     stock = selected_ticker.split(' - ')[0]
 
     st.sidebar.header("Analysis Period")
-    start_time = st.sidebar.date_input("Fecha de Inicio",
-                                       datetime.datetime.today() - timedelta(days=365),
-                                       format="DD/MM/YYYY")
-    end_time = st.sidebar.date_input("Fecha Final",
-                                     datetime.datetime.today(),
-                                     format="DD/MM/YYYY")
-    # st.sidebar.header("Help")
-    # st.sidebar.image(Image.open('assets/velas.jpg'))
+
+    # Lista de periodos y opciones de intervalos permitidos por yfinance
+    periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
+    interval_options = {
+        '1d': ['1m','2m','5m','15m','30m','1h','1d'],
+        '5d': ['1m','2m','5m','15m','30m','1h','1d'],
+        '1mo': ['5m','15m','30m','1h','1d','1wk'],
+        '3mo': ['15m','30m','1h','1d','1wk'],
+        '6mo': ['1h','1d','1wk'],
+        '1y': ['1h','1d','1wk','1mo'],
+        '2y': ['1d','1wk','1mo'],
+        '5y': ['1d','1wk','1mo'],
+        '10y': ['1d','1wk','1mo'],
+        'ytd': ['1h','1d','1wk'],
+        'max': ['1d','1wk','1mo']
+    }
+
+    # Period selection
+    selected_period = st.sidebar.selectbox("Select period", periods)
+    
+    # Interval selection based on the selected period
+    if selected_period:
+        allowed_intervals = interval_options[selected_period]
+        selected_interval = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True)
 
     st.sidebar.divider()
 
     st.sidebar.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">By: www.fisoft.es 🚀️</a>', unsafe_allow_html=True)
 
-    return stock, start_time, end_time, category, subcategory
+    return stock, selected_period, selected_interval, category, refresh_data
 
