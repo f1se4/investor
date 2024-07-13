@@ -144,7 +144,7 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
                 "color": 'rgba(64, 224, 208, 0.3)',
                 "lineWidth": 0,
                 "topColor": 'rgba(64, 224, 208, 0.3)',
-                "bottomColor": 'rgba(124, 224, 208, 0.3)',
+                "bottomColor": 'rgba(64, 000, 003, 0.1)',
                 "priceLineVisible": False,
             }
         })
@@ -157,6 +157,7 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
         signal = json.loads(df[['time', 'signal']].rename(columns={"signal": "value"}).dropna().to_json(orient="records"))
         df['color_hist'] = np.where( df['macd'] > 0, COLOR_BULL_HIST, COLOR_BEAR_HIST) 
         histogram = json.loads(df[['time', 'histogram','color_hist']].rename(columns={"histogram": "value", "color_hist":"color"}).dropna().to_json(orient="records"))
+        print(histogram)
         macd_series = [
         {
             "type": 'Line',
