@@ -27,5 +27,3 @@ def information(stock, category):
     if category == 'Indexados':
         st.subheader('Constituents')
         st.dataframe(obtener_constituyentes_y_pesos(stock))
-
-    return ticker_data
