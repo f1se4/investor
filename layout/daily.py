@@ -8,7 +8,7 @@ def daily(ticker_data, selected_interval):
 
     # Convert index (date) to CEST
 #    try:
-     daily_data.index = daily_data.index.tz_convert('CET')
+    daily_data.index = daily_data.index.tz_convert('CET')
 #    except:
 #        pass
 
