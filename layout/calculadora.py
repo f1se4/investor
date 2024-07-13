@@ -4,15 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from calculations.calculations import calcular_impuesto
 
-def calculadora():
-
-    colc1, colc2 = st.columns(2)
-
-    with colc1:
-        initial_investment = st.number_input("Initial Investment (€)", min_value=0.0, value=1000.0, step=100.0)
-        monthly_contribution = st.number_input("Monthly Contribution (€)", min_value=0.0, value=100.0, step=10.0)
-        annual_interest_rate = st.number_input("Annual Interest Rate (%)", min_value=0.0, value=5.0, step=0.1)
-        years = st.number_input("Number of Years", min_value=1, value=10, step=1)
+def calculadora(initial_investment, monthly_contribution, annual_interest_rate, years):
 
     # Calculating values
     months = years * 12
@@ -49,13 +41,13 @@ def calculadora():
     impuesto = calcular_impuesto(total_gain) 
     beneficio = total_gain - impuesto
 
-    with colc2:
-        st.header("Summary")
-        st.markdown(f"**Total Gain**: <span style='color: darkgreen;'>{total_gain:,.2f}€</span>", unsafe_allow_html=True)
-        st.markdown(f"**Total Investment**: <span style='color: orange;'>{total_invested_amount:,.2f}€</span>", unsafe_allow_html=True)
-        st.markdown(f"**Taxes**: <span style='color: red;'>{impuesto:,.2f}€</span>", unsafe_allow_html=True)
-        st.markdown(f"**Total Gain - Taxes**: <span style='color: green;'>{beneficio:,.2f}€</span>", unsafe_allow_html=True)
-        st.markdown(f"**Final Capital**: <span style='color: #b4ac85;'>{total_balance - impuesto:,.2f}€</span>", unsafe_allow_html=True)
+    st.title("Compound Interest Calculator")
+    st.header("Summary")
+    st.markdown(f"**Total Gain**: <span style='color: darkgreen;'>{total_gain:,.2f}€</span>", unsafe_allow_html=True)
+    st.markdown(f"**Total Investment**: <span style='color: orange;'>{total_invested_amount:,.2f}€</span>", unsafe_allow_html=True)
+    st.markdown(f"**Taxes**: <span style='color: red;'>{impuesto:,.2f}€</span>", unsafe_allow_html=True)
+    st.markdown(f"**Total Gain - Taxes**: <span style='color: green;'>{beneficio:,.2f}€</span>", unsafe_allow_html=True)
+    st.markdown(f"**Final Capital**: <span style='color: #b4ac85;'>{total_balance - impuesto:,.2f}€</span>", unsafe_allow_html=True)
 
     # Create a DataFrame for the chart
     df = pd.DataFrame({
