@@ -50,7 +50,7 @@ def configure_sidebar():
     selected_ticker = st.sidebar.selectbox("Selecciona un Ticker", tickers)
     stock = selected_ticker.split(' - ')[0]
 
-    st.sidebar.header("Analysis Period")
+    st.sidebar.header("Analysis Period (UTC+0)")
 
     # Lista de periodos y opciones de intervalos permitidos por yfinance
     periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
