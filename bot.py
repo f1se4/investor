@@ -19,6 +19,12 @@ def rsi(series, window):
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
+# Función para obtener el mínimo y máximo de los últimos N días
+def rolling_min_max(series, window):
+    rolling_min = series.rolling(window=window).min()
+    rolling_max = series.rolling(window=window).max()
+    return rolling_min, rolling_max
+
 # Función para calcular las bandas de Bollinger
 def bollinger_bands(series, window):
     sma = series.rolling(window=window).mean()
@@ -33,6 +39,7 @@ def get_data(ticker):
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
+    data['Min_14'], data['Max_14'] = rolling_min_max(data['Close'], window=14)
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     return data
@@ -42,21 +49,28 @@ def generate_signals(data):
     data['Buy_Signal'] = np.where((data['EMA_50'] > data['EMA_200']) &
                                   (data['RSI'] < 30) &
                                   (data['Close'] <= data['Bollinger_Low']) &
+                                  (data['Close'] <= data['Min_14']) &
                                   (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
     
     data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
                                    (data['RSI'] > 70) &
                                    (data['Close'] >= data['Bollinger_High']) &
+                                   (data['Close'] >= data['Max_14']) &
                                    (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
     return data
+
 # Función para determinar la acción a tomar
-def determine_action(data):
-    if data.iloc[-1]['Buy_Signal'] == 1:
-        return 'Comprar', data.index[-1]
-    elif data.iloc[-1]['Sell_Signal'] == 1:
-        return 'Vender', data.index[-1]
-    else:
-        return 'No hacer nada', None
+def determine_action(data, position):
+    if position == 'None':
+        if data.iloc[-1]['Buy_Signal'] == 1:
+            return 'Comprar', data.index[-1]
+        else:
+            return 'No hacer nada', None
+    elif position == 'Long':
+        if data.iloc[-1]['Sell_Signal'] == 1:
+            return 'Vender', data.index[-1]
+        else:
+            return 'No hacer nada', None
 
 # Función para realizar operaciones con Interactive Brokers
 # def place_order(ticker, action, quantity, simulate=True):
