@@ -175,7 +175,7 @@ def bot_main():
         
         st.subheader("Acciones a Tomar")
         actions_df = pd.DataFrame(actions)
-        st.write(actions_df)
+        st.dataframe(actions_df)
         
         st.subheader("Cartera Actual")
         portfolio_df = show_portfolio()
