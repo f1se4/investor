@@ -129,6 +129,7 @@ def show_portfolio():
 def plot_data(data, ticker):
     company_name = get_company_name(ticker)
     fig = go.Figure()
+
     fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close',
                              line=dict(color='rgba(31, 119, 180, 0.8)')))
     fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA 50',
@@ -162,17 +163,25 @@ def bot_main():
     #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
     acciones_evaluar = "AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
     
-    tickers = st.text_area("Introduce los símbolos de los tickers separados por comas", acciones_evaluar)
+    tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
     tickers = [ticker.strip() for ticker in tickers.split(',')]
     simulate = st.checkbox("Simular operaciones", value=True)
     
     if tickers:
         actions = []
+        portfolio = show_portfolio()
+        current_positions = {ticker: 'None' for ticker in tickers}
+
+        if not portfolio.empty:
+            for ticker in tickers:
+                if (portfolio['Ticker'] == ticker).any():
+                    last_action = portfolio[portfolio['Ticker'] == ticker].iloc[-1]['Action']
+                    current_positions[ticker] = 'Long' if last_action == 'Comprar' else 'None'
         
         for ticker in tickers:
             data = get_data(ticker)
             data = generate_signals(data)
-            action, signal_date = determine_action(data)
+            action, signal_date = determine_action(data, current_positions[ticker])
             try:
                 actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
                 
@@ -189,8 +198,7 @@ def bot_main():
                 pass
         
         st.subheader("Acciones a Tomar")
-        actions_df = pd.DataFrame(actions)
-        st.dataframe(actions_df)
+        st.dataframe(pd.DataFrame(actions))
         
         st.subheader("Cartera Actual")
         portfolio_df = show_portfolio()
