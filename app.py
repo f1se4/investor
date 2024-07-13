@@ -47,8 +47,6 @@ def main():
     """, unsafe_allow_html=True)
 
     data = yf.download(stock, period=selected_period, interval=selected_interval).drop(columns=['Adj Close'])
-    print("just downloaded")
-    print(data)
 
     if selected_period in ['1d','5d','1mo','3mo','6mo']:
         data_sm = yf.download(stock, period='1y', interval='1h').drop(columns=['Adj Close'])
@@ -75,6 +73,7 @@ def main():
             show_rsi = st.checkbox('Show RSI')
         with col3:
             show_volatility = st.checkbox('Show Volatility')
+
         placeholder = st.empty()
         with placeholder:
             daily(data, data_sm, show_sma200, show_sma5, show_macd, show_rsi, show_volatility)

@@ -33,7 +33,7 @@ def configure_sidebar():
     # Read tickers from file
     tickers_data = read_tickers()
 
-    refresh_data = st.sidebar.checkbox('Refresh Data', value=True)
+    refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
 
     # Select category
     category = st.sidebar.selectbox("Category", list(tickers_data.keys()))

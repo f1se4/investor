@@ -1,9 +1,12 @@
 from streamlit_lightweight_charts import renderLightweightCharts
 import numpy as np
 import json
+import pandas as pd
 
 COLOR_BULL = 'rgba(38,166,154,0.9)' # #26a69a
+COLOR_BULL_HIST = 'rgba(57,255,20,0.3)' # #39ff14
 COLOR_BEAR = 'rgba(239,83,80,0.9)'  # #ef5350
+COLOR_BEAR_HIST = 'rgba(239,83,80,0.4)'  # #ef5350
 
 def calculate_sma(df, window):
     return df['close'].rolling(window=window).mean()
@@ -13,13 +16,16 @@ def calculate_macd(df):
     exp2 = df['close'].ewm(span=26, adjust=False).mean()
     macd = exp1 - exp2
     signal = macd.ewm(span=9, adjust=False).mean()
-    return macd, signal
+    histogram = macd - signal
+    return macd, signal, histogram
 
 def calculate_rsi(df, window=14):
     delta = df['close'].diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
     rs = gain / loss
+    rs = rs.fillna(0)
+    print(rs)
     return 100 - (100 / (1 + rs))
 
 def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False, show_rsi=False, show_volatility=False, chart_height=500):
@@ -66,10 +72,8 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
     
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
-        max_time = df['time'].max()
-        min_time = df['time'].min()
-
-        df_sm = df_sm[(df_sm['time'] >= min_time) & (df_sm['time'] <= max_time)]
+        # Realizar el merge_asof
+        df_sm = pd.merge_asof(df, df_sm, on='time', direction='nearest')
 
         sma200 = json.loads(df_sm[['time', 'sma200']].rename(columns={"sma200": "value"}).dropna().to_json(orient="records"))
         price_volume_series.append({
@@ -96,27 +100,34 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
     additional_charts = []
 
     if show_macd:
-        df['macd'], df['signal'] = calculate_macd(df)
+        df['macd'], df['signal'], df['histogram'] = calculate_macd(df)
         macd = json.loads(df[['time', 'macd']].rename(columns={"macd": "value"}).dropna().to_json(orient="records"))
         signal = json.loads(df[['time', 'signal']].rename(columns={"signal": "value"}).dropna().to_json(orient="records"))
+        df['color_hist'] = np.where( df['macd'] > 0, COLOR_BULL_HIST, COLOR_BEAR_HIST) 
+        histogram = json.loads(df[['time', 'histogram','color_hist']].rename(columns={"histogram": "value", "color_hist":"color"}).dropna().to_json(orient="records"))
+        print(histogram)
         macd_series = [
-            {
-                "type": 'Line',
-                "data": macd,
-                "options": {
-                    "color": 'rgba(0, 255, 0, 0.8)',
-                    "lineWidth": 1,
-                }
-            },
-            {
-                "type": 'Line',
-                "data": signal,
-                "options": {
-                    "color": 'rgba(255, 0, 0, 0.8)',
-                    "lineWidth": 1,
-                }
+        {
+            "type": 'Line',
+            "data": macd,
+            "options": {
+                "color": 'rgba(0, 255, 0, 0.8)',
+                "lineWidth": 1,
             }
-        ]
+        },
+        {
+            "type": 'Line',
+            "data": signal,
+            "options": {
+                "color": 'rgba(255, 0, 0, 0.8)',
+                "lineWidth": 1,
+            }
+        },
+        {
+            "type": 'Histogram',
+            "data": histogram
+        }
+    ]
         additional_charts.append({
             "chart": {
                 "height": 150,
@@ -153,6 +164,10 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
     if show_rsi:
         df['rsi'] = calculate_rsi(df)
         rsi = json.loads(df[['time', 'rsi']].rename(columns={"rsi": "value"}).dropna().to_json(orient="records"))
+        df['high_rsi'] = 70
+        df['min_rsi'] = 30
+        high_rsi = json.loads(df[['time', 'high_rsi']].rename(columns={"high_rsi": "value"}).dropna().to_json(orient="records"))
+        min_rsi = json.loads(df[['time', 'min_rsi']].rename(columns={"min_rsi": "value"}).dropna().to_json(orient="records"))
         rsi_series = [
             {
                 "type": 'Line',
@@ -161,11 +176,27 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
                     "color": 'rgba(0, 0, 255, 0.8)',
                     "lineWidth": 1,
                 }
-            }
+            },
+            {
+                "type": 'Line',
+                "data": min_rsi,
+                "options": {
+                    "color": 'darkgreen',
+                    "lineWidth": 1,
+                }
+            },
+            {
+                "type": 'Line',
+                "data": high_rsi,
+                "options": {
+                    "color": 'darkred',
+                    "lineWidth": 1,
+                }
+            },
         ]
         additional_charts.append({
             "chart": {
-                "height": 100,
+                "height": 150,
                 "layout": {
                     "background": {
                         "type": "solid",
@@ -197,8 +228,14 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
         })
 
     if show_volatility:
-        df['volatility'] = df['high'] - df['low']
+        df['returns'] = df['close']/df['close'].shift().fillna(0)
+        df['volatility'] = df.returns.rolling(12).std().fillna(0) * 10
+        df['high_vol'] = 0.3
+        df['min_vol'] = 0.1
         volatility = json.loads(df[['time', 'volatility']].rename(columns={"volatility": "value"}).dropna().to_json(orient="records"))
+        returns = json.loads(df[['time', 'returns']].rename(columns={"returns": "value"}).dropna().to_json(orient="records"))
+        high_vol = json.loads(df[['time', 'high_vol']].rename(columns={"high_vol": "value"}).dropna().to_json(orient="records"))
+        min_vol = json.loads(df[['time', 'min_vol']].rename(columns={"min_vol": "value"}).dropna().to_json(orient="records"))
         volatility_series = [
             {
                 "type": 'Line',
@@ -207,11 +244,40 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
                     "color": 'rgba(255, 140, 0, 0.8)',
                     "lineWidth": 1,
                 }
-            }
+            },
+            {
+                "type": 'Line',
+                "data": min_vol,
+                "options": {
+                    "color": 'green',
+                    "lineWidth": 1,
+                }
+            },
+            {
+                "type": 'Line',
+                "data": high_vol,
+                "options": {
+                    "color": 'red',
+                    "lineWidth": 1,
+                }
+            },
+            # {
+            #     "type": 'Line',
+            #     "data": returns,
+            #     "priceFormat" : {
+            #             'type': 'price',
+            #             'precision' : 6,
+            #         'minMove':0.00001,
+            #                      },
+            #     "options": {
+            #         "color": 'rgba(227, 177, 210, 0.4)',
+            #         "lineWidth": 1,
+            #     }
+            # }
         ]
         additional_charts.append({
             "chart": {
-                "height": 100,
+                "height": 150,
                 "layout": {
                     "background": {
                         "type": "solid",
@@ -219,6 +285,9 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
                     },
                     "textColor": "white"
                 },
+                # "rightPriceScale":{
+                #     "mode":2
+                #                  },
                 "grid": {
                     "vertLines": {
                         "color": 'rgba(42, 46, 57, 0)',
@@ -236,7 +305,7 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
                     "minBarSpacing": 8,
                     "timeVisible": True,
                     "secondsVisible": False,
-                    "rightOffset": 12,
+                    "rightOffset": 0,
                 },
             },
             "series": volatility_series
@@ -279,5 +348,6 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
     ]
 
     charts.extend(additional_charts)
+    print(charts)
 
     return renderLightweightCharts(charts, 'priceAndVolume')
