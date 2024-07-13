@@ -14,6 +14,7 @@ from layout.forecasting      import forecasting
 from layout.faqs             import faqs
 from layout.information     import information
 from layout.calculadora     import calculadora
+import bot
 
 # Suppress warnings for better display
 warnings.filterwarnings("ignore")
@@ -80,7 +81,7 @@ def main():
             daily(data, data_sm, show_sma200, show_sma5, show_macd, show_rsi, show_volatility)
 
     with tab4:
-        pass
+        bot.bot_main()
         # forcasting(data, end_time, start_time)
 
     with tab5:
