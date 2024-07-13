@@ -19,6 +19,13 @@ def calculate_macd(df):
     histogram = macd - signal
     return macd, signal, histogram
 
+def calculate_bollinger_bands(df, window=20, num_of_std=2):
+    df['sma'] = df['close'].rolling(window).mean()
+    df['std'] = df['close'].rolling(window).std()
+    df['upper_band'] = df['sma'] + (df['std'] * num_of_std)
+    df['lower_band'] = df['sma'] - (df['std'] * num_of_std)
+    return df[['time', 'upper_band', 'lower_band']]
+
 def calculate_rsi(df, window=14):
     delta = df['close'].diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
@@ -28,7 +35,7 @@ def calculate_rsi(df, window=14):
     print(rs)
     return 100 - (100 / (1 + rs))
 
-def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False, show_rsi=False, show_volatility=False, chart_height=500):
+def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False, show_rsi=False, show_volatility=False, show_bollinger=False, chart_height=500):
     df.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
     df_sm.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
     df['time'] = df['time'].view('int64') // 10**9
@@ -94,6 +101,50 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
             "options": {
                 "color": 'rgba(75, 0, 130, 0.8)',
                 "lineWidth": 2,
+            }
+        })
+
+    if show_bollinger:
+        bollinger_bands = calculate_bollinger_bands(df)
+        upper_band = json.loads(bollinger_bands[['time', 'upper_band']].rename(columns={"upper_band": "value"}).dropna().to_json(orient="records"))
+        lower_band = json.loads(bollinger_bands[['time', 'lower_band']].rename(columns={"lower_band": "value"}).dropna().to_json(orient="records"))
+        
+        price_volume_series.append({
+            "type": 'Line',
+            "data": upper_band,
+            "options": {
+                "color": 'rgba(64, 224, 208, 0.8)',
+                "lineWidth": 1,
+            }
+        })
+        price_volume_series.append({
+            "type": 'Line',
+            "data": lower_band,
+            "options": {
+                "color": 'rgba(64, 224, 208, 0.8)',
+                "lineWidth": 1,
+            }
+        })
+        price_volume_series.append({
+            "type": 'Area',
+            "data": upper_band,
+            "options": {
+                "color": 'rgba(64, 224, 208, 0.3)',
+                "lineWidth": 0,
+                "topColor": 'rgba(64, 224, 208, 0.3)',
+                "bottomColor": 'rgba(64, 224, 208, 0.3)',
+                "priceLineVisible": False,
+            }
+        })
+        price_volume_series.append({
+            "type": 'Area',
+            "data": lower_band,
+            "options": {
+                "color": 'rgba(64, 224, 208, 0.3)',
+                "lineWidth": 0,
+                "topColor": 'rgba(64, 224, 208, 0.3)',
+                "bottomColor": 'rgba(64, 224, 208, 0.3)',
+                "priceLineVisible": False,
             }
         })
 

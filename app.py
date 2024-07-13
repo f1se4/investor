@@ -72,10 +72,11 @@ def main():
                 show_rsi = st.checkbox('Show RSI')
             with col3:
                 show_volatility = st.checkbox('Show Volatility')
+                show_bollinger  = st.checkbox('Bollinger Bands')
     
             placeholder = st.empty()
             with placeholder:
-                daily(data, data_sm, show_sma200, show_sma5, show_macd, show_rsi, show_volatility)
+                daily(data, data_sm, show_sma200, show_sma5, show_macd, show_rsi, show_volatility, show_bollinger)
     
         with tab2:
             information(stock, category)
