@@ -171,6 +171,8 @@ def plot_data(data, ticker):
     fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
                              marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
                              textposition="top center",textfont=dict(color='orange')))
+
+    fig.add_shape(type="line", x0=data.index[0])
     
     fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
     
