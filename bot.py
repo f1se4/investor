@@ -51,9 +51,9 @@ def get_data(ticker):
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data = calculate_macd(data)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
-    data['High_Rolling'] = data['High'].rolling(window=80).max()
-    data['High_Rolling_Rounded'] = data['High_Rolling'].round(1)
-    data['Low_Rolling'] = data['Low'].rolling(window=80).min()
+    data['High_Rolling'] = data['High'].rolling(window=14).max()
+    data['High_Rolling_Rounded'] = data['High_Rolling'].round(2)
+    data['Low_Rolling'] = data['Low'].rolling(window=14).min()
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -168,6 +168,10 @@ def plot_data(data, ticker):
                              line=dict(color='rgba(214, 39, 40, 0.3)')))
     fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
                              line=dict(color='rgba(148, 103, 189, 0.3)')))    
+
+    for valor in data['High_Rolling_Rounded'].tail(10).unique():
+        fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
+                             mode='lines'))
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
