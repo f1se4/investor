@@ -101,19 +101,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
         micro_pullback_points = df[df['micro_pullback']]
         bull_flag_points = df[df['bull_flag']]
 
-        micro_pullback_series = {
-                "type": 'SeriesMarker',
-                "data": json.loads(micro_pullback_points[['time']].to_json(orient="records")),
-                "options": {
-                    "shape": 'arrowUp',
-                    'position':'aboveBar',
-                    "color": 'rgba(0, 255, 0, 0.8)',
-                    "borderColor": 'rgba(0, 255, 0, 0.8)',
-                    "minSize": 6,
-                    "size": 8
-                }
-            }
-        
 
         # bull_flag_series = {
         #         "type": 'ShapeMarker',
