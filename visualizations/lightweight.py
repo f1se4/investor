@@ -98,15 +98,12 @@ def f_daily_plot(df, df_sm, show_patterns = False,
         df['micro_pullback'] = calculate_micro_pullback(df)
         df['bull_flag'] = calculate_bull_flag(df)
 
-        print(df)
-
         micro_pullback_points = df[df['micro_pullback']]
         bull_flag_points = df[df['bull_flag']]
 
-        micro_pullback_series = [
-            {
+        micro_pullback_series = {
                 "type": 'ShapeMarker',
-                "data": json.loads(micro_pullback_points[['time', 'low']].to_json(orient="records")),
+                "data": json.loads(micro_pullback_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
                 "options": {
                     "shape": 'arrowUp',
                     "color": 'rgba(0, 255, 0, 0.8)',
@@ -115,12 +112,11 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                     "size": 8
                 }
             }
-        ]
+        
 
-        bull_flag_series = [
-            {
+        bull_flag_series = {
                 "type": 'ShapeMarker',
-                "data": json.loads(bull_flag_points[['time', 'low']].to_json(orient="records")),
+                "data": json.loads(bull_flag_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
                 "options": {
                     "shape": 'arrowUp',
                     "color": 'rgba(0, 0, 255, 0.8)',
@@ -129,7 +125,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                     "size": 8
                 }
             }
-        ]
 
         price_volume_series.append(micro_pullback_series)
         price_volume_series.append(bull_flag_series)
