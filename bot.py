@@ -49,10 +49,10 @@ def get_data(ticker):
     data['RSI'] = rsi(data['Close'], window=14)
     data['Min_14'], data['Max_14'] = rolling_min_max(data['Close'], window=14)
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
-    data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
-    data['High_Rolling'] = data['High'].rolling(window=14).max()
-    data['Low_Rolling'] = data['Low'].rolling(window=14).min()
     data = calculate_macd(data)
+    data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
+    data['High_Rolling'] = data['High'].rolling(window=44).max()
+    data['Low_Rolling'] = data['Low'].rolling(window=44).min()
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -224,7 +224,7 @@ def bot_main():
             except:
                 st.write(f"Error getting {ticker}")
 
-        st.dataframe(data)
+        st.dataframe(data[['Close','High_Rolling', 'Low_Rolling']])
 
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
