@@ -43,7 +43,7 @@ def bollinger_bands(series, window):
 
 # Función para obtener los datos históricos
 def get_data(ticker):
-    data = yf.download(ticker, period='1y', interval='1h')
+    data = yf.download(ticker, period='1y', interval='1d')
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
@@ -160,18 +160,18 @@ def plot_data(data, ticker):
 
     fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close',
                              line=dict(color='rgba(31, 119, 180, 0.8)')))
-    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA 50',
-                             line=dict(color='rgba(255, 127, 14, 0.3)')))
-    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
-                             line=dict(color='rgba(44, 160, 44, 0.3)')))
-    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
-                             line=dict(color='rgba(214, 39, 40, 0.3)')))
-    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
-                             line=dict(color='rgba(148, 103, 189, 0.3)')))    
+    # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA 50',
+    #                          line=dict(color='rgba(255, 127, 14, 0.3)')))
+    # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
+    #                          line=dict(color='rgba(44, 160, 44, 0.3)')))
+    # fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
+    #                          line=dict(color='rgba(214, 39, 40, 0.3)')))
+    # fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
+    #                          line=dict(color='rgba(148, 103, 189, 0.3)')))    
 
     for valor in data['High_Rolling_Rounded'].tail(10).unique():
         fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
-                             mode='lines'))
+                             mode='lines', line=dict(color='rgba(65,105,225,0.2)')))
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
