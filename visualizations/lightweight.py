@@ -98,6 +98,8 @@ def f_daily_plot(df, df_sm, show_patterns = False,
         df['micro_pullback'] = calculate_micro_pullback(df)
         df['bull_flag'] = calculate_bull_flag(df)
 
+        print(df)
+
         micro_pullback_points = df[df['micro_pullback']]
         bull_flag_points = df[df['bull_flag']]
 
@@ -129,8 +131,8 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             }
         ]
 
-        price_volume_series.extend(micro_pullback_series)
-        price_volume_series.extend(bull_flag_series)
+        price_volume_series.append(micro_pullback_series)
+        price_volume_series.append(bull_flag_series)
 
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
