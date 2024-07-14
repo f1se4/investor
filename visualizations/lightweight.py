@@ -67,6 +67,11 @@ def f_daily_plot(df, df_sm, show_patterns = False,
 
     micro_pullback_points = df[df['micro_pullback']]
     bull_flag_points = df[df['bull_flag']]
+    micro_pullback_points['position'] = 'aboveBar'
+    micro_pullback_points['color'] ='rgba(255, 192, 0, 1)'
+    micro_pullback_points['shape'] = 'arrowDown'
+    micro_pullback_points['text'] = 'MP'
+    micro_pullback_points['size'] = 1
     
     price_volume_series = [
         {
@@ -79,15 +84,15 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 "wickUpColor": COLOR_BULL,
                 "wickDownColor": COLOR_BEAR
             },
-            "markers": [
-                {
-                    "time":1720792200,
-                    "position": 'aboveBar',
-                    "color": 'rgba(255, 192, 0, 1)',
-                    "shape": 'arrowDown',
-                    "text": 'H',
-                    "size": 1
-                },
+            "markers": [json.loads(micro_pullback_points[['time','position','color','shape','text','size']]).to_json(orient="recrods")
+                # {
+                #     "time":1720792200,
+                #     "position": 'aboveBar',
+                #     "color": 'rgba(255, 192, 0, 1)',
+                #     "shape": 'arrowDown',
+                #     "text": 'H',
+                #     "size": 1
+                # },
             ]
         },
         {
