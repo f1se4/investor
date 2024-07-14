@@ -44,7 +44,7 @@ def calculate_rsi(df, window=14):
     loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
     rs = gain / loss
     rs = rs.fillna(0)
-    print(rs)
+    # print(rs)
     return 100 - (100 / (1 + rs))
 
 def f_daily_plot(df, df_sm, show_patterns = False,
@@ -72,6 +72,8 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     micro_pullback_points['shape'] = 'arrowDown'
     micro_pullback_points['text'] = 'MP'
     micro_pullback_points['size'] = 1
+    print(type(micro_pullback_points))
+    print(micro_pullback_points[['time','position','color','shape','text','size']].to_json(orient="records"))
     
     price_volume_series = [
         {
@@ -84,7 +86,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 "wickUpColor": COLOR_BULL,
                 "wickDownColor": COLOR_BEAR
             },
-            "markers": [json.loads(micro_pullback_points[['time','position','color','shape','text','size']]).to_json(orient="recrods")
+            "markers":  micro_pullback_points[['time','position','color','shape','text','size']].to_json(orient="records")
                 # {
                 #     "time":1720792200,
                 #     "position": 'aboveBar',
@@ -93,7 +95,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 #     "text": 'H',
                 #     "size": 1
                 # },
-            ]
+            # ]
         },
         {
             "type": 'Histogram',
@@ -211,7 +213,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
         signal = json.loads(df[['time', 'signal']].rename(columns={"signal": "value"}).dropna().to_json(orient="records"))
         df['color_hist'] = np.where( df['macd'] > 0, COLOR_BULL_HIST, COLOR_BEAR_HIST) 
         histogram = json.loads(df[['time', 'histogram','color_hist']].rename(columns={"histogram": "value", "color_hist":"color"}).dropna().to_json(orient="records"))
-        print(histogram)
+        # print(histogram)
         macd_series = [
         {
             "type": 'Line',
@@ -454,6 +456,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     ]
 
     charts.extend(additional_charts)
-    print(charts)
+    # print(charts)
 
     return renderLightweightCharts(charts, 'overlaid')
