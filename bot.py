@@ -43,7 +43,7 @@ def bollinger_bands(series, window):
 
 # Función para obtener los datos históricos
 def get_data(ticker):
-    data = yf.download(ticker, period='1y', interval='1d')
+    data = yf.download(ticker, period='5d', interval='1m')
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
@@ -175,7 +175,7 @@ def plot_data(data, ticker):
 
     for valor in data['Low_Rolling_Rounded'].tail(10).unique():
         fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
-                             mode='lines', line=dict(color='rgba(165,105,225,0.2)')))
+                             mode='lines', line=dict(color='rgba(165,05,225,0.2)')))
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
@@ -197,7 +197,8 @@ def bot_main():
     st.title("TradeBot")
 
     #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
-    acciones_evaluar = "AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
+    #acciones_evaluar = "AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
+    acciones_evaluar = "BTC-EUR"
     
     tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
     tickers = [ticker.strip() for ticker in tickers.split(',')]
