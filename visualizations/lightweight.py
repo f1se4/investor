@@ -79,16 +79,24 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 "wickUpColor": COLOR_BULL,
                 "wickDownColor": COLOR_BEAR
             },
-        "markers" : [
-            {
-                "time": '2024-14-07',
-                "position": 'aboveBar',
-                "color": 'rgba(255, 192, 0, 1)',
-                "shape": 'arrowDown',
-                "text": 'H',
-                "size": 3
-            }
-        ]
+            "markers": [
+                {
+                    "time": '2024-07-14T08:00:00',
+                    "position": 'aboveBar',
+                    "color": 'rgba(255, 192, 0, 1)',
+                    "shape": 'arrowDown',
+                    "text": 'H',
+                    "size": 3
+                },
+                {
+                    "time": '2024-05-13',
+                    "position": 'belowBar',
+                    "color": 'rgba(255, 192, 0, 1)',
+                    "shape": 'arrowUp',
+                    "text": 'L',
+                    "size": 3
+                },
+            ]
         },
         {
             "type": 'Histogram',
@@ -451,93 +459,4 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     charts.extend(additional_charts)
     print(charts)
 
-    return renderLightweightCharts(charts, 'priceAndVolume')
-
-
-def f_daily_plot(df, df_sm, show_patterns = False,
-                 show_sma200=False, show_sma5=False, show_macd=False, 
-                 show_rsi=False, show_volatility=False, show_bollinger=False, 
-                 chart_height=500):
-    import streamlit_lightweight_charts.dataSamples as data
-    df = df.reset_index()
-    df_sm = df_sm.reset_index()
-    df.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
-    df_sm.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
-    df['time'] = df['time'].view('int64') // 10**9
-    df_sm['time'] = df_sm['time'].view('int64') // 10**9
-
-    df['color'] = np.where(df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
-
-    candles = json.loads(df.to_json(orient="records"))
-    volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
-    df['micro_pullback'] = calculate_micro_pullback(df)
-    df['bull_flag'] = calculate_bull_flag(df)
-    
-    overlaidAreaSeriesOptions = {
-        "height": 400,
-        "rightPriceScale": {
-            "scaleMargins": {
-                "top": 0.1,
-                "bottom": 0.1,
-            },
-            "mode": 2, # PriceScaleMode: 0-Normal, 1-Logarithmic, 2-Percentage, 3-IndexedTo100
-            "borderColor": 'rgba(197, 203, 206, 0.4)',
-        },
-        "timeScale": {
-            "borderColor": 'rgba(197, 203, 206, 0.4)',
-        },
-        "layout": {
-            "background": {
-                "type": 'solid',
-                "color": '#100841'
-            },
-            "textColor": '#ffffff',
-        },
-        "grid": {
-            "vertLines": {
-                "color": 'rgba(197, 203, 206, 0.4)',
-                "style": 1, # LineStyle: 0-Solid, 1-Dotted, 2-Dashed, 3-LargeDashed
-            },
-            "horzLines": {
-                "color": 'rgba(197, 203, 206, 0.4)',
-                "style": 1, # LineStyle: 0-Solid, 1-Dotted, 2-Dashed, 3-LargeDashed
-            }
-        }
-    }
-    seriesOverlaidChart = [
-        {
-            "type": 'Candlestick',
-            "data": candles,
-            "options": {
-                "topColor": 'rgba(255, 192, 0, 0.7)',
-                "bottomColor": 'rgba(255, 192, 0, 0.3)',
-                "lineColor": 'rgba(255, 192, 0, 1)',
-                "lineWidth": 2,
-            },
-            "markers": [
-                {
-                    "time": '2024-04-08',
-                    "position": 'aboveBar',
-                    "color": 'rgba(255, 192, 0, 1)',
-                    "shape": 'arrowDown',
-                    "text": 'H',
-                    "size": 3
-                },
-                {
-                    "time": '2024-05-13',
-                    "position": 'belowBar',
-                    "color": 'rgba(255, 192, 0, 1)',
-                    "shape": 'arrowUp',
-                    "text": 'L',
-                    "size": 3
-                },
-            ]
-        },
-    ]
-    
-    return renderLightweightCharts([
-        {
-            "chart": overlaidAreaSeriesOptions,
-            "series": seriesOverlaidChart
-        }
-    ], 'overlaid')
+    return renderLightweightCharts(charts, 'overlaid')
