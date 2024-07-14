@@ -50,12 +50,16 @@ def get_data(ticker):
     data['Min_14'], data['Max_14'] = rolling_min_max(data['Close'], window=14)
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
+    data['High_Rolling'] = data['High'].rolling(window=14).max()
+    data['Low_Rolling'] = data['Low'].rolling(window=14).min()
     return data
 
 # Función para generar señales de trading
 def generate_signals(data):
     # A - Swing Trading
     #      * Identify Oportunities based in trends and correction cycles
+    # B - Breakouts 
+    #      * levels and confirmations
     data['Buy_Signal'] = np.where((data['EMA_50'] > data['EMA_200']) & #A
                                   (data['RSI'] < 30) & #A
                                   (data['Close'] <= data['Bollinger_Low']) &
