@@ -52,6 +52,8 @@ def get_data(ticker):
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
+    data['Breakout_Above'] = (data['Close'] > df['High_Rolling']) & (df['Volume'] > volume_threshold * df['Volume_Avg'])
+    data['Breakout_Below'] = (data['Close'] < df['Low_Rolling']) & (df['Volume'] > volume_threshold * df['Volume_Avg'])
     return data
 
 # Función para generar señales de trading
