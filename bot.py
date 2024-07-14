@@ -54,17 +54,20 @@ def get_data(ticker):
 
 # Función para generar señales de trading
 def generate_signals(data):
-    data['Buy_Signal'] = np.where((data['EMA_50'] > data['EMA_200']) &
-                                  (data['RSI'] < 30) &
+    # A - Swing Trading
+    #      * Identify Oportunities based in trends and correction cycles
+    data['Buy_Signal'] = np.where((data['EMA_50'] > data['EMA_200']) & #A
+                                  (data['RSI'] < 30) & #A
                                   (data['Close'] <= data['Bollinger_Low']) &
                                   (data['Close'] <= data['Min_14']) &
-                                  (data['MACD'] <= data['Min_14']) &
+                                  (data['MACD'] > 0 ) & #A
                                   (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
     
     data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
                                    (data['RSI'] > 70) &
                                    (data['Close'] >= data['Bollinger_High']) &
                                    (data['Close'] >= data['Max_14']) &
+                                   (data['MACD'] < 0 ) &
                                    (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
     return data
 
