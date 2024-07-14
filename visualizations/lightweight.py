@@ -131,6 +131,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
 
         price_volume_series.extend(micro_pullback_series)
         price_volume_series.extend(bull_flag_series)
+
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
         # Realizar el merge_asof

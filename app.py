@@ -5,7 +5,6 @@ import yfinance as yf
 
 from calculations.calculations import get_company_name
 from layout.sidebar          import configure_sidebar
-from layout.daily            import daily
 from layout.faqs             import faqs
 from layout.information     import information
 from layout.calculadora     import calculadora
@@ -66,18 +65,22 @@ def main():
             # Añadir checkboxes para los indicadores
             col1, col2, col3 = st.columns(3)
             with col1:
-                show_sma200 = st.checkbox('Show SMA200')
-                show_sma5 = st.checkbox('Show SMA5')
+                show_sma200 = st.checkbox('SMA200')
+                show_sma5 = st.checkbox('SMA5')
             with col2:
-                show_macd = st.checkbox('Show MACD')
-                show_rsi = st.checkbox('Show RSI')
+                show_macd = st.checkbox('MACD')
+                show_rsi = st.checkbox('RSI')
             with col3:
-                show_volatility = st.checkbox('Show Volatility')
+                show_volatility = st.checkbox('Volatility')
                 show_bollinger  = st.checkbox('Bollinger Bands')
+                show_patterns = st.checkbox('Patterns')
     
             placeholder = st.empty()
             with placeholder:
-                daily(data, data_sm, show_sma200, show_sma5, show_macd, show_rsi, show_volatility, show_bollinger)
+                f_daily_plot(data, data_sm, show_patterns,
+                             show_sma200, show_sma5, 
+                             show_macd, show_rsi, 
+                             show_volatility, show_bollinger)
     
         with tab2:
             information(stock, category)
