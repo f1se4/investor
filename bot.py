@@ -56,8 +56,9 @@ def get_data(ticker):
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
-    data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
-    data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
+    data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) 
+    data['Breakout_Volume'] = (data['Volume'] > volume_threshold * data['Volume_Avg'])
+    data['Breakout_Below'] = (data['Close'] < data['Low_Rolling'])
 
     # Depuración
     print("Depuración Breakout:")
