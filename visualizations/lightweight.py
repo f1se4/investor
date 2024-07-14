@@ -459,6 +459,19 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                  show_rsi=False, show_volatility=False, show_bollinger=False, 
                  chart_height=500):
     import streamlit_lightweight_charts.dataSamples as data
+    df = df.reset_index()
+    df_sm = df_sm.reset_index()
+    df.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
+    df_sm.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
+    df['time'] = df['time'].view('int64') // 10**9
+    df_sm['time'] = df_sm['time'].view('int64') // 10**9
+
+    df['color'] = np.where(df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
+
+    candles = json.loads(df.to_json(orient="records"))
+    volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
+    df['micro_pullback'] = calculate_micro_pullback(df)
+    df['bull_flag'] = calculate_bull_flag(df)
     
     overlaidAreaSeriesOptions = {
         "height": 400,
@@ -491,11 +504,10 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             }
         }
     }
-    
     seriesOverlaidChart = [
         {
-            "type": 'Area',
-            "data": data.seriesMultipleChartArea01,
+            "type": 'Candlestick',
+            "data": candles,
             "options": {
                 "topColor": 'rgba(255, 192, 0, 0.7)',
                 "bottomColor": 'rgba(255, 192, 0, 0.3)',
@@ -504,7 +516,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             },
             "markers": [
                 {
-                    "time": '2019-04-08',
+                    "time": '2024-04-08',
                     "position": 'aboveBar',
                     "color": 'rgba(255, 192, 0, 1)',
                     "shape": 'arrowDown',
@@ -512,7 +524,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                     "size": 3
                 },
                 {
-                    "time": '2019-05-13',
+                    "time": '2024-05-13',
                     "position": 'belowBar',
                     "color": 'rgba(255, 192, 0, 1)',
                     "shape": 'arrowUp',
@@ -521,27 +533,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 },
             ]
         },
-        {
-            "type": 'Area',
-            "data": data.seriesMultipleChartArea02,
-            "options": {
-                "topColor": 'rgba(67, 83, 254, 0.7)',
-                "bottomColor": 'rgba(67, 83, 254, 0.3)',
-                "lineColor": 'rgba(67, 83, 254, 1)',
-                "lineWidth": 2,
-            },
-            "markers": [
-    
-                {
-                    "time": '2019-05-03',
-                    "position": 'aboveBar',
-                    "color": 'rgba(67, 83, 254, 1)',
-                    "shape": 'arrowDown',
-                    "text": 'PEAK',
-                    "size": 3
-                },
-            ]
-        }
     ]
     
     return renderLightweightCharts([
