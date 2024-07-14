@@ -51,13 +51,17 @@ def get_data(ticker):
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
-    data['High_Rolling_Mean'] = data['High_Rolling'].rolling(window=14).median()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
-    data['Low_Rolling_Mean'] = data['Low_Rolling'].rolling(window=14).median()
+    data = calculate_macd(data)
+
+    # Calcular las señales de ruptura
     volume_threshold = 1.5
     data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
     data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
-    data = calculate_macd(data)
+    
+    # Depuración
+    print("Depuración Breakout:")
+    print(data[['Close', 'High_Rolling', 'Low_Rolling', 'Volume', 'Volume_Avg', 'Breakout_Above', 'Breakout_Below']].tail(10))
     return data
 
 # Función para generar señales de trading
@@ -162,28 +166,20 @@ def plot_data(data, ticker):
                              line=dict(color='rgba(214, 39, 40, 0.3)')))
     fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
                              line=dict(color='rgba(148, 103, 189, 0.3)')))    
-    
+
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
-    
+
     fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
                              marker=dict(color='magenta', size=10, symbol="cross"), text=buy_signals.index.strftime('%Y-%m-%d'),
                              textposition="bottom center", textfont=dict(color='magenta')))
-    
+
     fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
                              marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
                              textposition="top center",textfont=dict(color='orange')))
 
-    # # Add horizontal lines for each value in High_Rolling
-    # for i in range(len(data)):
-    #     if not np.isnan(data['High_Rolling_Mean'].iloc[i]):
-    #         fig.add_shape(type="line",
-    #                       x0=data.index[0], y0=data['High_Rolling_Mean'].iloc[i],
-    #                       x1=data.index[-1], y1=data['High_Rolling_Mean'].iloc[i],
-    #                       line=dict(color="rgb(65,105,225,0.2)", width=1))
-    
     fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
-    
+
     return fig
 
 # Función principal
