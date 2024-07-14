@@ -60,7 +60,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
 
     df['color'] = np.where(df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
 
-    candles = json.loads(df.to_json(orient="records"))
+    candles = json.loads(df[['time', 'open', 'high', 'low', 'close', 'volume']].to_json(orient="records"))
     volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
     df['micro_pullback'] = calculate_micro_pullback(df)
     df['bull_flag'] = calculate_bull_flag(df)
@@ -81,20 +81,12 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             },
             "markers": [
                 {
-                    "time": '2024-07-14T08:00:00',
+                    "time":1720792200,
                     "position": 'aboveBar',
                     "color": 'rgba(255, 192, 0, 1)',
                     "shape": 'arrowDown',
                     "text": 'H',
-                    "size": 3
-                },
-                {
-                    "time": '2024-05-13',
-                    "position": 'belowBar',
-                    "color": 'rgba(255, 192, 0, 1)',
-                    "shape": 'arrowUp',
-                    "text": 'L',
-                    "size": 3
+                    "size": 1
                 },
             ]
         },
