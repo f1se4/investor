@@ -62,9 +62,6 @@ def get_data(ticker):
     data['Breakout_Volume'] = (data['Volume'] > volume_threshold * data['Volume_Avg'])
     data['Breakout_Below'] = (data['Close'] < data['Low_Rolling'])
 
-    # Depuración
-    print("Depuración Breakout:")
-    print(data[['Close', 'High_Rolling', 'Low_Rolling', 'Volume', 'Volume_Avg', 'Breakout_Above', 'Breakout_Below']].tail(10))
     return data
 
 # Función para generar señales de trading
@@ -78,14 +75,16 @@ def generate_signals(data):
                                   (data['Close'] <= data['Bollinger_Low']) &
                                   (data['Close'] <= data['Min_14']) &
                                   (data['MACD'] > 0 ) & #A
-                                  (data['Breakout_Above']) , 1, 0) #B
+                                  # (data['Breakout_Above']) &
+                                  (data['Breakout_Volume']), 1, 0) #B
     
     data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
                                    (data['RSI'] > 70) &
                                    (data['Close'] >= data['Bollinger_High']) &
                                    (data['Close'] >= data['Max_14']) &
                                    (data['MACD'] < 0 ) &
-                                   (data['Breakout_Below']) , 1, 0) #B
+                                   # (data['Breakout_Below']) & #B
+                                  (data['Breakout_Volume']), 1, 0) #B
     return data
 
 # Función para determinar la acción a tomar
@@ -189,7 +188,7 @@ def plot_data(data, ticker):
                              marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
                              textposition="top center",textfont=dict(color='orange')))
 
-    fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
+    fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price', showlegend=False)
 
     return fig
 
@@ -234,7 +233,7 @@ def bot_main():
             except:
                 st.write(f"Error getting {ticker}")
 
-        st.dataframe(data[['Close','High_Rolling', 'Low_Rolling','Breakout_Above']])
+        st.dataframe(data)
 
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
