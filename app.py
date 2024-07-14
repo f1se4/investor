@@ -73,11 +73,10 @@ def main():
             with col3:
                 show_volatility = st.checkbox('Volatility')
                 show_bollinger  = st.checkbox('Bollinger Bands')
-                show_patterns = st.checkbox('Patterns')
     
             placeholder = st.empty()
             with placeholder:
-                f_daily_plot(data, data_sm, show_patterns,
+                f_daily_plot(data, data_sm,
                              show_sma200, show_sma5, 
                              show_macd, show_rsi, 
                              show_volatility, show_bollinger)

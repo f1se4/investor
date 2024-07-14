@@ -47,7 +47,7 @@ def calculate_rsi(df, window=14):
     # print(rs)
     return 100 - (100 / (1 + rs))
 
-def f_daily_plot(df, df_sm, show_patterns = False,
+def f_daily_plot(df, df_sm,
                  show_sma200=False, show_sma5=False, show_macd=False, 
                  show_rsi=False, show_volatility=False, show_bollinger=False, 
                  chart_height=500):
@@ -65,16 +65,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     df['micro_pullback'] = calculate_micro_pullback(df)
     df['bull_flag'] = calculate_bull_flag(df)
 
-    micro_pullback_points = df[df['micro_pullback']]
-    bull_flag_points = df[df['bull_flag']]
-    micro_pullback_points['position'] = 'aboveBar'
-    micro_pullback_points['color'] ='rgba(255, 192, 0, 1)'
-    micro_pullback_points['shape'] = 'arrowDown'
-    micro_pullback_points['text'] = 'MP'
-    micro_pullback_points['size'] = 1
-    print(type(micro_pullback_points))
-    print(micro_pullback_points[['time','position','color','shape','text','size']].to_json(orient="records"))
-    
     price_volume_series = [
         {
             "type": 'Candlestick',
@@ -86,17 +76,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 "wickUpColor": COLOR_BULL,
                 "wickDownColor": COLOR_BEAR
             },
-            # "markers":  micro_pullback_points[['time','position','color','shape','text','size']].to_json(orient="records")
-        "markers": [{"time":1720916040,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720916520,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720916760,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720917180,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720917420,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720917600,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720917900,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720918500,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720918980,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720919340,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720919700,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720919880,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720920240,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720920780,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720921560,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720921920,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720922460,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720923000,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720923240,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720923420,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720923780,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720924200,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720924500,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720924680,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720925100,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720925400,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720925640,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720926300,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720926960,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720927080,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720927320,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720927620,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720927980,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720928160,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720928520,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1},{"time":1720929000,"position":"aboveBar","color":"rgba(255, 192, 0, 1)","shape":"arrowDown","text":"MP","size":1}]
-                # {
-                #     "time":1720792200,
-                #     "position": 'aboveBar',
-                #     "color": 'rgba(255, 192, 0, 1)',
-                #     "shape": 'arrowDown',
-                #     "text": 'H',
-                #     "size": 1
-                # },
-            # ]
         },
         {
             "type": 'Histogram',
@@ -116,24 +95,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             }
         }
     ]
-    
-    if show_patterns:
-        pass
-        # bull_flag_series = {
-        #         "type": 'ShapeMarker',
-        #         "data": json.loads(bull_flag_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
-        #         "options": {
-        #             "shape": 'arrowUp',
-        #             "color": 'rgba(0, 0, 255, 0.8)',
-        #             "borderColor": 'rgba(0, 0, 255, 0.8)',
-        #             "minSize": 6,
-        #             "size": 8
-        #         }
-        #     }
-
-        # price_volume_series.append(micro_pullback_series)
-        # price_volume_series.append(bull_flag_series)
-
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
         # Realizar el merge_asof
@@ -457,6 +418,6 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     ]
 
     charts.extend(additional_charts)
-    # print(charts)
+    print(charts)
 
     return renderLightweightCharts(charts, 'overlaid')

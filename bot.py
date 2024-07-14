@@ -54,6 +54,7 @@ def get_data(ticker):
     data['High_Rolling'] = data['High'].rolling(window=14).max()
     data['High_Rolling_Rounded'] = data['High_Rolling'].round(2)
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
+    data['Low_Rolling_Rounded'] = data['Low'].rolling(window=14).min()
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -172,6 +173,10 @@ def plot_data(data, ticker):
     for valor in data['High_Rolling_Rounded'].tail(10).unique():
         fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
                              mode='lines', line=dict(color='rgba(65,105,225,0.2)')))
+
+    for valor in data['Low_Rolling_Rounded'].tail(10).unique():
+        fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
+                             mode='lines', line=dict(color='rgba(165,105,225,0.2)')))
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
