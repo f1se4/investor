@@ -9,6 +9,7 @@ from layout.daily            import daily
 from layout.faqs             import faqs
 from layout.information     import information
 from layout.calculadora     import calculadora
+from visualizations.lightweight import f_daily_plot
 import bot
 
 # Suppress warnings for better display

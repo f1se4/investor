@@ -11,6 +11,18 @@ COLOR_BEAR_HIST = 'rgba(239,83,80,0.4)'  # #ef5350
 def calculate_sma(df, window):
     return df['close'].rolling(window=window).mean()
 
+def calculate_micro_pullback(df):
+    df['change'] = df['close'].diff()
+    df['change_prev'] = df['change'].shift(1)
+    micro_pullback = (df['change_prev'] < 0) & (df['change'] > 0)
+    return micro_pullback
+
+def calculate_bull_flag(df):
+    df['change_prev'] = df['change'].shift(1)
+    df['change_next'] = df['change'].shift(-1)
+    bull_flag = (df['change_prev'] > 0) & (df['change_next'] < 0) & (df['change_prev'] > df['change_next'])
+    return bull_flag
+
 def calculate_macd(df):
     exp1 = df['close'].ewm(span=12, adjust=False).mean()
     exp2 = df['close'].ewm(span=26, adjust=False).mean()
@@ -35,7 +47,12 @@ def calculate_rsi(df, window=14):
     print(rs)
     return 100 - (100 / (1 + rs))
 
-def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False, show_rsi=False, show_volatility=False, show_bollinger=False, chart_height=500):
+def f_daily_plot(df, df_sm, show_patterns = False,
+                 show_sma200=False, show_sma5=False, show_macd=False, 
+                 show_rsi=False, show_volatility=False, show_bollinger=False, 
+                 chart_height=500):
+    df = df.reset_index()
+    df_sm = df_sm.reset_index()
     df.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
     df_sm.columns = ['time', 'open', 'high', 'low', 'close', 'volume']
     df['time'] = df['time'].view('int64') // 10**9
@@ -77,6 +94,43 @@ def f_daily_plot(df, df_sm, show_sma200=False, show_sma5=False, show_macd=False,
         }
     ]
     
+    if show_patterns:
+        df['micro_pullback'] = calculate_micro_pullback(df)
+        df['bull_flag'] = calculate_bull_flag(df)
+
+        micro_pullback_points = df[df['micro_pullback']]
+        bull_flag_points = df[df['bull_flag']]
+
+        micro_pullback_series = [
+            {
+                "type": 'ShapeMarker',
+                "data": json.loads(micro_pullback_points[['time', 'low']].to_json(orient="records")),
+                "options": {
+                    "shape": 'arrowUp',
+                    "color": 'rgba(0, 255, 0, 0.8)',
+                    "borderColor": 'rgba(0, 255, 0, 0.8)',
+                    "minSize": 6,
+                    "size": 8
+                }
+            }
+        ]
+
+        bull_flag_series = [
+            {
+                "type": 'ShapeMarker',
+                "data": json.loads(bull_flag_points[['time', 'low']].to_json(orient="records")),
+                "options": {
+                    "shape": 'arrowUp',
+                    "color": 'rgba(0, 0, 255, 0.8)',
+                    "borderColor": 'rgba(0, 0, 255, 0.8)',
+                    "minSize": 6,
+                    "size": 8
+                }
+            }
+        ]
+
+        price_volume_series.extend(micro_pullback_series)
+        price_volume_series.extend(bull_flag_series)
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
         # Realizar el merge_asof
