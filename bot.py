@@ -172,7 +172,13 @@ def plot_data(data, ticker):
                              marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
                              textposition="top center",textfont=dict(color='orange')))
 
-    fig.add_shape(type="line", x0=data.index[0])
+    # Add horizontal lines for each value in High_Rolling
+    for i in range(len(data)):
+        if not np.isnan(data['High_Rolling'].iloc[i]):
+            fig.add_shape(type="line",
+                          x0=data.index[0], y0=data['High_Rolling'].iloc[i],
+                          x1=data.index[-1], y1=data['High_Rolling'].iloc[i],
+                          line=dict(color="RoyalBlue", width=1))
     
     fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
     
