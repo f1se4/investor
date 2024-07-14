@@ -81,7 +81,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             },
         "markers" : [
             {
-                "time": micro_pullback_points['time'][-1],
+                "time": '2024-14-07',
                 "position": 'aboveBar',
                 "color": 'rgba(255, 192, 0, 1)',
                 "shape": 'arrowDown',
