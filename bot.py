@@ -52,8 +52,9 @@ def get_data(ticker):
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
-    data['Breakout_Above'] = (data['Close'] > df['High_Rolling']) & (df['Volume'] > volume_threshold * df['Volume_Avg'])
-    data['Breakout_Below'] = (data['Close'] < df['Low_Rolling']) & (df['Volume'] > volume_threshold * df['Volume_Avg'])
+    volume_threshold = 1.5
+    data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
+    data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
     return data
 
 # Función para generar señales de trading
@@ -67,14 +68,14 @@ def generate_signals(data):
                                   (data['Close'] <= data['Bollinger_Low']) &
                                   (data['Close'] <= data['Min_14']) &
                                   (data['MACD'] > 0 ) & #A
-                                  (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
+                                  (data['Breakout_Above']) , 1, 0) #B
     
     data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
                                    (data['RSI'] > 70) &
                                    (data['Close'] >= data['Bollinger_High']) &
                                    (data['Close'] >= data['Max_14']) &
                                    (data['MACD'] < 0 ) &
-                                   (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
+                                   (data['Breakout_Bellow']) , 1, 0) #B
     return data
 
 # Función para determinar la acción a tomar
