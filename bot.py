@@ -43,7 +43,7 @@ def bollinger_bands(series, window):
 
 # Función para obtener los datos históricos
 def get_data(ticker):
-    data = yf.download(ticker, period='10y', interval='1d')
+    data = yf.download(ticker, period='2y', interval='1d')
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
@@ -51,7 +51,9 @@ def get_data(ticker):
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
+    data['High_Rolling_Mean'] = data['High_Rolling'].rolling(window=14).mean()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
+    data['Low_Rolling_Mean'] = data['Low_Rolling'].rolling(window=14).mean()
     volume_threshold = 1.5
     data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
     data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
