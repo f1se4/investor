@@ -19,6 +19,14 @@ def rsi(series, window):
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
+def calculate_macd(df):
+    df['EMA_12'] = ema(df['Close'], 12)
+    df['EMA_26'] = ema(df['Close'], 26)
+    df['MACD_Line'] = df['EMA_12'] - df['EMA_26']
+    df['Signal_Line'] = df['MACD_Line'].ewm(span=9, adjust=False).mean()
+    df['MACD'] = df['MACD_Line'] - df['Signal_Line']
+    return df
+
 # Función para obtener el mínimo y máximo de los últimos N días
 def rolling_min_max(series, window):
     rolling_min = series.rolling(window=window).min()
@@ -50,6 +58,7 @@ def generate_signals(data):
                                   (data['RSI'] < 30) &
                                   (data['Close'] <= data['Bollinger_Low']) &
                                   (data['Close'] <= data['Min_14']) &
+                                  (data['MACD'] <= data['Min_14']) &
                                   (data['Volume'] > 1.5 * data['Volume_Avg']), 1, 0)
     
     data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
@@ -63,14 +72,14 @@ def generate_signals(data):
 def determine_action(data, position):
     if position == 'None':
         if data.iloc[-1]['Buy_Signal'] == 1:
-            return 'Comprar', data.index[-1]
+            return 'Buy', data.index[-1]
         else:
-            return 'No hacer nada', None
+            return 'Hold', None
     elif position == 'Long':
         if data.iloc[-1]['Sell_Signal'] == 1:
-            return 'Vender', data.index[-1]
+            return 'Sell', data.index[-1]
         else:
-            return 'No hacer nada', None
+            return 'Hold', None
 
 # Función para realizar operaciones con Interactive Brokers
 # def place_order(ticker, action, quantity, simulate=True):
