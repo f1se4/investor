@@ -62,6 +62,11 @@ def f_daily_plot(df, df_sm, show_patterns = False,
 
     candles = json.loads(df.to_json(orient="records"))
     volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
+    df['micro_pullback'] = calculate_micro_pullback(df)
+    df['bull_flag'] = calculate_bull_flag(df)
+
+    micro_pullback_points = df[df['micro_pullback']]
+    bull_flag_points = df[df['bull_flag']]
     
     price_volume_series = [
         {
@@ -73,7 +78,17 @@ def f_daily_plot(df, df_sm, show_patterns = False,
                 "borderVisible": False,
                 "wickUpColor": COLOR_BULL,
                 "wickDownColor": COLOR_BEAR
+            },
+        "markers" : [
+            {
+                "time": micro_pullback_points['time'][-1],
+                "position": 'aboveBar',
+                "color": 'rgba(255, 192, 0, 1)',
+                "shape": 'arrowDown',
+                "text": 'H',
+                "size": 3
             }
+        ]
         },
         {
             "type": 'Histogram',
@@ -95,13 +110,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
     ]
     
     if show_patterns:
-        df['micro_pullback'] = calculate_micro_pullback(df)
-        df['bull_flag'] = calculate_bull_flag(df)
-
-        micro_pullback_points = df[df['micro_pullback']]
-        bull_flag_points = df[df['bull_flag']]
-
-
+        pass
         # bull_flag_series = {
         #         "type": 'ShapeMarker',
         #         "data": json.loads(bull_flag_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
@@ -114,7 +123,7 @@ def f_daily_plot(df, df_sm, show_patterns = False,
         #         }
         #     }
 
-        price_volume_series.append(micro_pullback_series)
+        # price_volume_series.append(micro_pullback_series)
         # price_volume_series.append(bull_flag_series)
 
     if show_sma200:
