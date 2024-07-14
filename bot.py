@@ -43,7 +43,7 @@ def bollinger_bands(series, window):
 
 # Función para obtener los datos históricos
 def get_data(ticker):
-    data = yf.download(ticker, period='2y', interval='1d')
+    data = yf.download(ticker, period='1y', interval='1h')
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
@@ -51,8 +51,9 @@ def get_data(ticker):
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data = calculate_macd(data)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
-    data['High_Rolling'] = data['High'].rolling(window=44).max()
-    data['Low_Rolling'] = data['Low'].rolling(window=44).min()
+    data['High_Rolling'] = data['High'].rolling(window=80).max()
+    data['High_Rolling_Rounded'] = data['High_Rolling'].round(1)
+    data['Low_Rolling'] = data['Low'].rolling(window=80).min()
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -224,7 +225,7 @@ def bot_main():
             except:
                 st.write(f"Error getting {ticker}")
 
-        st.dataframe(data[['Close','High_Rolling', 'Low_Rolling']])
+        st.dataframe(data[['Close','High_Rolling', 'Low_Rolling','Breakout_Above']])
 
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
