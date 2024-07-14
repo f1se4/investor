@@ -51,9 +51,9 @@ def get_data(ticker):
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
-    data['High_Rolling_Mean'] = data['High_Rolling'].rolling(window=14).mean()
+    data['High_Rolling_Mean'] = data['High_Rolling'].rolling(window=14).median()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
-    data['Low_Rolling_Mean'] = data['Low_Rolling'].rolling(window=14).mean()
+    data['Low_Rolling_Mean'] = data['Low_Rolling'].rolling(window=14).median()
     volume_threshold = 1.5
     data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
     data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
@@ -176,11 +176,11 @@ def plot_data(data, ticker):
 
     # Add horizontal lines for each value in High_Rolling
     for i in range(len(data)):
-        if not np.isnan(data['High_Rolling'].iloc[i]):
+        if not np.isnan(data['High_Rolling_Mean'].iloc[i]):
             fig.add_shape(type="line",
-                          x0=data.index[0], y0=data['High_Rolling'].iloc[i],
-                          x1=data.index[-1], y1=data['High_Rolling'].iloc[i],
-                          line=dict(color="RoyalBlue", width=1))
+                          x0=data.index[0], y0=data['High_Rolling_Mean'].iloc[i],
+                          x1=data.index[-1], y1=data['High_Rolling_Mean'].iloc[i],
+                          line=dict(color="rgb(65,105,225,0.2)", width=1))
     
     fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
     
