@@ -55,6 +55,7 @@ def get_data(ticker):
     volume_threshold = 1.5
     data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
     data['Breakout_Below'] = (data['Close'] < data['Low_Rolling']) & (data['Volume'] > volume_threshold * data['Volume_Avg'])
+    data = calculate_macd(data)
     return data
 
 # Función para generar señales de trading
@@ -75,7 +76,7 @@ def generate_signals(data):
                                    (data['Close'] >= data['Bollinger_High']) &
                                    (data['Close'] >= data['Max_14']) &
                                    (data['MACD'] < 0 ) &
-                                   (data['Breakout_Bellow']) , 1, 0) #B
+                                   (data['Breakout_Below']) , 1, 0) #B
     return data
 
 # Función para determinar la acción a tomar
@@ -215,6 +216,8 @@ def bot_main():
                 #     portfolio = update_portfolio(ticker, action, 10, last_price)
             except:
                 pass
+
+        st.dataframe(data)
         
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
