@@ -114,20 +114,20 @@ def f_daily_plot(df, df_sm, show_patterns = False,
             }
         
 
-        bull_flag_series = {
-                "type": 'ShapeMarker',
-                "data": json.loads(bull_flag_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
-                "options": {
-                    "shape": 'arrowUp',
-                    "color": 'rgba(0, 0, 255, 0.8)',
-                    "borderColor": 'rgba(0, 0, 255, 0.8)',
-                    "minSize": 6,
-                    "size": 8
-                }
-            }
+        # bull_flag_series = {
+        #         "type": 'ShapeMarker',
+        #         "data": json.loads(bull_flag_points[['time', 'low']].rename(columns={'low':'value'}).to_json(orient="records")),
+        #         "options": {
+        #             "shape": 'arrowUp',
+        #             "color": 'rgba(0, 0, 255, 0.8)',
+        #             "borderColor": 'rgba(0, 0, 255, 0.8)',
+        #             "minSize": 6,
+        #             "size": 8
+        #         }
+        #     }
 
         price_volume_series.append(micro_pullback_series)
-        price_volume_series.append(bull_flag_series)
+        # price_volume_series.append(bull_flag_series)
 
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
