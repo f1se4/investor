@@ -174,13 +174,13 @@ def plot_data(data, ticker):
                              marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
                              textposition="top center",textfont=dict(color='orange')))
 
-    # Add horizontal lines for each value in High_Rolling
-    for i in range(len(data)):
-        if not np.isnan(data['High_Rolling_Mean'].iloc[i]):
-            fig.add_shape(type="line",
-                          x0=data.index[0], y0=data['High_Rolling_Mean'].iloc[i],
-                          x1=data.index[-1], y1=data['High_Rolling_Mean'].iloc[i],
-                          line=dict(color="rgb(65,105,225,0.2)", width=1))
+    # # Add horizontal lines for each value in High_Rolling
+    # for i in range(len(data)):
+    #     if not np.isnan(data['High_Rolling_Mean'].iloc[i]):
+    #         fig.add_shape(type="line",
+    #                       x0=data.index[0], y0=data['High_Rolling_Mean'].iloc[i],
+    #                       x1=data.index[-1], y1=data['High_Rolling_Mean'].iloc[i],
+    #                       line=dict(color="rgb(65,105,225,0.2)", width=1))
     
     fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price')
     
@@ -209,10 +209,10 @@ def bot_main():
                     current_positions[ticker] = 'Long' if last_action == 'Comprar' else 'None'
         
         for ticker in tickers:
-            data = get_data(ticker)
-            data = generate_signals(data)
-            action, signal_date = determine_action(data, current_positions[ticker])
             try:
+                data = get_data(ticker)
+                data = generate_signals(data)
+                action, signal_date = determine_action(data, current_positions[ticker])
                 actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
                 
                 # st.write(data.tail(10))
@@ -225,10 +225,8 @@ def bot_main():
                 #     last_price = data.iloc[-1]['Close']
                 #     portfolio = update_portfolio(ticker, action, 10, last_price)
             except:
-                pass
+                st.write(f"Error getting {ticker}")
 
-        st.dataframe(data)
-        
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
         
