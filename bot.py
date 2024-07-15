@@ -4,6 +4,7 @@ import numpy as np
 import streamlit as st
 # from ib_insync import *
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import os
 from calculations.calculations import get_company_name
 
@@ -84,7 +85,7 @@ def generate_signals(data):
                                   # (data['RSI'] < 30) & #A
                                   (data['Close'] > data['Bollinger_High']) &
                                   # (data['Close'] <= data['Min_14']) &
-                                  # (data['MACD'] > 0 ) & #A
+                                  (data['MACD'] > 0 ) & #A
                                   # (data['Breakout_Above']) &
                                   (data['Breakout_Volume']), 1, 0) #B
     
@@ -92,7 +93,7 @@ def generate_signals(data):
                                    # (data['RSI'] > 70) &
                                    (data['Close'] < data['Bollinger_Low']) &
                                    # (data['Close'] >= data['Max_14']) &
-                                   # (data['MACD'] < 0 ) &
+                                   (data['MACD'] < 0 ) &
                                    # (data['Breakout_Below']) & #B
                                   (data['Breakout_Volume']), 1, 0) #B
     return data
@@ -166,31 +167,56 @@ def show_portfolio():
 # Función para graficar datos con Plotly
 def plot_data(data, ticker):
     company_name = get_company_name(ticker)
-    fig = go.Figure()
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05)
 
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close',
-                             line=dict(color='rgba(31, 119, 180, 0.8)')))
-    # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA 50',
-    #                          line=dict(color='rgba(255, 127, 14, 0.3)')))
+    data = data.tail(60).copy()
+
+    # Añadir gráfico de velas (candlestick)
+    fig.add_trace(go.Candlestick(x=data.index,
+                                 open=data['Open'],
+                                 high=data['High'],
+                                 low=data['Low'],
+                                 close=data['Close'],
+                                 name='Candlestick'), row=1, col=1)
+
     fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
                              line=dict(color='rgba(44, 160, 44, 0.3)')))
     fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
                              line=dict(color='rgba(214, 39, 40, 0.3)')))
+
     fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
-                             line=dict(color='rgba(148, 103, 189, 0.3)')))    
+                             line=dict(color='rgba(255, 152, 150, 0.3)')))  # Color similar a rgba(214, 39, 40, 0.3)
+
+    # Añadir área sombreada entre Bollinger High y Bollinger Low
+    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], fill='tonexty',
+                             fillcolor='rgba(214, 39, 40, 0.1)', line=dict(color='rgba(214, 39, 40, 0.3)'),
+                             mode='lines', name='Bollinger Bands'))
+    
+    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], fill='tonexty',
+                             fillcolor='rgba(255, 152, 150, 0.1)', line=dict(color='rgba(255, 152, 150, 0.3)'),
+                             mode='lines', name='Bollinger Bands'))
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
 
     fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
-                             marker=dict(color='magenta', size=10, symbol="cross"), text=buy_signals.index.strftime('%Y-%m-%d'),
-                             textposition="bottom center", textfont=dict(color='magenta')))
+                             marker=dict(color='magenta', size=7, symbol="cross"), 
+                             text=buy_signals.index.strftime('%Y-%m-%d %H:%M'),
+                             textposition="bottom left", textfont=dict(color='magenta')))
 
     fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
-                             marker=dict(color='orange', size=10, symbol="x"), text=sell_signals.index.strftime('%Y-%m-%d'),
-                             textposition="top center",textfont=dict(color='orange')))
+                             marker=dict(color='orange', size=7, symbol="x"), 
+                             text=sell_signals.index.strftime('%Y-%m-%d %H:%M'),
+                             textposition="top left",textfont=dict(color='orange')))
 
-    fig.update_layout(title=f'{ticker} - {company_name}', xaxis_title='Date', yaxis_title='Price', showlegend=False)
+    # Añadir gráfico de volumen al segundo subplot
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker_color='rgba(31, 119, 180, 0.3)'),
+                  row=2, col=1)
+
+    fig.update_layout(title=f'{ticker} - {company_name}', 
+                      xaxis_title='', yaxis_title='', 
+                      xaxis_rangeslider_visible=False,
+                      showlegend=False)
 
     return fig
 
@@ -199,8 +225,8 @@ def bot_main():
     st.title("TradeBot")
 
     #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
-    #acciones_evaluar = "AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
-    acciones_evaluar = "BTC-EUR"
+    acciones_evaluar = "BTC-EUR,AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
+    #acciones_evaluar = "BTC-EUR"
     
     tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
     tickers = [ticker.strip() for ticker in tickers.split(',')]
