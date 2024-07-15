@@ -167,7 +167,7 @@ def show_portfolio():
 # Función para graficar datos con Plotly
 def plot_data(data, ticker):
     company_name = get_company_name(ticker)
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05)
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.05)
 
     data = data.tail(60).copy()
 
@@ -196,6 +196,10 @@ def plot_data(data, ticker):
                              fillcolor='rgba(255, 152, 150, 0.1)', line=dict(color='rgba(255, 152, 150, 0.3)'),
                              mode='lines', name='Bollinger Bands'))
 
+    fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
+                         marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
+                         opacity=0.6), row=3, col=1)
+
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
 
@@ -211,6 +215,10 @@ def plot_data(data, ticker):
 
     # Añadir gráfico de volumen al segundo subplot
     fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker_color='rgba(31, 119, 180, 0.3)'),
+                  row=2, col=1)
+    # Añadir gráfico de volumen al segundo subplot
+    fig.add_trace(go.Scatter(x=data.index, y=data['Volume_Avg'], name='Volume', 
+                             marker_color='rgba(131, 119, 180, 0.4)'),
                   row=2, col=1)
 
     fig.update_layout(title=f'{ticker} - {company_name}', 

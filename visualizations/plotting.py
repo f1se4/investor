@@ -628,7 +628,9 @@ def plot_indicators_macd(data):
 
     # Plot Histograma del MACD
     macd_histogram = macd_line - signal_line
-    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), opacity=0.6), row=1, col=1)
+    fig.add_trace(go.Bar(x=data.index, y=macd_histogram, 
+                         marker_color=np.where(macd_histogram >= 0, 'green', 'darkgray'), 
+                         opacity=0.6), row=1, col=1)
 
     fig.update_yaxes(title_text="MACD 12/26", showticklabels=False)
 
