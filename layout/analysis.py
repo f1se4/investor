@@ -28,7 +28,7 @@ def analysis(data, full_data):
 
     with colp3:
         sma200 = st.checkbox('SMA (200)')
-        sma5  = st.checkbox('SMA (5)')
+        sma5  = st.checkbox('SMA (5)', value=True)
 
     markers = {
         'kendall' : kendall,

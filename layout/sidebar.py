@@ -73,12 +73,12 @@ def configure_sidebar():
         }
     
         # Period selection
-        selected_period = st.sidebar.selectbox("Select period", periods)
+        selected_period = st.sidebar.selectbox("Select period", periods, index=1)
         
         # Interval selection based on the selected period
         if selected_period:
             allowed_intervals = interval_options[selected_period]
-            selected_interval = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True)
+            selected_interval = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True, index=3)
 
     if selected_tab == 'Calculator':
         initial_investment = st.sidebar.number_input("Initial Investment (€)", min_value=0.0, value=1000.0, step=100.0)

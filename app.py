@@ -49,34 +49,36 @@ def main():
             </div>
             <hr style="border: 2px solid #3B83BD;">
         """, unsafe_allow_html=True)
-    
         data = yf.download(stock, period=selected_period, interval=selected_interval).drop(columns=['Adj Close'])
     
         if selected_period in ['1d','5d','1mo','3mo','6mo']:
             data_sm = yf.download(stock, period='1y', interval='1h').drop(columns=['Adj Close'])
         else:
             data_sm = data.copy()
-    
+
         tab1, tab2 = st.tabs(['Analysis',
                               'Information', 
                               ])
+
+        if len(data) == 0:
+            st.write("Try another period/interval combination")
+        else:
+            with tab1:# Crear un contenedor para los radiobuttons en horizontal
+                # Añadir checkboxes para los indicadores
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    show_sma200 = st.checkbox('SMA200')
+                    show_sma5 = st.checkbox('SMA5', value=True)
+                with col2:
+                    show_macd = st.checkbox('MACD', value=True)
+                    show_rsi = st.checkbox('RSI')
+                with col3:
+                    show_volatility = st.checkbox('Volatility')
+                    show_bollinger  = st.checkbox('Bollinger Bands')
     
-        with tab1:# Crear un contenedor para los radiobuttons en horizontal
-            # Añadir checkboxes para los indicadores
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                show_sma200 = st.checkbox('SMA200')
-                show_sma5 = st.checkbox('SMA5')
-            with col2:
-                show_macd = st.checkbox('MACD')
-                show_rsi = st.checkbox('RSI')
-            with col3:
-                show_volatility = st.checkbox('Volatility')
-                show_bollinger  = st.checkbox('Bollinger Bands')
-    
-            placeholder = st.empty()
-            with placeholder:
-                f_daily_plot(data, data_sm,
+                placeholder = st.empty()
+                with placeholder:
+                    f_daily_plot(data, data_sm,
                              show_sma200, show_sma5, 
                              show_macd, show_rsi, 
                              show_volatility, show_bollinger)
