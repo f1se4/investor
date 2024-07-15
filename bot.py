@@ -43,7 +43,7 @@ def bollinger_bands(series, window):
 
 # Función para obtener los datos históricos
 def get_data(ticker):
-    data = yf.download(ticker, period='5d', interval='1m')
+    data = yf.download(ticker, period='1d', interval='1m')
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['RSI'] = rsi(data['Close'], window=14)
@@ -55,6 +55,7 @@ def get_data(ticker):
     data['High_Rolling_Rounded'] = data['High_Rolling'].round(2)
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
     data['Low_Rolling_Rounded'] = data['Low'].rolling(window=14).min()
+    # data['atr'] = atr(data, 14)
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -64,25 +65,34 @@ def get_data(ticker):
 
     return data
 
+# Average True Range (ATR)
+def atr(df, window):
+    high_low = df['high'] - df['low']
+    high_close = np.abs(df['high'] - df['close'].shift())
+    low_close = np.abs(df['low'] - df['close'].shift())
+    ranges = pd.concat([high_low, high_close, low_close], axis=1)
+    true_range = ranges.max(axis=1)
+    return true_range.rolling(window=window).mean()
+
 # Función para generar señales de trading
 def generate_signals(data):
     # A - Swing Trading
     #      * Identify Oportunities based in trends and correction cycles
     # B - Breakouts 
     #      * levels and confirmations
-    data['Buy_Signal'] = np.where((data['EMA_50'] > data['EMA_200']) & #A
-                                  (data['RSI'] < 30) & #A
-                                  (data['Close'] <= data['Bollinger_Low']) &
-                                  (data['Close'] <= data['Min_14']) &
-                                  (data['MACD'] > 0 ) & #A
+    data['Buy_Signal'] = np.where((data['Close'] < data['EMA_200']) & #A
+                                  # (data['RSI'] < 30) & #A
+                                  (data['Close'] > data['Bollinger_High']) &
+                                  # (data['Close'] <= data['Min_14']) &
+                                  # (data['MACD'] > 0 ) & #A
                                   # (data['Breakout_Above']) &
                                   (data['Breakout_Volume']), 1, 0) #B
     
-    data['Sell_Signal'] = np.where((data['EMA_50'] < data['EMA_200']) &
-                                   (data['RSI'] > 70) &
-                                   (data['Close'] >= data['Bollinger_High']) &
-                                   (data['Close'] >= data['Max_14']) &
-                                   (data['MACD'] < 0 ) &
+    data['Sell_Signal'] = np.where((data['Close'] > data['EMA_200']) &
+                                   # (data['RSI'] > 70) &
+                                   (data['Close'] < data['Bollinger_Low']) &
+                                   # (data['Close'] >= data['Max_14']) &
+                                   # (data['MACD'] < 0 ) &
                                    # (data['Breakout_Below']) & #B
                                   (data['Breakout_Volume']), 1, 0) #B
     return data
@@ -162,20 +172,12 @@ def plot_data(data, ticker):
                              line=dict(color='rgba(31, 119, 180, 0.8)')))
     # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA 50',
     #                          line=dict(color='rgba(255, 127, 14, 0.3)')))
-    # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
-    #                          line=dict(color='rgba(44, 160, 44, 0.3)')))
-    # fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
-    #                          line=dict(color='rgba(214, 39, 40, 0.3)')))
-    # fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
-    #                          line=dict(color='rgba(148, 103, 189, 0.3)')))    
-
-    for valor in data['High_Rolling_Rounded'].tail(10).unique():
-        fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
-                             mode='lines', line=dict(color='rgba(65,105,225,0.2)')))
-
-    for valor in data['Low_Rolling_Rounded'].tail(10).unique():
-        fig.add_trace(go.Scatter(x=data.index, y=[valor] * len(data),
-                             mode='lines', line=dict(color='rgba(165,05,225,0.2)')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
+                             line=dict(color='rgba(44, 160, 44, 0.3)')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
+                             line=dict(color='rgba(214, 39, 40, 0.3)')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
+                             line=dict(color='rgba(148, 103, 189, 0.3)')))    
 
     buy_signals = data[data['Buy_Signal'] == 1]
     sell_signals = data[data['Sell_Signal'] == 1]
@@ -202,7 +204,7 @@ def bot_main():
     
     tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
     tickers = [ticker.strip() for ticker in tickers.split(',')]
-    simulate = st.checkbox("Simular operaciones", value=True)
+    # simulate = st.checkbox("Simular operaciones", value=True)
     
     if tickers:
         actions = []
@@ -234,7 +236,7 @@ def bot_main():
             except:
                 st.write(f"Error getting {ticker}")
 
-        st.dataframe(data)
+        # st.dataframe(data)
 
         st.subheader("Acciones a Tomar")
         st.dataframe(pd.DataFrame(actions))
