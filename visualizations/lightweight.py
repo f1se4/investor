@@ -11,6 +11,12 @@ COLOR_BEAR_HIST = 'rgba(239,83,80,0.4)'  # #ef5350
 def calculate_sma(df, window):
     return df['close'].rolling(window=window).mean()
 
+# Paso 1: Importar las librerías necesarias y definir la función para calcular la volatilidad.
+def calculate_volatility(df):
+    df['returns'] = df['close'].pct_change()
+    df['volatility'] = df['returns'].rolling(window=21).std() * 100  # Volatilidad en porcentaje
+    return df
+
 def calculate_micro_pullback(df):
     df['change'] = df['close'].diff()
     df['change_prev'] = df['change'].shift(1)
@@ -298,10 +304,11 @@ def f_daily_plot(df, df_sm,
         })
 
     if show_volatility:
-        df['returns'] = df['close']/df['close'].shift().fillna(0)
-        df['volatility'] = df.returns.rolling(12).std().fillna(0) * 10
+        # Paso 3: Calcular la volatilidad.
+        df = calculate_volatility(df)
         df['high_vol'] = 0.3
         df['min_vol'] = 0.1
+        df['returns'] = df['returns'] * 100
         volatility = json.loads(df[['time', 'volatility']].rename(columns={"volatility": "value"}).dropna().to_json(orient="records"))
         returns = json.loads(df[['time', 'returns']].rename(columns={"returns": "value"}).dropna().to_json(orient="records"))
         high_vol = json.loads(df[['time', 'high_vol']].rename(columns={"high_vol": "value"}).dropna().to_json(orient="records"))
@@ -331,19 +338,19 @@ def f_daily_plot(df, df_sm,
                     "lineWidth": 1,
                 }
             },
-            # {
-            #     "type": 'Line',
-            #     "data": returns,
-            #     "priceFormat" : {
-            #             'type': 'price',
-            #             'precision' : 6,
-            #         'minMove':0.00001,
-            #                      },
-            #     "options": {
-            #         "color": 'rgba(227, 177, 210, 0.4)',
-            #         "lineWidth": 1,
-            #     }
-            # }
+            {
+                "type": 'Line',
+                "data": returns,
+                "priceFormat" : {
+                        'type': 'price',
+                        'precision' : 6,
+                    'minMove':0.00001,
+                                 },
+                "options": {
+                    "color": 'rgba(227, 177, 210, 0.4)',
+                    "lineWidth": 1,
+                }
+            }
         ]
         additional_charts.append({
             "chart": {
