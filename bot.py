@@ -42,52 +42,41 @@ def bollinger_bands(series, window):
     lower_band = sma - (std * 2)
     return upper_band, lower_band
 
-def calculate_g_channel(df, window=100):
-    df['High'] = df['High'].rolling(window=window).max()
-    df['Low'] = df['Low'].rolling(window=window).min()
-    df['Mid'] = (df['High'] + df['Low']) / 2
-    return df
+def calculate_g_channel(df, length=100):
+    df = df.copy()
+    df = df.reset_index()
+    df['a'] = np.nan
+    df['b'] = np.nan
+    
+    # Initialize the first values for 'a' and 'b'
+    df.at[0, 'a'] = df.at[0, 'Close']
+    df.at[0, 'b'] = df.at[0, 'Close']
+    
+    for i in range(1, len(df)):
+        previous_a = df.at[i-1, 'a'] if not np.isnan(df.at[i-1, 'a']) else df.at[i, 'Close']
+        previous_b = df.at[i-1, 'b'] if not np.isnan(df.at[i-1, 'b']) else df.at[i, 'Close']
 
-# def calculate_g_channel(data, length=100):
-#     # Rellenar valores nulos usando el método 'bfill'
-#     src_filled = data['Close']
-#     nz_previous = src_filled.shift(1).fillna(method='bfill')  # Rellena los NaN con el siguiente valor no nulo
-#     previous = src_filled.shift(1)
-#
-#     amax = pd.concat([src_filled,nz_previous], axis=1).max(axis=1)
-#     bmin = pd.concat([src_filled,nz_previous], axis=1).min(axis=1)
-#
-#     a = amax - ((amax - bmin).fillna(method='bfill'))/length
-#     b = bmin + ((amax - bmin).fillna(method='bfill'))/length
-#
-#     # Calcular el promedio
-#     data['a'] = a
-#     data['b'] = b
-#     data['avg'] = (a + b) / 2
-#     close = data['Close']
-#
-#     # Calcular las condiciones de cruce
-#     crossup = (b.shift(1) < close.shift(1)) & (b > close)
-#     crossdn = (a.shift(1) < close.shift(1)) & (a > close)
-#     
-#     # Determinar si es una tendencia alcista
-#     data['crossup'] = crossup
-#     data['crossdn'] = crossdn
-#     #
-#     # Calcular barssince para crossdn y crossup
-#     barssince_crossdn = crossdn.groupby((crossdn != crossdn.shift()).cumsum()).cumcount()
-#     barssince_crossup = crossup.groupby((crossup != crossup.shift()).cumsum()).cumcount()
-#     
-#     # Calcular la condición bullish
-#     bullish = barssince_crossdn <= barssince_crossup
-#     data['bullish'] = bullish
-#
-#     return data
+        df.at[i, 'a'] = max(df.at[i, 'Close'], previous_a) - (previous_a - previous_b) / length
+        df.at[i, 'b'] = min(df.at[i, 'Close'], previous_b) + (previous_a - previous_b) / length
+
+    df['avg'] = (df['a'] + df['b']) / 2
+    df['crossup'] = (df['b'].shift(1) < df['Close'].shift(1)) & (df['b'] > df['Close'])
+    df['crossdn'] = (df['a'].shift(1) < df['Close'].shift(1)) & (df['a'] > df['Close'])
+    df['bullish'] = df.apply(lambda row: (df.loc[:row.name, 'crossdn'].sum() <= df.loc[:row.name, 'crossup'].sum()), axis=1)
+
+    df['color'] = df['bullish'].apply(lambda x: 'lime' if x else 'red')
+
+    # Add buy and sell signals
+    df['Sell_Signal_GC'] = np.where((df['bullish'] == True) & (df['bullish'].shift(1) == False), df['avg'], np.nan)
+    df['Buy_Signal_GC'] = np.where((df['bullish'] == False) & (df['bullish'].shift(1) == True), df['avg'], np.nan)
+
+    df = df.set_index('Datetime')
+    return df
 
 # Función para obtener los datos históricos
 def get_data(ticker, selected_interval):
     data = yf.download(ticker, period='1d', interval=selected_interval)
-    # data = calculate_g_channel(data)
+    data = calculate_g_channel(data)
     # print(data)
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
@@ -141,12 +130,10 @@ def generate_signals(data, show_g_channel, show_simple_trade):
                                        (data['MACD'] < 0 ) &
                                        # (data['Breakout_Below']) & #B
                                       (data['Breakout_Volume']), 1, 0) #B
-    if show_g_channel:
-        pass
-        # buy_signals = np.where((data['bullish'] & ~np.roll(data['bullish'], 1)), data['avg'], np.nan)
-        # sell_signals = np.where((~data['bullish'] & np.roll(data['bullish'], 1)), data['avg'], np.nan)
-        # data['Buy_Signal_GC'] = buy_signals
-        # data['Sell_Signal_GC'] = sell_signals
+    # if show_g_channel:
+    # # Add buy and sell signals
+    #     data['Buy_Signal_GC'] = np.where((data['bullish'] == True) & (data['bullish'].shift(1) == False), data['avg'], np.nan)
+    #     data['Sell_Signal_GC'] = np.where((data['bullish'] == False) & (data['bullish'].shift(1) == True), data['avg'], np.nan)
 
     data['Buy'] = data.get('Buy_Signal', 0) + data.get('Buy_Signal_GC', 0)
     data['Sell'] = data.get('Sell_Signal', 0) + data.get('Sell_Signal_GC', 0)
@@ -226,7 +213,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
                         row_heights=[0.8, 0.2, 0.2],
                         vertical_spacing=0.05)
 
-    data = data.tail(60).copy()
+    #data = data.tail(60).copy()
 
     # Añadir gráfico de velas (candlestick)
     fig.add_trace(go.Candlestick(x=data.index,
@@ -236,8 +223,8 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
 
-    # fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
-    #                          line=dict(color='rgba(255,255,204, 0.8)')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
+                              line=dict(color='rgba(255,255,204, 0.8)')))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
                          marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
@@ -281,25 +268,17 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
                                  textposition="top left",textfont=dict(color='orange')))
 
     if show_g_channel:
-        pass
         # Agregar líneas de promedio y precios de cierre
-        # fig.add_trace(go.Scatter(x=data.index, y=data['avg'], mode='lines', name='Average', line=dict(color='green', width=1)))
-        # fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close price', line=dict(color='blue', width=1)))
+        fig.add_trace(go.Scatter(x=data.index, y=data['avg'], mode='lines', name='Average', line=dict(color='green', width=1)))
+        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close price', line=dict(color='blue', width=1)))
 
         #Agregar señales de compra/venta
-        # fig.add_trace(go.Scatter(x=data.index, y=data['Buy_Signal_GC'], mode='markers', name='Buy', marker=dict(color='lime', size=10, symbol='triangle-up')))
-        # fig.add_trace(go.Scatter(x=data.index, y=data['Sell_Signal_GC'], mode='markers', name='Sell', marker=dict(color='red', size=10, symbol='triangle-down')))
-        # buy_signals = data[data['Buy_Signal_GC'] == 1]
-        # sell_signals = data[data['Sell_Signal_GC'] == -1]
-        # 
-        # fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'],
-        #                          mode='markers', marker=dict(symbol='triangle-up', color='magenta', size=10), name='Buy Signal'))
-        # fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'],
-        #                          mode='markers', marker=dict(symbol='triangle-down', color='orange', size=10), name='Sell Signal'))
+        fig.add_trace(go.Scatter(x=data.index, y=data['Buy_Signal_GC'], mode='markers', name='Buy', marker=dict(color='magenta', size=10, symbol='triangle-up')))
+        fig.add_trace(go.Scatter(x=data.index, y=data['Sell_Signal_GC'], mode='markers', name='Sell', marker=dict(color='orange', size=10, symbol='triangle-down')))
 
         # Add shaded areas for the G-Channel
-        # fig.add_trace(go.Scatter(x=data.index, y=data['High'], line=dict(color='green', width=1), name='High Channel'))
-        # fig.add_trace(go.Scatter(x=data.index, y=data['Low'], line=dict(color='red', width=1), name='Low Channel', fill='tonexty', fillcolor='rgba(0, 100, 80, 0.2)'))
+        fig.add_trace(go.Scatter(x=data.index, y=data['avg'], line=dict(color='green', width=1), name='High Channel'))
+        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], line=dict(color='red', width=1), name='Low Channel', fill='tonexty', fillcolor='rgba(0, 100, 80, 0.2)'))
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='', 
@@ -328,8 +307,8 @@ def bot_main(selected_interval='5m', show_g_channel=True, show_simple_trade=True
         
         for ticker in tickers:
             data = get_data(ticker, selected_interval)
+            data = generate_signals(data, show_g_channel, show_simple_trade)
             try:
-                data = generate_signals(data, show_g_channel, show_simple_trade)
                 action, signal_date = determine_action(data, current_positions[ticker])
                 actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
                 
