@@ -86,6 +86,13 @@ def configure_sidebar():
         annual_interest_rate = st.sidebar.number_input("Annual Interest Rate (%)", min_value=0.0, value=5.0, step=0.1)
         years = st.sidebar.number_input("Number of Years", min_value=1, value=10, step=1)
 
+    if selected_tab == 'Trading':
+        refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
+        select_g_strategy = st.sidebar.checkbox('G-Channel', value=True)
+        select_trade_simple = st.sidebar.checkbox('Simple Strategy', value=True)
+        selected_interval_trading = st.sidebar.radio('Select Interval', ['1m','2m','5m','15m'], horizontal=True)
+
+
     
     st.sidebar.divider()
 
@@ -96,6 +103,6 @@ def configure_sidebar():
     elif selected_tab == 'Calculator':
         return selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 'NONE'
     elif selected_tab == 'Trading':
-        return selected_tab, None, None, None, None, None
+        return selected_tab, selected_interval_trading, select_g_strategy, select_trade_simple, refresh_data, None
 
 

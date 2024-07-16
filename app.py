@@ -97,7 +97,22 @@ def main():
             # forcasting(data, end_time, start_time)
 
     if side_elements[0] == 'Trading':
-        bot.bot_main()
+        selected_interval_trading = side_elements[1]
+        show_g_strategy = side_elements[2]
+        show_trade_simple = side_elements[3]
+        refresh_data = side_elements[4]
+
+        #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
+        acciones_evaluar = "BTC-EUR,AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
+        #acciones_evaluar = "BTC-EUR"
+        
+        tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
+        placeholder_trade = st.empty()
+        # with placeholder_trade:
+        if refresh_data:
+            refresh_interval = 60000
+            st_autorefresh(interval=refresh_interval,key='datarefresh')
+        bot.bot_main(selected_interval_trading, show_g_strategy, show_trade_simple, tickers)
 
     if side_elements[0] == 'Calculator':
         initial_investment = side_elements[1]
