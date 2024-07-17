@@ -205,7 +205,8 @@ def f_backtesting(data):
     
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
-        if int(row['Buy']) == 1 | int(row['Sell']) == 1:
+        print(row['Buy'],row['Sell'])
+        if row['Buy'] == 1.0 or row['Sell'] == 1.0:
             print(row['Buy'],row['Sell'])
             buy_date = None
             sell_date = None

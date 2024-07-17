@@ -118,7 +118,6 @@ def main():
             st_autorefresh(interval=refresh_interval,key='datarefresh')
 
         st.title("TradeBot")
-        current_positions = {ticker: 'None' for ticker in tickers}
         for ticker in tickers:
             # try:
             data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
@@ -126,7 +125,7 @@ def main():
             st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
             backtest = bot.f_backtesting(data)
             print(backtest)
-                # st.dataframe(bot.f_backtesting(data))
+            st.dataframe(bot.f_backtesting(data))
             # except:
             #     st.write(f"Errors loading {ticker}")
 
