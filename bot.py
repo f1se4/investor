@@ -214,12 +214,22 @@ def f_backtesting(data):
 
             if row['Buy'] == 1:
                 # Registrar la compra
+                sell_price=old_price
                 buy_price = row['Close']
                 signal_date = index
+                old_price = buy_price
+                action = 'Buy'
+                try:
+                    trade_return = (sell_price - buy_price) / buy_price
+                except:
+                    trade_return = 0
             elif row['Sell'] == 1:
                 # Registrar la venta
+                buy_price=old_price
                 sell_price = row['Close']
                 signal_date = index
+                action = 'Sell'
+                old_price=sell_price
                 # Calcular el rendimiento de la operación
                 try:
                     trade_return = (sell_price - buy_price) / buy_price
@@ -228,6 +238,7 @@ def f_backtesting(data):
             # Añadir la operación al DataFrame de resultados
             results.append({
                     'Date': signal_date,
+                    'Action' : action,
                     'Buy_Price': buy_price,
                     'Sell_Price': sell_price,
                     'Return': trade_return
