@@ -255,7 +255,7 @@ def f_backtesting(data):
 # Función para aplicar formato condicional y otros estilos
 def style_dataframe(df):
     df['Return_Percent'] = df['Return'] * 100  # Convertir a porcentaje para barras de progreso
-    df['Return'] = df['Return'].apply(lambda x: "{:.2%}".format(x))  # Formatear como porcentaje
+    df['Return'] = df['Return'].apply(lambda x: "{:.2%} 💰️".format(x))  # Formatear como porcentaje
 
     styled_df = df.style.applymap(
         lambda x: 'color: red;' if isinstance(x, str) and '-' in x else 'color: green;' if isinstance(x, str) else '',
