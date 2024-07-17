@@ -88,10 +88,16 @@ def configure_sidebar():
 
     if selected_tab == 'Trading':
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
-        select_g_strategy = st.sidebar.checkbox('G-Channel', value=True)
-        select_trade_simple = st.sidebar.checkbox('Simple Strategy', value=True)
-        selected_interval_trading = st.sidebar.radio('Select Interval', ['1m','2m','5m','15m'], horizontal=True)
-
+        st.sidebar.markdown("## Trade Strategies")
+        select_g_strategy = st.sidebar.checkbox('G-Channel', value=False, label_visibility="collapsed", disabled=True)
+        select_trade_simple = st.sidebar.checkbox('Bollinger Bands with MACD Strategy', value=False)
+        select_MM = st.sidebar.checkbox('Golden Cross with RSI Strategy', value=False)
+        select_period_trade = st.sidebar.radio('Select Period', ['1d','1y'], index=1)
+        if select_period_trade == '1d':
+            selected_interval_trading = st.sidebar.radio('Select Interval', ['1m','2m','5m','15m'], index=2, horizontal=True)
+        if select_period_trade == '1y':
+            selected_interval_trading = st.sidebar.radio('Select Interval', ['1d'], index=0, horizontal=True)
+        values = st.sidebar.slider("Select a range of values for display", 0, 1440, 100 )
 
     
     st.sidebar.divider()
@@ -99,10 +105,10 @@ def configure_sidebar():
     st.sidebar.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">By: www.fisoft.es 🚀️</a>', unsafe_allow_html=True)
 
     if selected_tab == 'Analysis':
-        return selected_tab, stock, selected_period, selected_interval, category, refresh_data
+        return selected_tab, stock, selected_period, selected_interval, category, refresh_data, 'NONE', 'NONE'
     elif selected_tab == 'Calculator':
-        return selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 'NONE'
+        return selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 'NONE', 'NONE', 'NONE'
     elif selected_tab == 'Trading':
-        return selected_tab, selected_interval_trading, select_g_strategy, select_trade_simple, refresh_data, None
+        return selected_tab, selected_interval_trading, select_g_strategy, select_trade_simple, refresh_data, select_MM, values, select_period_trade
 
 

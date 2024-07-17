@@ -1,8 +1,6 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import streamlit as st
-# from ib_insync import *
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
@@ -15,8 +13,8 @@ def ema(series, window):
 # Función para calcular el RSI
 def rsi(series, window):
     delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+    gain = (delta.where(delta > 0, 0)).rolling(window=window,  min_periods=1).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window, min_periods=1).mean()
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
@@ -42,54 +40,24 @@ def bollinger_bands(series, window):
     lower_band = sma - (std * 2)
     return upper_band, lower_band
 
-def calculate_g_channel(df, length=100):
-    df = df.copy()
-    df = df.reset_index()
-    df['a'] = np.nan
-    df['b'] = np.nan
-    
-    # Initialize the first values for 'a' and 'b'
-    df.at[0, 'a'] = df.at[0, 'Close']
-    df.at[0, 'b'] = df.at[0, 'Close']
-    
-    for i in range(1, len(df)):
-        previous_a = df.at[i-1, 'a'] if not np.isnan(df.at[i-1, 'a']) else df.at[i, 'Close']
-        previous_b = df.at[i-1, 'b'] if not np.isnan(df.at[i-1, 'b']) else df.at[i, 'Close']
-
-        df.at[i, 'a'] = max(df.at[i, 'Close'], previous_a) - (previous_a - previous_b) / length
-        df.at[i, 'b'] = min(df.at[i, 'Close'], previous_b) + (previous_a - previous_b) / length
-
-    df['avg'] = (df['a'] + df['b']) / 2
-    df['crossup'] = (df['b'].shift(1) < df['Close'].shift(1)) & (df['b'] > df['Close'])
-    df['crossdn'] = (df['a'].shift(1) < df['Close'].shift(1)) & (df['a'] > df['Close'])
-    df['bullish'] = df.apply(lambda row: (df.loc[:row.name, 'crossdn'].sum() <= df.loc[:row.name, 'crossup'].sum()), axis=1)
-
-    df['color'] = df['bullish'].apply(lambda x: 'lime' if x else 'red')
-
-    # Add buy and sell signals
-    df['Sell_Signal_GC'] = np.where((df['bullish'] == True) & (df['bullish'].shift(1) == False), df['avg'], np.nan)
-    df['Buy_Signal_GC'] = np.where((df['bullish'] == False) & (df['bullish'].shift(1) == True), df['avg'], np.nan)
-
-    df = df.set_index('Datetime')
-    return df
-
 # Función para obtener los datos históricos
-def get_data(ticker, selected_interval):
-    data = yf.download(ticker, period='1d', interval=selected_interval)
-    data = calculate_g_channel(data)
-    # print(data)
+def get_data(ticker, selected_interval, select_period):
+    data = yf.download(ticker, period=select_period, interval=selected_interval)
+    try:
+        data.index = data.index.tz_convert('CET')
+    except:
+        pass
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
+    data['EMA_80'] = ema(data['Close'], window=80)
+    data['EMA_280'] = ema(data['Close'], window=280)
     data['RSI'] = rsi(data['Close'], window=14)
     data['Min_14'], data['Max_14'] = rolling_min_max(data['Close'], window=14)
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data = calculate_macd(data)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
-    data['High_Rolling_Rounded'] = data['High_Rolling'].round(2)
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
-    data['Low_Rolling_Rounded'] = data['Low'].rolling(window=14).min()
-    # data['atr'] = atr(data, 14)
 
     # Calcular las señales de ruptura
     volume_threshold = 1.5
@@ -99,45 +67,29 @@ def get_data(ticker, selected_interval):
 
     return data
 
-# Average True Range (ATR)
-def atr(df, window):
-    high_low = df['high'] - df['low']
-    high_close = np.abs(df['high'] - df['close'].shift())
-    low_close = np.abs(df['low'] - df['close'].shift())
-    ranges = pd.concat([high_low, high_close, low_close], axis=1)
-    true_range = ranges.max(axis=1)
-    return true_range.rolling(window=window).mean()
-
 # Función para generar señales de trading
-def generate_signals(data, show_g_channel, show_simple_trade):
-    # A - Swing Trading
-    #      * Identify Oportunities based in trends and correction cycles
-    # B - Breakouts 
-    #      * levels and confirmations
-    if show_simple_trade:
-        data['Buy_Signal'] = np.where((data['Close'] < data['EMA_200']) & #A
-                                      # (data['RSI'] < 30) & #A
-                                      (data['Close'] > data['Bollinger_High']) &
-                                      # (data['Close'] <= data['Min_14']) &
-                                      (data['MACD'] > 0 ) & #A
-                                      # (data['Breakout_Above']) &
-                                      (data['Breakout_Volume']), 1, 0) #B
+def generate_signals(data, show_MACD, show_simple_trade, show_MM):
+    data['Buy'] = 0
+    data['Sell'] = 0
 
-        data['Sell_Signal'] = np.where((data['Close'] > data['EMA_200']) &
-                                       # (data['RSI'] > 70) &
-                                       (data['Close'] < data['Bollinger_Low']) &
-                                       # (data['Close'] >= data['Max_14']) &
-                                       (data['MACD'] < 0 ) &
-                                       # (data['Breakout_Below']) & #B
-                                      (data['Breakout_Volume']), 1, 0) #B
-    # if show_g_channel:
-    # # Add buy and sell signals
-    #     data['Buy_Signal_GC'] = np.where((data['bullish'] == True) & (data['bullish'].shift(1) == False), data['avg'], np.nan)
-    #     data['Sell_Signal_GC'] = np.where((data['bullish'] == False) & (data['bullish'].shift(1) == True), data['avg'], np.nan)
+    if show_MM: # Diario
+        data['Buy'] = np.where((data['EMA_50'] > data['EMA_200']) &
+                                      (data['EMA_50'].shift(1) <= data['EMA_200'].shift(1)) &
+                                      (data['RSI'] > 50) 
+                                      , 1, 0)
+                                      # (data['Breakout_Volume']), 1, 0)
+        data['Sell'] = np.where((data['EMA_50'] < data['EMA_200']) &
+                                      (data['EMA_50'].shift(1) >= data['EMA_200'].shift(1)) &
+                                      (data['RSI'] < 50) 
+                                      , 1, 0)
+                                      # (data['Breakout_Volume']), 1, 0)
 
-    data['Buy'] = data.get('Buy_Signal', 0) + data.get('Buy_Signal_GC', 0)
-    data['Sell'] = data.get('Sell_Signal', 0) + data.get('Sell_Signal_GC', 0)
+    if show_MACD: #Intradia
+        data['Buy'] = np.where((data['Close'] < data['Bollinger_Lower']) &
+                                          (data['MACD'] > data['Signal_Line'] ), 1,0)
 
+        data['Sell'] = np.where((data['Close'] > data['Bollinger_High']) &
+                                          (data['MACD'] > data['Signal_Line'] ), 1,0)
     return data
 
 # Función para determinar la acción a tomar
@@ -153,29 +105,6 @@ def determine_action(data, position):
         else:
             return 'Hold', None
 
-# Función para realizar operaciones con Interactive Brokers
-# def place_order(ticker, action, quantity, simulate=True):
-#     ib = IB()
-#     if simulate:
-#         ib.connect('127.0.0.1', 7497, clientId=1)  # Simulated trading
-#     else:
-#         ib.connect('127.0.0.1', 7496, clientId=1)  # Live trading
-#     
-#     contract = Stock(ticker, 'SMART', 'USD')
-#     ib.qualifyContracts(contract)
-#     
-#     if action == 'Comprar':
-#         order = MarketOrder('BUY', quantity)
-#     elif action == 'Vender':
-#         order = MarketOrder('SELL', quantity)
-#     else:
-#         return "No action taken"
-#     
-#     trade = ib.placeOrder(contract, order)
-#     ib.sleep(1)
-#     ib.disconnect()
-#     return trade
-#
 # Función para actualizar la cartera
 def update_portfolio(ticker, action, quantity, price):
     portfolio_file = 'portfolio.csv'
@@ -207,7 +136,8 @@ def show_portfolio():
         return pd.DataFrame(columns=['Ticker', 'Action', 'Quantity', 'Price', 'Date'])
 
 # Función para graficar datos con Plotly
-def plot_data(data, ticker, show_g_channel, show_simple_trade):
+def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
+    format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
                         row_heights=[0.8, 0.2, 0.2],
@@ -223,8 +153,6 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
-                              line=dict(color='rgba(255,255,204, 0.8)')))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
                          marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
@@ -240,45 +168,42 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
 
     if show_simple_trade:
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
-                                 line=dict(color='rgba(214, 39, 40, 0.3)')))
+                                 line=dict(color='rgba(248, 237, 98, 0.3)')))
 
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], mode='lines', name='Bollinger Low',
-                                 line=dict(color='rgba(255, 152, 150, 0.3)')))  # Color similar a rgba(214, 39, 40, 0.3)
+                                 line=dict(color='rgba(233,215,0, 0.3)')))  # Color similar a rgba(214, 39, 40, 0.3)
 
         # Añadir área sombreada entre Bollinger High y Bollinger Low
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], fill='tonexty',
-                                 fillcolor='rgba(214, 39, 40, 0.1)', line=dict(color='rgba(214, 39, 40, 0.3)'),
+                                 fillcolor='rgba(248,237,98, 0.1)', line=dict(color='rgba(248, 237, 98, 0.3)'),
                                  mode='lines', name='Bollinger Bands'))
-        
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_Low'], fill='tonexty',
-                                 fillcolor='rgba(255, 152, 150, 0.1)', line=dict(color='rgba(255, 152, 150, 0.3)'),
+                                 fillcolor='rgba(248,237,98, 0.1)', line=dict(color='rgba(214,39,40, 0.3)'),
                                  mode='lines', name='Bollinger Bands'))
 
-        buy_signals = data[data['Buy_Signal'] == 1]
-        sell_signals = data[data['Sell_Signal'] == 1]
-
-        fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
-                                 marker=dict(color='magenta', size=7, symbol="cross"), 
-                                 text=buy_signals.index.strftime('%Y-%m-%d %H:%M'),
-                                 textposition="bottom left", textfont=dict(color='magenta')))
-
-        fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
-                                 marker=dict(color='orange', size=7, symbol="x"), 
-                                 text=sell_signals.index.strftime('%Y-%m-%d %H:%M'),
-                                 textposition="top left",textfont=dict(color='orange')))
 
     if show_g_channel:
-        # Agregar líneas de promedio y precios de cierre
-        fig.add_trace(go.Scatter(x=data.index, y=data['avg'], mode='lines', name='Average', line=dict(color='green', width=1)))
-        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close price', line=dict(color='blue', width=1)))
+        pass
 
-        #Agregar señales de compra/venta
-        fig.add_trace(go.Scatter(x=data.index, y=data['Buy_Signal_GC'], mode='markers', name='Buy', marker=dict(color='magenta', size=10, symbol='triangle-up')))
-        fig.add_trace(go.Scatter(x=data.index, y=data['Sell_Signal_GC'], mode='markers', name='Sell', marker=dict(color='orange', size=10, symbol='triangle-down')))
+    if show_MM:
+        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
+                              line=dict(color='rgba(153,204,255, 0.8)')))
+        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='Average', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
-        # Add shaded areas for the G-Channel
-        fig.add_trace(go.Scatter(x=data.index, y=data['avg'], line=dict(color='green', width=1), name='High Channel'))
-        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], line=dict(color='red', width=1), name='Low Channel', fill='tonexty', fillcolor='rgba(0, 100, 80, 0.2)'))
+        format = '%d-%m-%Y'
+
+    buy_signals = data[data['Buy'] == 1]
+    sell_signals = data[data['Sell'] == 1]
+
+    fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
+                                 marker=dict(color='#65fe08', size=15, symbol="arrow-up"), 
+                                 text=buy_signals.index.strftime(format),
+                                 textposition="bottom left", textfont=dict(color='#65fe08')))
+
+    fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
+                                 marker=dict(color='#F93822', size=12, symbol="arrow-down"), 
+                                 text=sell_signals.index.strftime(format),
+                                 textposition="top right",textfont=dict(color='#F93822')))
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='', 
@@ -286,50 +211,3 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade):
                       showlegend=False)
 
     return fig
-
-# Función principal
-def bot_main(selected_interval='5m', show_g_channel=True, show_simple_trade=True, tickers="BTC-EUR"):
-    st.title("TradeBot")
-
-    tickers = [ticker.strip() for ticker in tickers.split(',')]
-    # simulate = st.checkbox("Simular operaciones", value=True)
-    
-    if tickers:
-        actions = []
-        portfolio = show_portfolio()
-        current_positions = {ticker: 'None' for ticker in tickers}
-
-        if not portfolio.empty:
-            for ticker in tickers:
-                if (portfolio['Ticker'] == ticker).any():
-                    last_action = portfolio[portfolio['Ticker'] == ticker].iloc[-1]['Action']
-                    current_positions[ticker] = 'Long' if last_action == 'Comprar' else 'None'
-        
-        for ticker in tickers:
-            data = get_data(ticker, selected_interval)
-            data = generate_signals(data, show_g_channel, show_simple_trade)
-            try:
-                action, signal_date = determine_action(data, current_positions[ticker])
-                actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
-                
-                # st.write(data.tail(10))
-                st.plotly_chart(plot_data(data, ticker, show_g_channel, show_simple_trade))
-                with st.expander(f'data - {ticker}'):
-                    st.dataframe(data)
-                # if action != 'No hacer nada':
-                #     # trade = place_order(ticker, action, quantity=10, simulate=simulate)  # Cantidad fija de 10 para ejemplo
-                #     st.write(f"Orden ejecutada para {ticker}: trade")
-                #     
-                #     # Actualizar la cartera
-                #     last_price = data.iloc[-1]['Close']
-                #     portfolio = update_portfolio(ticker, action, 10, last_price)
-            except:
-                st.write(f"Error getting {ticker}")
-
-
-        st.subheader("Acciones a Tomar")
-        st.dataframe(pd.DataFrame(actions))
-        
-        st.subheader("Cartera Actual")
-        portfolio_df = show_portfolio()
-        st.write(portfolio_df)

@@ -179,7 +179,7 @@ def f_daily_plot(df, df_sm,
         df['macd'], df['signal'], df['histogram'] = calculate_macd(df)
         macd = json.loads(df[['time', 'macd']].rename(columns={"macd": "value"}).dropna().to_json(orient="records"))
         signal = json.loads(df[['time', 'signal']].rename(columns={"signal": "value"}).dropna().to_json(orient="records"))
-        df['color_hist'] = np.where( df['macd'] > 0, COLOR_BULL_HIST, COLOR_BEAR_HIST) 
+        df['color_hist'] = np.where( df['histogram'] > 0, COLOR_BULL_HIST, COLOR_BEAR_HIST) 
         histogram = json.loads(df[['time', 'histogram','color_hist']].rename(columns={"histogram": "value", "color_hist":"color"}).dropna().to_json(orient="records"))
         # print(histogram)
         macd_series = [

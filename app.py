@@ -2,6 +2,7 @@ import warnings
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 import yfinance as yf
+import pandas as pd
 
 from calculations.calculations import get_company_name
 from layout.sidebar          import configure_sidebar
@@ -20,8 +21,8 @@ st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./as
 
 # Main function to run the app
 def main():
-    side_elements = [0,1,2,3,4,5]
-    side_elements[0], side_elements[1], side_elements[2], side_elements[3], side_elements[4], side_elements[5] = configure_sidebar()
+    side_elements = [0,1,2,3,4,5,6,7]
+    side_elements[0], side_elements[1], side_elements[2], side_elements[3], side_elements[4], side_elements[5], side_elements[6], side_elements[7] = configure_sidebar()
 
     if side_elements[0] == 'Analysis':
         stock = side_elements[1]
@@ -101,18 +102,36 @@ def main():
         show_g_strategy = side_elements[2]
         show_trade_simple = side_elements[3]
         refresh_data = side_elements[4]
+        show_MM = side_elements[5]
+        values = side_elements[6]
+        select_period_trade = side_elements[7]
 
         #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
-        acciones_evaluar = "BTC-EUR,AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM"
+        acciones_evaluar = "BTC-EUR, A500.MI, SGLN.L"
         #acciones_evaluar = "BTC-EUR"
         
         tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)
-        placeholder_trade = st.empty()
-        # with placeholder_trade:
+        tickers = [ticker.strip() for ticker in tickers.split(',')]
+        
         if refresh_data:
             refresh_interval = 60000
             st_autorefresh(interval=refresh_interval,key='datarefresh')
-        bot.bot_main(selected_interval_trading, show_g_strategy, show_trade_simple, tickers)
+
+        st.title("TradeBot")
+        actions = []
+        current_positions = {ticker: 'None' for ticker in tickers}
+        for ticker in tickers:
+            try:
+                data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
+                data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
+                action, signal_date = bot.determine_action(data, current_positions[ticker])
+                actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
+                st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
+            except:
+                st.write(f"Errors loading {ticker}")
+
+        st.subheader("Acciones a Tomar")
+        st.dataframe(pd.DataFrame(actions))
 
     if side_elements[0] == 'Calculator':
         initial_investment = side_elements[1]
