@@ -126,8 +126,8 @@ def show_portfolio():
 def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
-                        row_heights=[0.8, 0.2, 0.2],
+    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
+                        row_heights=[0.8, 0.1, 0.1, 0.1],
                         vertical_spacing=0.05)
 
     #data = data.tail(60).copy()
@@ -152,6 +152,9 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     fig.add_trace(go.Scatter(x=data.index, y=data['Volume_Avg'], name='Volume', 
                              marker_color='rgba(131, 119, 180, 0.4)'),
                   row=2, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['RSI'], name='RSI', 
+                             marker_color='rgba(131, 119, 180, 0.4)'),
+                  row=3, col=1)
 
     if show_simple_trade:
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
@@ -195,6 +198,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='', 
                       xaxis_rangeslider_visible=False,
+                      height=700,
                       showlegend=False)
 
     return fig
