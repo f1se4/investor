@@ -203,18 +203,16 @@ def f_backtesting(data):
     # DataFrame para almacenar los resultados del backtesting
     backtest_results = pd.DataFrame(columns=['Buy_Date', 'Sell_Date', 'Buy_Price', 'Sell_Price', 'Return'])
     
-    # Variables para almacenar información de las operaciones
-    buy_price = None
-    buy_date = None
     
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
-        print(row['Buy'],row['Sell'])
-        if row['Buy'] == 1 and buy_price is None:
+        if row['Buy'] == 1 | row['Sell'] == 1:
+        if row['Buy'] == 1:
+            print(row['Buy'],row['Sell'])
             # Registrar la compra
             buy_price = row['Close']
             buy_date = index
-        elif row['Sell'] == 1 and buy_price is not None:
+        elif row['Sell'] == 1:
             # Registrar la venta
             sell_price = row['Close']
             sell_date = index
@@ -224,14 +222,11 @@ def f_backtesting(data):
             except:
                 trade_return = 0
             # Añadir la operación al DataFrame de resultados
-            backtest_results = backtest_results.append({
+        backtest_results = backtest_results.append({
                 'Buy_Date': buy_date,
                 'Sell_Date': sell_date,
                 'Buy_Price': buy_price,
                 'Sell_Price': sell_price,
                 'Return': trade_return
             }, ignore_index=True)
-            # Resetear las variables de compra
-            buy_price = None
-            buy_date = None
     return backtest_results
