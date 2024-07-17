@@ -198,3 +198,36 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                       showlegend=False)
 
     return fig
+
+def f_backtesting(data):
+    # DataFrame para almacenar los resultados del backtesting
+    backtest_results = pd.DataFrame(columns=['Buy_Date', 'Sell_Date', 'Buy_Price', 'Sell_Price', 'Return'])
+    
+    # Variables para almacenar información de las operaciones
+    buy_price = None
+    buy_date = None
+    
+    # Recorrer el DataFrame `data` para identificar las operaciones
+    for index, row in data.iterrows():
+        if row['Buy'] == 1 and buy_price is None:
+            # Registrar la compra
+            buy_price = row['Close']
+            buy_date = index
+        elif row['Sell'] == 1 and buy_price is not None:
+            # Registrar la venta
+            sell_price = row['Close']
+            sell_date = index
+            # Calcular el rendimiento de la operación
+            trade_return = (sell_price - buy_price) / buy_price
+            # Añadir la operación al DataFrame de resultados
+            backtest_results = backtest_results.append({
+                'Buy_Date': buy_date,
+                'Sell_Date': sell_date,
+                'Buy_Price': buy_price,
+                'Sell_Price': sell_price,
+                'Return': trade_return
+            }, ignore_index=True)
+            # Resetear las variables de compra
+            buy_price = None
+            buy_date = None
+    return backtest_results
