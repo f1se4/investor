@@ -202,6 +202,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
 def f_backtesting(data):
     # DataFrame para almacenar los resultados del backtesting
     backtest_results = pd.DataFrame(columns=['Buy_Date', 'Sell_Date', 'Buy_Price', 'Sell_Price', 'Return'])
+    print(f"longitud de data {len(data)}")
     
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
@@ -234,4 +235,4 @@ def f_backtesting(data):
                     'Sell_Price': sell_price,
                     'Return': trade_return
                 }, ignore_index=True)
-        return backtest_results
+    return backtest_results
