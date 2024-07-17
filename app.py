@@ -119,14 +119,17 @@ def main():
 
         st.title("TradeBot")
         for ticker in tickers:
-            # try:
-            data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
-            data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
-            st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
-            backtest = bot.style_dataframe(bot.f_backtesting(data))
-            st.dataframe(backtest, use_container_width=True)
-            # except:
-            #     st.write(f"Errors loading {ticker}")
+            try:
+                data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
+                data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
+                st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
+                backtesting_data = bot.f_backtesting(data)
+                if ~backtesting_data.empty:
+                    print(backtesting_data)
+                    backtest = bot.style_dataframe(bot.f_backtesting(data))
+                    st.dataframe(backtest, use_container_width=True)
+            except:
+                st.write(f"Errors loading {ticker}")
 
             with st.expander('Full Data'):
                 st.dataframe(data)
