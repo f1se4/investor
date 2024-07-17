@@ -127,7 +127,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
-                        row_heights=[0.8, 0.1, 0.1, 0.1],
+                        row_heights=[0.8, 0.066, 0.066, 0.066],
                         vertical_spacing=0.05)
 
     #data = data.tail(60).copy()
@@ -154,7 +154,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                   row=2, col=1)
     fig.add_trace(go.Scatter(x=data.index, y=data['RSI'], name='RSI', 
                              marker_color='rgba(131, 119, 180, 0.4)'),
-                  row=3, col=1)
+                  row=4, col=1)
 
     if show_simple_trade:
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
