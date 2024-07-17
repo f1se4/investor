@@ -62,7 +62,7 @@ def generate_signals(data, show_MACD, show_simple_trade, show_MM):
     if show_MM: # Diario
         data['Buy'] = np.where((data['EMA_50'] > data['EMA_200']) &
                                       (data['EMA_50'].shift(1) <= data['EMA_200'].shift(1)) &
-                                      (data['RSI'] > 50) 
+                                      (data['RSI'] < 60) 
                                       , 1, 0)
                                       # (data['Breakout_Volume']), 1, 0)
         data['Sell'] = np.where((data['EMA_50'] < data['EMA_200']) &
