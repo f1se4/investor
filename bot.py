@@ -209,6 +209,7 @@ def f_backtesting(data):
     
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
+        print(row['Buy'],row['Sell'])
         if row['Buy'] == 1 and buy_price is None:
             # Registrar la compra
             buy_price = row['Close']

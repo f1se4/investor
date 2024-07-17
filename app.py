@@ -124,7 +124,9 @@ def main():
                 data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
                 data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
                 st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
-                st.dataframe(bot.f_backtesting(data))
+                backtest = bot.f_backtesting(data)
+                print(backtest)
+                # st.dataframe(bot.f_backtesting(data))
             except:
                 st.write(f"Errors loading {ticker}")
 
