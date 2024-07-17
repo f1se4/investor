@@ -202,16 +202,16 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
 def f_backtesting(data):
     # DataFrame para almacenar los resultados del backtesting
     results = []
+    old_price = 0
     
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
         if row['Buy'] == 1.0 or row['Sell'] == 1.0:
             print(row['Buy'],row['Sell'])
-            buy_date = None
-            sell_date = None
             buy_price = 0
             sell_price = 0
             trade_return = 0
+
             if row['Buy'] == 1:
                 # Registrar la compra
                 buy_price = row['Close']

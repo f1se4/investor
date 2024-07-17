@@ -125,7 +125,7 @@ def main():
             st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
             backtest = bot.f_backtesting(data)
             print(backtest)
-            st.dataframe(bot.f_backtesting(data))
+            st.dataframe(bot.f_backtesting(data), use_container_width=True)
             # except:
             #     st.write(f"Errors loading {ticker}")
 
