@@ -85,12 +85,12 @@ def determine_action(data, position):
         if data.iloc[-1]['Buy'] >= 1:
             return 'Buy', data.index[-1], data.index[-1]['Close']
         else:
-            return 'Hold', None
+            return 'Hold', None, None
     elif position == 'Long':
         if data.iloc[-1]['Sell'] >= 1:
             return 'Sell', data.index[-1], data.index[-1]['Close']
         else:
-            return 'Hold', None
+            return 'Hold', None, None
 
 # Función para actualizar la cartera
 def update_portfolio(ticker, action, quantity, price):

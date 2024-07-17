@@ -118,20 +118,15 @@ def main():
             st_autorefresh(interval=refresh_interval,key='datarefresh')
 
         st.title("TradeBot")
-        actions = []
         current_positions = {ticker: 'None' for ticker in tickers}
         for ticker in tickers:
             try:
                 data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
                 data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
-                action, signal_date, price_close = bot.determine_action(data, current_positions[ticker])
-                actions.append({'Ticker': ticker, 'Acción': action, 'Fecha de Señal': signal_date})
                 st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
             except:
                 st.write(f"Errors loading {ticker}")
 
-        st.subheader("Acciones a Tomar")
-        st.dataframe(pd.DataFrame(actions))
 
     if side_elements[0] == 'Calculator':
         initial_investment = side_elements[1]
