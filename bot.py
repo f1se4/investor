@@ -26,12 +26,6 @@ def calculate_macd(df):
     df['MACD'] = df['MACD_Line'] - df['Signal_Line']
     return df
 
-# Función para obtener el mínimo y máximo de los últimos N días
-def rolling_min_max(series, window):
-    rolling_min = series.rolling(window=window).min()
-    rolling_max = series.rolling(window=window).max()
-    return rolling_min, rolling_max
-
 # Función para calcular las bandas de Bollinger
 def bollinger_bands(series, window):
     sma = series.rolling(window=window).mean()
@@ -52,18 +46,11 @@ def get_data(ticker, selected_interval, select_period):
     data['EMA_80'] = ema(data['Close'], window=80)
     data['EMA_280'] = ema(data['Close'], window=280)
     data['RSI'] = rsi(data['Close'], window=14)
-    data['Min_14'], data['Max_14'] = rolling_min_max(data['Close'], window=14)
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data = calculate_macd(data)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
-
-    # Calcular las señales de ruptura
-    volume_threshold = 1.5
-    data['Breakout_Above'] = (data['Close'] > data['High_Rolling']) 
-    data['Breakout_Volume'] = (data['Volume'] > volume_threshold * data['Volume_Avg'])
-    data['Breakout_Below'] = (data['Close'] < data['Low_Rolling'])
 
     return data
 
@@ -96,12 +83,12 @@ def generate_signals(data, show_MACD, show_simple_trade, show_MM):
 def determine_action(data, position):
     if position == 'None':
         if data.iloc[-1]['Buy'] >= 1:
-            return 'Buy', data.index[-1]
+            return 'Buy', data.index[-1], data.index[-1]['Close']
         else:
             return 'Hold', None
     elif position == 'Long':
         if data.iloc[-1]['Sell'] >= 1:
-            return 'Sell', data.index[-1]
+            return 'Sell', data.index[-1], data.index[-1]['Close']
         else:
             return 'Hold', None
 
