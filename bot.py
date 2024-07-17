@@ -214,20 +214,20 @@ def f_backtesting(data):
             trade_return = 0
 
             if row['Buy'] == 1:
+                buy_price = row['Close']
+                signal_date = index
+                action = 'Buy'
                 if counter == 0:
                     counter =+ 1
                     trade_return = 0
                 else:
                     # Registrar la compra
                     sell_price=old_price
-                    buy_price = row['Close']
-                    signal_date = index
-                    old_price = buy_price
-                    action = 'Buy'
                     try:
                         trade_return = (sell_price - buy_price) / buy_price
                     except:
                         trade_return = 0
+                old_price = buy_price
             elif row['Sell'] == 1:
                 if counter == 0:
                     continue
