@@ -259,9 +259,6 @@ def style_dataframe(df):
 
     styled_df = df.style.applymap(
         lambda x: 'color: red;' if isinstance(x, str) and '-' in x else 'color: green;' if isinstance(x, str) else '',
-        subset=['Return']
-    ).bar(
-        subset=['Return_Percent'], align='mid', color=['#d65f5f', '#5fba7d']
-    ).hide(axis='columns', subset='Return_Percent')
+        subset=['Return'])
 
     return styled_df
