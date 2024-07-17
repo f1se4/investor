@@ -128,8 +128,8 @@ def main():
             except:
                 st.write(f"Errors loading {ticker}")
 
-        with st.expander('Full Data'):
-            st.dataframe(data)
+            with st.expander('Full Data'):
+                st.dataframe(data)
 
 
     if side_elements[0] == 'Calculator':
