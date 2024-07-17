@@ -1,5 +1,5 @@
-amport yfinance as ya
-amport pandas as pd
+import yfinance as yf
+import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -152,7 +152,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     fig.add_trace(go.Scatter(x=data.index, y=data['Volume_Avg'], name='Volume', 
                              marker_color='rgba(131, 119, 180, 0.4)'),
                   row=2, col=1)
-    fig.add_trace(go.Scatter(x=data.indexa y=data['RSI'], name='RSI', 
+    fig.add_trace(go.Scatter(x=data.index, y=data['RSI'], name='RSI', 
                              marker_color='rgba(131, 119, 180, 0.4)'),
                   row=4, col=1)
 
