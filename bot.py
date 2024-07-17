@@ -175,7 +175,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     if show_MM:
         fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
                               line=dict(color='rgba(153,204,255, 0.8)')))
-        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='Average', line=dict(color='rgba(85,136,255,0.8)', width=1)))
+        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA_50', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
         format = '%d-%m-%Y'
 
