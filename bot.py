@@ -203,30 +203,34 @@ def f_backtesting(data):
     # DataFrame para almacenar los resultados del backtesting
     backtest_results = pd.DataFrame(columns=['Buy_Date', 'Sell_Date', 'Buy_Price', 'Sell_Price', 'Return'])
     
-    
     # Recorrer el DataFrame `data` para identificar las operaciones
     for index, row in data.iterrows():
-        if row['Buy'] == 1 | row['Sell'] == 1:
-        if row['Buy'] == 1:
+        if int(row['Buy']) == 1 | int(row['Sell']) == 1:
             print(row['Buy'],row['Sell'])
-            # Registrar la compra
-            buy_price = row['Close']
-            buy_date = index
-        elif row['Sell'] == 1:
-            # Registrar la venta
-            sell_price = row['Close']
-            sell_date = index
-            # Calcular el rendimiento de la operación
-            try:
-                trade_return = (sell_price - buy_price) / buy_price
-            except:
-                trade_return = 0
+            buy_date = None
+            sell_date = None
+            buy_price = 0
+            sell_price = 0
+            trade_return = 0
+            if row['Buy'] == 1:
+                # Registrar la compra
+                buy_price = row['Close']
+                buy_date = index
+            elif row['Sell'] == 1:
+                # Registrar la venta
+                sell_price = row['Close']
+                sell_date = index
+                # Calcular el rendimiento de la operación
+                try:
+                    trade_return = (sell_price - buy_price) / buy_price
+                except:
+                    trade_return = 0
             # Añadir la operación al DataFrame de resultados
-        backtest_results = backtest_results.append({
-                'Buy_Date': buy_date,
-                'Sell_Date': sell_date,
-                'Buy_Price': buy_price,
-                'Sell_Price': sell_price,
-                'Return': trade_return
-            }, ignore_index=True)
-    return backtest_results
+            backtest_results = backtest_results.append({
+                    'Buy_Date': buy_date,
+                    'Sell_Date': sell_date,
+                    'Buy_Price': buy_price,
+                    'Sell_Price': sell_price,
+                    'Return': trade_return
+                }, ignore_index=True)
+        return backtest_results
