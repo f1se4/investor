@@ -138,28 +138,28 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
 
-#     # Calcular el POC (precio con mayor volumen)
-#     poc = data['Volume'].idxmax()
-#     poc_price = data.loc[poc, 'Close']
-#
-#     # Crear el gráfico de volumen
-#     fig.add_trace(go.Bar(
-#     x=data.index,
-#     y=data['Volume'],
-#     name='Volumen',
-#     marker=dict(color='blue'),
-#     yaxis='y2'
-#     ), row=1, col=1)
-#
-#     # Marcar el POC en el gráfico de precios
-#     fig.add_trace(go.Scatter(
-#     x=[data.index[0], data.index[-1]],
-#     y=[poc_price, poc_price],
-#     mode='lines',
-#     name='POC',
-#     line=dict(color='red', dash='dash')
-#     ),row=1,col=1)
-#
+    # Calcular el POC (precio con mayor volumen)
+    poc = data['Volume'].idxmax()
+    poc_price = data.loc[poc, 'Close']
+
+    # Crear el gráfico de volumen
+    fig.add_trace(go.Bar(
+    x=data.index,
+    y=data['Volume'],
+    name='Volumen',
+    marker=dict(color='blue'),
+    yaxis='y2'
+    ), row=1, col=1)
+
+    # # Marcar el POC en el gráfico de precios
+    # fig.add_trace(go.Scatter(
+    # x=[data.index[0], data.index[-1]],
+    # y=[poc_price, poc_price],
+    # mode='lines',
+    # name='POC',
+    # line=dict(color='red', dash='dash')
+    # ),row=1,col=1)
+
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
                          marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
                          opacity=0.6), row=3, col=1)
@@ -217,7 +217,6 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='', 
                       xaxis_rangeslider_visible=False,
-                      yaxis2=dict(title='Volumen', overlaying='y', side='left'),
                       height=700,
                       showlegend=False)
 
