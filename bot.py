@@ -20,17 +20,14 @@ def rsi(series, window):
 
 # Identificar divergencias
 def identify_rsi_divergences(df):
-    df = df.copy()
-    df = df.reset_index()
-    print(df)
     divergences = []
     for i in range(1, len(df) - 1):
         if df['Close'][i] < df['Close'][i-1] and df['Close'][i] < df['Close'][i+1]:
             if df['RSI'][i] > df['RSI'][i-1] and df['RSI'][i] > df['RSI'][i+1]:
-                divergences.append((df['Date'][i], df['Close'][i], df['RSI'][i], 'Bullish'))
+                divergences.append((df.index[i], df['Close'][i], df['RSI'][i], 'Bullish'))
         if df['Close'][i] > df['Close'][i-1] and df['Close'][i] > df['Close'][i+1]:
             if df['RSI'][i] < df['RSI'][i-1] and df['RSI'][i] < df['RSI'][i+1]:
-                divergences.append((df['Date'][i], df['Close'][i], df['RSI'][i], 'Bearish'))
+                divergences.append((df.index[i], df['Close'][i], df['RSI'][i], 'Bearish'))
     return divergences
 
 def calculate_macd(df):
