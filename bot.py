@@ -22,6 +22,7 @@ def rsi(series, window):
 def identify_rsi_divergences(df):
     df = df.copy()
     df = df.reset_index()
+    print(df)
     divergences = []
     for i in range(1, len(df) - 1):
         if df['Close'][i] < df['Close'][i-1] and df['Close'][i] < df['Close'][i+1]:
