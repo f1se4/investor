@@ -122,6 +122,39 @@ def show_portfolio():
     else:
         return pd.DataFrame(columns=['Ticker', 'Action', 'Quantity', 'Price', 'Date'])
 
+def calculate_poc_val_vah(data):
+    # Crear una DataFrame con precios y volúmenes
+    price_volume_df = data[['Close', 'Volume']].copy()
+    
+    # Ordenar por precios y volúmenes
+    price_volume_df = price_volume_df.sort_values(by='Close')
+    
+    # Calcular el volumen total
+    total_volume = price_volume_df['Volume'].sum()
+    
+    # Calcular el volumen objetivo (70% del volumen total)
+    target_volume = total_volume * 0.70
+    
+    # Inicializar variables para encontrar VAL y VAH
+    cumulative_volume = 0
+    val = None
+    vah = None
+    
+    # Calcular VAL y VAH
+    for price, volume in price_volume_df.itertuples(index=False):
+        cumulative_volume += volume
+        if cumulative_volume <= target_volume:
+            val = price
+        else:
+            vah = price
+            break
+    
+    # Calcular el POC (precio con mayor volumen)
+    poc = data['Volume'].idxmax()
+    poc_price = data.loc[poc, 'Close']
+    
+    return poc_price, val, vah
+
 # Función para graficar datos con Plotly
 def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     format = '%Y-%m-%d %H:%M'
@@ -137,28 +170,48 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                                  low=data['Low'],
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
+    # Calcular POC, VAL y VAH
+    poc_price, val, vah = calculate_poc_val_vah(data)
+    
+    # Identificar otros máximos relativos en el volumen
+    volume_peaks = data['Volume'][(data['Volume'].shift(1) < data['Volume']) & (data['Volume'].shift(-1) < data['Volume'])]
 
-    # Calcular el POC (precio con mayor volumen)
-    poc = data['Volume'].idxmax()
-    poc_price = data.loc[poc, 'Close']
-
-    # # Crear el gráfico de volumen
-    # fig.add_trace(go.Bar(
-    # x=data.index,
-    # y=data['Volume'],
-    # name='Volumen',
-    # marker=dict(color='blue'),
-    # yaxis='y2'
-    # ), row=1, col=1)
-
-    # # Marcar el POC en el gráfico de precios
-    # fig.add_trace(go.Scatter(
-    # x=[data.index[0], data.index[-1]],
-    # y=[poc_price, poc_price],
-    # mode='lines',
-    # name='POC',
-    # line=dict(color='red', dash='dash')
-    # ),row=1,col=1)
+    # Marcar el POC, VAL y VAH en el gráfico de precios
+    fig.add_trace(go.Scatter(
+        x=[data.index[0], data.index[-1]],
+        y=[poc_price, poc_price],
+        mode='lines',
+        name='POC',
+        line=dict(color='black', dash='dash')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=[data.index[0], data.index[-1]],
+        y=[val, val],
+        mode='lines',
+        name='VAL',
+        line=dict(color='darkgray', dash='dash'))
+    )
+    
+    fig.add_trace(go.Scatter(
+        x=[data.index[0], data.index[-1]],
+        y=[vah, vah],
+        mode='lines',
+        name='VAH',
+        line=dict(color='lightgray', dash='dash')
+    ))
+    
+    # Marcar otros máximos relativos
+    peak_lines = []
+    for peak_date, peak_volume in volume_peaks.items():
+        peak_price = data.loc[peak_date, 'Close']
+        peak_lines.append(fig.add_trace(go.Scatter(
+            x=[peak_date, peak_date],
+            y=[data['Low'].min(), data['High'].max()],
+            mode='lines',
+            name=f'Peak {peak_date.date()}',
+            line=dict(color='gray', dash='dot')
+        )))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
                          marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
