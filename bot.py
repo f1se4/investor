@@ -20,6 +20,8 @@ def rsi(series, window):
 
 # Identificar divergencias
 def identify_rsi_divergences(df):
+    df = df.copy()
+    df = df.reset_index()
     divergences = []
     for i in range(1, len(df) - 1):
         if df['Close'][i] < df['Close'][i-1] and df['Close'][i] < df['Close'][i+1]:
@@ -184,7 +186,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
     # Diverengcias RSI
-    divergences = identify_divergences(data)
+    divergences = identify_rsi_divergences(data)
 
     # Calcular POC, VAL y VAH
     poc_price, val, vah = calculate_poc_val_vah(data)
