@@ -190,7 +190,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
         y=[val, val],
         mode='lines',
         name='VAL',
-        line=dict(color='darkgray', dash='dash'))
+        line=dict(color='rgba(107,107,107,0.5)', dash='dash'))
     )
     
     fig.add_trace(go.Scatter(
@@ -198,7 +198,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
         y=[vah, vah],
         mode='lines',
         name='VAH',
-        line=dict(color='lightgray', dash='dash')
+        line=dict(color='rgba(107,107,107,0.5)', dash='dash')
     ))
     
     # Marcar otros máximos relativos
