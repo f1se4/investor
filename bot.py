@@ -247,10 +247,10 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     for divergence in divergences:
         if divergence[3] == 'Bullish':
             fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='green', size=10), name='Divergencia Alcista'),row=4,col=1)
-            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[2]], mode='markers', marker=dict(color='green', size=10), name='RSI Alcista', yaxis='y2'),row=4,col=1)
+            # fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[2]], mode='markers', marker=dict(color='green', size=10), name='RSI Alcista', yaxis='y2'),row=4,col=1)
         if divergence[3] == 'Bearish':
             fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='red', size=10), name='Divergencia Bajista'),row=4,col=1)
-            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[2]], mode='markers', marker=dict(color='red', size=10), name='RSI Bajista', yaxis='y2'),row=4,col=1)
+            # fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[2]], mode='markers', marker=dict(color='red', size=10), name='RSI Bajista', yaxis='y2'),row=4,col=1)
     
     if show_simple_trade:
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
