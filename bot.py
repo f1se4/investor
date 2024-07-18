@@ -210,7 +210,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
             x=[data.index[0], data.index[-1]],
             mode='lines',
             name=f'Peak {peak_date.date()}',
-            line=dict(color='rgba(93,93,93,0.4)', dash='dot')
+            line=dict(color='rgba(93,93,93,0.1)', dash='dot')
         )))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
