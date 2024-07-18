@@ -182,7 +182,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
         y=[poc_price, poc_price],
         mode='lines',
         name='POC',
-        line=dict(color='black', dash='dash')
+        line=dict(color='rgba(68,102,119,0.8)', dash='dash')
     ))
     
     fig.add_trace(go.Scatter(
@@ -206,11 +206,11 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     for peak_date, peak_volume in volume_peaks.items():
         peak_price = data.loc[peak_date, 'Close']
         peak_lines.append(fig.add_trace(go.Scatter(
-            x=[peak_date, peak_date],
-            y=[data['Low'].min(), data['High'].max()],
+            y=[peak_price, peak_price],
+            x=[data.index[0], data.index[-1]],
             mode='lines',
             name=f'Peak {peak_date.date()}',
-            line=dict(color='gray', dash='dot')
+            line=dict(color='rgba(17,17,17,0.9)', dash='dot')
         )))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
