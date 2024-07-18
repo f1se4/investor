@@ -142,14 +142,14 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     poc = data['Volume'].idxmax()
     poc_price = data.loc[poc, 'Close']
 
-    # Crear el gráfico de volumen
-    fig.add_trace(go.Bar(
-    x=data.index,
-    y=data['Volume'],
-    name='Volumen',
-    marker=dict(color='blue'),
-    yaxis='y2'
-    ), row=1, col=1)
+    # # Crear el gráfico de volumen
+    # fig.add_trace(go.Bar(
+    # x=data.index,
+    # y=data['Volume'],
+    # name='Volumen',
+    # marker=dict(color='blue'),
+    # yaxis='y2'
+    # ), row=1, col=1)
 
     # # Marcar el POC en el gráfico de precios
     # fig.add_trace(go.Scatter(
