@@ -18,6 +18,18 @@ def rsi(series, window):
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
+# Identificar divergencias
+def identify_rsi_divergences(df):
+    divergences = []
+    for i in range(1, len(df) - 1):
+        if df['Close'][i] < df['Close'][i-1] and df['Close'][i] < df['Close'][i+1]:
+            if df['RSI'][i] > df['RSI'][i-1] and df['RSI'][i] > df['RSI'][i+1]:
+                divergences.append((df['Date'][i], df['Close'][i], df['RSI'][i], 'Bullish'))
+        if df['Close'][i] > df['Close'][i-1] and df['Close'][i] > df['Close'][i+1]:
+            if df['RSI'][i] < df['RSI'][i-1] and df['RSI'][i] < df['RSI'][i+1]:
+                divergences.append((df['Date'][i], df['Close'][i], df['RSI'][i], 'Bearish'))
+    return divergences
+
 def calculate_macd(df):
     df['EMA_12'] = ema(df['Close'], 12)
     df['EMA_26'] = ema(df['Close'], 26)
@@ -46,6 +58,7 @@ def get_data(ticker, selected_interval, select_period):
     data['EMA_80'] = ema(data['Close'], window=80)
     data['EMA_280'] = ema(data['Close'], window=280)
     data['RSI'] = rsi(data['Close'], window=14)
+
     data['Bollinger_High'], data['Bollinger_Low'] = bollinger_bands(data['Close'], window=20)
     data = calculate_macd(data)
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
@@ -170,6 +183,9 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                                  low=data['Low'],
                                  close=data['Close'],
                                  name='Candlestick'), row=1, col=1)
+    # Diverengcias RSI
+    divergences = identify_divergences(data)
+
     # Calcular POC, VAL y VAH
     poc_price, val, vah = calculate_poc_val_vah(data)
     
