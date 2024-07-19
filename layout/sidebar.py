@@ -28,8 +28,8 @@ def configure_sidebar():
     logo = Image.open('assets/logo.jpeg')
     st.sidebar.image(logo)
     st.sidebar.header("Application")
-    # selected_tab = st.sidebar.radio("", ["Analysis", "Trading", "Calculator"], horizontal=True)
-    selected_tab = st.sidebar.radio("", ["Analysis", "Calculator"], horizontal=True)
+    selected_tab = st.sidebar.radio("", ["Analysis", "Trading", "Calculator"], horizontal=True)
+    # selected_tab = st.sidebar.radio("", ["Analysis", "Calculator"], horizontal=True)
     
     if selected_tab == 'Analysis':
     # with sd_tab1:

@@ -346,6 +346,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                       xaxis_title='', yaxis_title='', 
                       xaxis_rangeslider_visible=False,
                       height=700,
+                      dragmode='drawline',  # Habilitar el modo de dibujo de líneas
                       showlegend=False)
 
     return fig
