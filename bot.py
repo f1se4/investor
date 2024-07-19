@@ -6,6 +6,54 @@ from plotly.subplots import make_subplots
 import os
 from calculations.calculations import get_company_name
 
+def f_parabolic_SAR(df, af=0.02, max_af=0.2):
+    """
+    Calcula el Parabolic SAR para un dataframe de pandas con columnas 'High' y 'Low'.
+
+    Parameters:
+    df (pandas.DataFrame): DataFrame con los datos de precios.
+    af (float): Factor de aceleración inicial.
+    max_af (float): Factor de aceleración máximo.
+
+    Returns:
+    pandas.DataFrame: DataFrame con una columna adicional 'SAR' con los valores del Parabolic SAR.
+    """
+    high = df['High']
+    low = df['Low']
+    
+    sar = df['Close'].copy()
+    uptrend = True
+    af = af
+    ep = high.iloc[0]
+    
+    for i in range(1, len(df)):
+        if uptrend:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if low.iloc[i] < sar.iloc[i]:
+                uptrend = False
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = low.iloc[i]
+        else:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if high.iloc[i] > sar.iloc[i]:
+                uptrend = True
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = high.iloc[i]
+        
+        if uptrend:
+            if high.iloc[i] > ep:
+                ep = high.iloc[i]
+                af = min(af + 0.02, max_af)
+        else:
+            if low.iloc[i] < ep:
+                ep = low.iloc[i]
+                af = min(af + 0.02, max_af)
+    
+    df['SAR'] = sar
+    return df
+
 # Función para calcular la EMA
 def ema(series, window):
     return series.ewm(span=window, adjust=False).mean()
@@ -216,6 +264,10 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
         name='VAH',
         line=dict(color='rgba(107,107,107,0.5)', dash='dash')
     ))
+    fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
+                             mode='markers',
+                             marker=dict(color='blue', size=5),
+                             name='Parabolic SAR'))
     
     # Marcar otros máximos relativos
     peak_lines = []
