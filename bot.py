@@ -32,7 +32,7 @@ def f_parabolic_SAR(df, af=0.02, max_af=0.2):
             if low.iloc[i] < sar.iloc[i]:
                 uptrend = False
                 sar.iloc[i] = ep
-                af = 0.02
+                af = 0.03
                 ep = low.iloc[i]
         else:
             sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
@@ -329,18 +329,18 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
 
         format = '%d-%m-%Y'
 
-    buy_signals = data[data['Buy'] == 1]
-    sell_signals = data[data['Sell'] == 1]
+    # buy_signals = data[data['Buy'] == 1]
+    # sell_signals = data[data['Sell'] == 1]
 
-    fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
-                                 marker=dict(color='#65fe08', size=15, symbol="arrow-up"), 
-                                 text=buy_signals.index.strftime(format),
-                                 textposition="bottom left", textfont=dict(color='#65fe08')))
-
-    fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
-                                 marker=dict(color='#F93822', size=12, symbol="arrow-down"), 
-                                 text=sell_signals.index.strftime(format),
-                                 textposition="top right",textfont=dict(color='#F93822')))
+    # fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['Close'], mode='markers+text', name='Buy Signal',
+    #                              marker=dict(color='#65fe08', size=15, symbol="arrow-up"), 
+    #                              text=buy_signals.index.strftime(format),
+    #                              textposition="bottom left", textfont=dict(color='#65fe08')))
+    #
+    # fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['Close'], mode='markers+text', name='Sell Signal',
+    #                              marker=dict(color='#F93822', size=12, symbol="arrow-down"), 
+    #                              text=sell_signals.index.strftime(format),
+    #                              textposition="top right",textfont=dict(color='#F93822')))
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='', 
