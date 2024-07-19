@@ -32,20 +32,20 @@ def f_parabolic_SAR(df, af=0.03, max_af=0.3):
             if low.iloc[i] < sar.iloc[i]:
                 uptrend = False
                 sar.iloc[i] = ep
-                af = 0.03
+                af = 0.02
                 ep = low.iloc[i]
         else:
             sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
             if high.iloc[i] > sar.iloc[i]:
                 uptrend = True
                 sar.iloc[i] = ep
-                af = 0.03
+                af = 0.02
                 ep = high.iloc[i]
         
         if uptrend:
             if high.iloc[i] > ep:
                 ep = high.iloc[i]
-                af = min(af + 0.03, max_af)
+                af = min(af + 0.02, max_af)
         else:
             if low.iloc[i] < ep:
                 ep = low.iloc[i]
