@@ -9,6 +9,54 @@ from statsmodels.tsa.arima.model import ARIMA
 #########################################################################################
 #### Funciones Cálculos
 #########################################################################################
+def f_parabolic_SAR(df, af=0.03, max_af=0.3):
+    """
+    Calcula el Parabolic SAR para un dataframe de pandas con columnas 'High' y 'Low'.
+
+    Parameters:
+    df (pandas.DataFrame): DataFrame con los datos de precios.
+    af (float): Factor de aceleración inicial.
+    max_af (float): Factor de aceleración máximo.
+
+    Returns:
+    pandas.DataFrame: DataFrame con una columna adicional 'SAR' con los valores del Parabolic SAR.
+    """
+    high = df['High']
+    low = df['Low']
+    
+    sar = df['Close'].copy()
+    uptrend = True
+    af = af
+    ep = high.iloc[0]
+    
+    for i in range(1, len(df)):
+        if uptrend:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if low.iloc[i] < sar.iloc[i]:
+                uptrend = False
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = low.iloc[i]
+        else:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if high.iloc[i] > sar.iloc[i]:
+                uptrend = True
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = high.iloc[i]
+        
+        if uptrend:
+            if high.iloc[i] > ep:
+                ep = high.iloc[i]
+                af = min(af + 0.02, max_af)
+        else:
+            if low.iloc[i] < ep:
+                ep = low.iloc[i]
+                af = min(af + 0.02, max_af)
+    
+    df['SAR'] = sar
+    return df
+
 def calcular_fibonacci(data):
     # Calcular los niveles de Fibonacci
     max_price = data['Adj Close'].max()
