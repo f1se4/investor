@@ -119,11 +119,6 @@ def f_daily_plot(df, df_sm,
     volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
     df['micro_pullback'] = calculate_micro_pullback(df)
     df['bull_flag'] = calculate_bull_flag(df)
-    df = f_parabolic_SAR(df)
-    sar_data = [{
-        'time': df['time'],
-        'value': df['SAR'][i]
-    } for i in range(len(df))]
 
     price_volume_series = [
         {
@@ -155,6 +150,17 @@ def f_daily_plot(df, df_sm,
             }
         }
     ]
+    df = f_parabolic_SAR(df)
+    sar_data = json.loads(df[['time', 'SAR']].rename(columns={"SAR": "value"}).dropna().to_json(orient="records"))
+    price_volume_series.append({
+            "type": 'Line',
+            "data": sar_data,
+            "options": {
+                "color": 'rgba(255, 215, 0, 0.8)',
+                "lineWidth": 2,
+            }
+        })
+
     if show_sma200:
         df_sm['sma200'] = calculate_sma(df_sm, 200)
         # Realizar el merge_asof
