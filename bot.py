@@ -112,6 +112,7 @@ def get_data(ticker, selected_interval, select_period):
     data['Volume_Avg'] = data['Volume'].rolling(window=20).mean()
     data['High_Rolling'] = data['High'].rolling(window=14).max()
     data['Low_Rolling'] = data['Low'].rolling(window=14).min()
+    data = f_parabolic_SAR(data)
 
     return data
 
