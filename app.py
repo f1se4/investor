@@ -106,7 +106,7 @@ def main():
         select_period_trade = side_elements[7]
 
         #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
-        acciones_evaluar = "BTC-EUR, ELE.MC, ITX.MC, TEF.MC, REP.MC, CABK.MC, FER.MC"
+        acciones_evaluar = "^SPX,BTC-EUR, ELE.MC, ITX.MC, TEF.MC, REP.MC, CABK.MC, FER.MC"
         #acciones_evaluar = "BTC-EUR"
         
         tickers = st.text_area("Insert the tickers separated by commas", acciones_evaluar)

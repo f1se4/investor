@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 import os
 from calculations.calculations import get_company_name
 
-def f_parabolic_SAR(df, af=0.02, max_af=0.2):
+def f_parabolic_SAR(df, af=0.03, max_af=0.3):
     """
     Calcula el Parabolic SAR para un dataframe de pandas con columnas 'High' y 'Low'.
 
@@ -39,13 +39,13 @@ def f_parabolic_SAR(df, af=0.02, max_af=0.2):
             if high.iloc[i] > sar.iloc[i]:
                 uptrend = True
                 sar.iloc[i] = ep
-                af = 0.02
+                af = 0.03
                 ep = high.iloc[i]
         
         if uptrend:
             if high.iloc[i] > ep:
                 ep = high.iloc[i]
-                af = min(af + 0.02, max_af)
+                af = min(af + 0.03, max_af)
         else:
             if low.iloc[i] < ep:
                 ep = low.iloc[i]
