@@ -120,6 +120,10 @@ def f_daily_plot(df, df_sm,
     df['micro_pullback'] = calculate_micro_pullback(df)
     df['bull_flag'] = calculate_bull_flag(df)
     df = f_parabolic_SAR(df)
+    sar_data = [{
+        'time': df['time'],
+        'value': df['SAR'][i]
+    } for i in range(len(df))]
 
     price_volume_series = [
         {
