@@ -347,6 +347,9 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                       xaxis_rangeslider_visible=False,
                       height=700,
                       dragmode='drawline',  # Habilitar el modo de dibujo de líneas
+                      shapes=[],  # Inicializar lista vacía para las líneas dibujadasleyenda, ya que solo hay dos gráficos
+                      newshape=dict(line=dict(color="red")),
+                      modebar_add=['drawline','eraseshape'],
                       showlegend=False)
 
     return fig
