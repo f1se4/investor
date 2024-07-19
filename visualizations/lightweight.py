@@ -8,6 +8,55 @@ COLOR_BULL_HIST = 'rgba(57,255,20,0.3)' # #39ff14
 COLOR_BEAR = 'rgba(239,83,80,0.9)'  # #ef5350
 COLOR_BEAR_HIST = 'rgba(239,83,80,0.4)'  # #ef5350
 
+def f_parabolic_SAR(df, af=0.03, max_af=0.3):
+    """
+    Calcula el Parabolic SAR para un dataframe de pandas con columnas 'High' y 'Low'.
+
+    Parameters:
+    df (pandas.DataFrame): DataFrame con los datos de precios.
+    af (float): Factor de aceleración inicial.
+    max_af (float): Factor de aceleración máximo.
+
+    Returns:
+    pandas.DataFrame: DataFrame con una columna adicional 'SAR' con los valores del Parabolic SAR.
+    """
+    high = df['high']
+    low = df['low']
+    
+    sar = df['close'].copy()
+    uptrend = True
+    af = af
+    ep = high.iloc[0]
+    
+    for i in range(1, len(df)):
+        if uptrend:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if low.iloc[i] < sar.iloc[i]:
+                uptrend = False
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = low.iloc[i]
+        else:
+            sar.iloc[i] = sar.iloc[i-1] + af * (ep - sar.iloc[i-1])
+            if high.iloc[i] > sar.iloc[i]:
+                uptrend = True
+                sar.iloc[i] = ep
+                af = 0.02
+                ep = high.iloc[i]
+        
+        if uptrend:
+            if high.iloc[i] > ep:
+                ep = high.iloc[i]
+                af = min(af + 0.02, max_af)
+        else:
+            if low.iloc[i] < ep:
+                ep = low.iloc[i]
+                af = min(af + 0.02, max_af)
+    
+    df['SAR'] = sar
+    return df
+
+
 def calculate_sma(df, window):
     return df['close'].rolling(window=window).mean()
 
@@ -70,6 +119,7 @@ def f_daily_plot(df, df_sm,
     volume = json.loads(df[['time', 'volume']].rename(columns={"volume": "value"}).to_json(orient="records"))
     df['micro_pullback'] = calculate_micro_pullback(df)
     df['bull_flag'] = calculate_bull_flag(df)
+    df = f_parabolic_SAR(df)
 
     price_volume_series = [
         {
