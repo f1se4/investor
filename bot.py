@@ -102,14 +102,15 @@ def get_data(ticker, selected_interval, select_period):
     except:
         pass
 
-    # Verificamos el intervalo seleccionado
-    if 'd' in selected_interval:  # Si el intervalo es diario o superior
-        data = data.asfreq('D')
-        data.fillna(method='ffill', inplace=True)
-        data = data[data.index.dayofweek < 5]
-    else:  # Si el intervalo es intradía
-        data = data.asfreq(selected_interval)
-        data.fillna(method='ffill', inplace=True)
+    # # Verificamos el intervalo seleccionado
+    # if 'd' in selected_interval:  # Si el intervalo es diario o superior
+    #     data = data.asfreq('D')
+    #     data.fillna(method='ffill', inplace=True)
+    #     data = data[data.index.dayofweek < 5]
+    # else:  # Si el intervalo es intradía
+    #     data = data.asfreq(selected_interval)
+    #     data.fillna(method='ffill', inplace=True)
+
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
     data['EMA_80'] = ema(data['Close'], window=80)
