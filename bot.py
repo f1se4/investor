@@ -245,54 +245,54 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     # Diverengcias RSI
     # divergences = identify_rsi_divergences(data)
 
-    if show_g_channel:
+    if show_g_channel: #En verdad es volumen
+        # Calcular POC, VAL y VAH
+        poc_price, val, vah = calculate_poc_val_vah(data)
+        
+        # Identificar otros máximos relativos en el volumen
+        volume_peaks = data['Volume'][(data['Volume'].shift(1) < data['Volume']) & (data['Volume'].shift(-1) < data['Volume'])]
 
-    # Calcular POC, VAL y VAH
-    poc_price, val, vah = calculate_poc_val_vah(data)
-    
-    # Identificar otros máximos relativos en el volumen
-    volume_peaks = data['Volume'][(data['Volume'].shift(1) < data['Volume']) & (data['Volume'].shift(-1) < data['Volume'])]
+        # Marcar el POC, VAL y VAH en el gráfico de precios
+        fig.add_trace(go.Scatter(
+            x=[data.index[0], data.index[-1]],
+            y=[poc_price, poc_price],
+            mode='lines',
+            name='POC',
+            line=dict(color='rgba(68,102,119,0.8)', dash='dash')
+        ))
+        
+        fig.add_trace(go.Scatter(
+            x=[data.index[0], data.index[-1]],
+            y=[val, val],
+            mode='lines',
+            name='VAL',
+            line=dict(color='rgba(107,107,107,0.5)', dash='dash'))
+        )
+        
+        fig.add_trace(go.Scatter(
+            x=[data.index[0], data.index[-1]],
+            y=[vah, vah],
+            mode='lines',
+            name='VAH',
+            line=dict(color='rgba(107,107,107,0.5)', dash='dash')
+        ))
+        # Marcar otros máximos relativos
+        peak_lines = []
+        for peak_date, peak_volume in volume_peaks.items():
+            peak_price = data.loc[peak_date, 'Close']
+            peak_lines.append(fig.add_trace(go.Scatter(
+                y=[peak_price, peak_price],
+                x=[data.index[0], data.index[-1]],
+                mode='lines',
+                name=f'Peak {peak_date.date()}',
+                line=dict(color='rgba(93,93,93,0.1)', dash='dot')
+            )))
 
-    # Marcar el POC, VAL y VAH en el gráfico de precios
-    fig.add_trace(go.Scatter(
-        x=[data.index[0], data.index[-1]],
-        y=[poc_price, poc_price],
-        mode='lines',
-        name='POC',
-        line=dict(color='rgba(68,102,119,0.8)', dash='dash')
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=[data.index[0], data.index[-1]],
-        y=[val, val],
-        mode='lines',
-        name='VAL',
-        line=dict(color='rgba(107,107,107,0.5)', dash='dash'))
-    )
-    
-    fig.add_trace(go.Scatter(
-        x=[data.index[0], data.index[-1]],
-        y=[vah, vah],
-        mode='lines',
-        name='VAH',
-        line=dict(color='rgba(107,107,107,0.5)', dash='dash')
-    ))
     fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
                              mode='markers',
                              marker=dict(color='rgba(59,131,189,0.8)', size=5),
                              name='Parabolic SAR'))
     
-    # Marcar otros máximos relativos
-    peak_lines = []
-    for peak_date, peak_volume in volume_peaks.items():
-        peak_price = data.loc[peak_date, 'Close']
-        peak_lines.append(fig.add_trace(go.Scatter(
-            y=[peak_price, peak_price],
-            x=[data.index[0], data.index[-1]],
-            mode='lines',
-            name=f'Peak {peak_date.date()}',
-            line=dict(color='rgba(93,93,93,0.1)', dash='dot')
-        )))
 
     fig.add_trace(go.Bar(x=data.index, y=data.MACD, 
                          marker_color=np.where(data.MACD >= 0, 'green', 'darkgray'), 
