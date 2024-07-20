@@ -5,9 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 from calculations.calculations import get_company_name
-import timedelta
-
-
+from datetime import timedelta
 
 def f_parabolic_SAR(df, af=0.03, max_af=0.3):
     """
@@ -117,6 +115,8 @@ def get_data(ticker, selected_interval, select_period, smai=200, smaii=100):
         data.index = data.index.tz_convert('CET')
     except:
         pass
+
+    data["Datetime"] = data.index
 
     # # Verificamos el intervalo seleccionado
     # if 'd' in selected_interval:  # Si el intervalo es diario o superior
