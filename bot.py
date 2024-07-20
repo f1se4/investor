@@ -323,7 +323,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
     format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
-                        row_heights=[0.8, 0.066, 0.066, 0.066],
+                        row_heights=[0.7, 0.1, 0.1, 0.1],
                         vertical_spacing=0.05)
 
     # Añadir gráfico de velas (candlestick)
@@ -401,15 +401,17 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
                              marker_color='rgba(131, 119, 180, 0.4)'),
                   row=4, col=1)
     fig.add_trace(go.Scatter(
+        mode='lines',
                 y=[30, 30],
                 x=[data.index[0], data.index[-1]],
-                             marker_color='blue'),
+                             marker_color='rgba(0,0,255,0.3)'),
                   row=4, col=1)
     fig.add_trace(go.Scatter(
+                mode='lines',
                 y=[70, 70],
                 x=[data.index[0], data.index[-1]],
-                             marker_color='blue'),
-                  row=4, col=1)
+                marker_color='rgba(239,169,74,0.3)'),
+                row=4, col=1)
     # Agregar divergencias al gráfico
     # for divergence in divergences:
     #     if divergence[3] == 'Bullish':
