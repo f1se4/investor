@@ -1,12 +1,12 @@
 {
   "Indexados": {
-    "USA": ["A500.MI", "RS2K.PA", "SPY", "IWM"],
+    "USA": ["^GSPC", "A500.MI", "RS2K.PA", "SPY", "IWM", "^VIX"],
     "World": ["IWDA.AS", "0P0001CLDK.F"],
     "Emergentes": ["IE0031786142.IR"],
     "AI or IT": ["UST.MI", "IUIT.L", "XAIX.DE", "0P00015OFP.F"]
   },
   "Divisas": {
-    "Crypto": ["BTC-EUR", "ETH-EUR", "USDT-EUR", "BNB-EUR"]
+    "Crypto": ["BTC-USD", "ETH-EUR", "USDT-EUR", "BNB-EUR"]
   },
   "Renta Fija": {
     "Bonos": ["IBGS.AS", "IBCX.L", "IBCI.AS"]
@@ -24,15 +24,12 @@
   },
   "Materias Primas": {
     "Metales": ["SGLN.L"],
-    "Oro Físico": ["XAUEUR"]
+    "Oro Físico": ["XAUEUR=X"]
   },
   "Magníficos 7": {
     "Tecnológicas": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA"]
   },
   "Indicadores Macroeconómicos": {
-    "USA": ["GDP", "CPI", "UNRATE", "FEDFUNDS", "UMCSENT"],
-    "World": ["WLD_GDP", "WLD_CPI", "WLD_UNRATE", "WLD_RATE", "WLD_SENT"],
-    "Europa": ["EU_GDP", "EU_CPI", "EU_UNRATE", "EU_RATE", "EU_SENT"],
-    "España": ["ES_GDP", "ES_CPI", "ES_UNRATE", "ES_RATE", "ES_SENT"]
+    "USA": ["^IRX"]
   }
 }

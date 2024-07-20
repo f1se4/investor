@@ -96,14 +96,14 @@ def configure_sidebar():
         select_MMI = st.sidebar.checkbox('SMA I', value=False)
         select_MM = st.sidebar.checkbox('SMA II', value=False)
         st.sidebar.subheader("Indicators Parameters")
-        if select_MM:
-            smaii = st.sidebar.number_input(label='SMA II Window',value=100, step=10)
-        else:
-            smaii = 1
         if select_MMI:
             smai = st.sidebar.number_input(label='SMA I Window',value=200, step=10)
         else:
             smai = 1
+        if select_MM:
+            smaii = st.sidebar.number_input(label='SMA II Window',value=100, step=10)
+        else:
+            smaii = 1
         st.sidebar.divider()
         select_period_trade = st.sidebar.selectbox("Select period", periods)
         # Interval selection based on the selected period
