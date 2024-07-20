@@ -230,6 +230,94 @@ def calculate_poc_val_vah(data):
     
     return poc_price, val, vah
 
+def calculate_poc_val_vah(data):
+    # Crear una DataFrame con precios y volúmenes
+    price_volume_df = data[['Close', 'Volume']].copy()
+    
+    # Ordenar por precios
+    price_volume_df = price_volume_df.sort_values(by='Close')
+    
+    # Calcular el volumen total
+    total_volume = price_volume_df['Volume'].sum()
+    
+    # Calcular el volumen objetivo (70% del volumen total)
+    target_volume = total_volume * 0.70
+    
+    # Inicializar variables para encontrar VAL y VAH
+    cumulative_volume = 0
+    val = None
+    vah = None
+    
+    # Calcular VAL y VAH
+    for price, volume in price_volume_df.itertuples(index=False):
+        cumulative_volume += volume
+        if cumulative_volume <= target_volume:
+            val = price
+        if cumulative_volume >= target_volume and vah is None:
+            vah = price
+    
+    # Calcular el POC (precio con mayor volumen)
+    poc = data['Volume'].idxmax()
+    poc_price = data.loc[poc, 'Close']
+    
+    return poc_price, val, vah
+
+def calculate_poc_val_vah(data):
+    # Crear una DataFrame con precios y volúmenes
+    price_volume_df = data[['Close', 'Volume']].copy()
+    
+    # Calcular el POC (precio con mayor volumen)
+    poc_index = data['Volume'].idxmax()
+    poc_price = data.loc[poc_index, 'Close']
+    
+    # Ordenar por precios
+    price_volume_df = price_volume_df.sort_values(by='Close')
+    
+    # Calcular el volumen total
+    total_volume = price_volume_df['Volume'].sum()
+    
+    # Calcular el volumen objetivo (70% del volumen total)
+    target_volume = total_volume * 0.70
+    
+    # Inicializar variables para encontrar VAL y VAH
+    cumulative_volume = 0
+    val = None
+    vah = None
+    middle_price = poc_price
+
+    # Encuentra VAL (Value Area Low) y VAH (Value Area High) alrededor del POC
+    lower_half_volume = price_volume_df[price_volume_df['Close'] <= middle_price]
+    upper_half_volume = price_volume_df[price_volume_df['Close'] > middle_price]
+
+    lower_cumulative_volume = lower_half_volume['Volume'].sum()
+    upper_cumulative_volume = upper_half_volume['Volume'].sum()
+
+    if lower_cumulative_volume > target_volume / 2:
+        # Encuentra el VAL en la mitad inferior
+        lower_half_volume = lower_half_volume.sort_values(by='Close', ascending=False)
+        cumulative_volume = 0
+        for price, volume in lower_half_volume.itertuples(index=False):
+            cumulative_volume += volume
+            if cumulative_volume >= target_volume / 2:
+                val = price
+                break
+    else:
+        val = lower_half_volume['Close'].min()
+
+    if upper_cumulative_volume > target_volume / 2:
+        # Encuentra el VAH en la mitad superior
+        upper_half_volume = upper_half_volume.sort_values(by='Close')
+        cumulative_volume = 0
+        for price, volume in upper_half_volume.itertuples(index=False):
+            cumulative_volume += volume
+            if cumulative_volume >= target_volume / 2:
+                vah = price
+                break
+    else:
+        vah = upper_half_volume['Close'].max()
+    
+    return poc_price, val, vah
+
 # Función para graficar datos con Plotly
 def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
     format = '%Y-%m-%d %H:%M'
