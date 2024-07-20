@@ -94,9 +94,16 @@ def configure_sidebar():
         show_par = st.sidebar.checkbox('Parabolic SAR', value=False)
         select_trade_simple = st.sidebar.checkbox('Bollinger Bands', value=False)
         select_MMI = st.sidebar.checkbox('SMA I', value=False)
-        smai = st.sidebar.number_input(label='SMA I Window',value=200)
         select_MM = st.sidebar.checkbox('SMA II', value=False)
-        smaii = st.sidebar.number_input(label='SMA II Window',value=100)
+        st.sidebar.subheader("Indicators Parameters")
+        if select_MM:
+            smaii = st.sidebar.number_input(label='SMA II Window',value=100)
+        else:
+            smaii = 1
+        if select_MMI:
+            smai = st.sidebar.number_input(label='SMA I Window',value=200)
+        else:
+            smai = 1
         st.sidebar.divider()
         select_period_trade = st.sidebar.selectbox("Select period", periods)
         # Interval selection based on the selected period
