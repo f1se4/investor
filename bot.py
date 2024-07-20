@@ -445,7 +445,11 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
     #                              textposition="top right",textfont=dict(color='#F93822')))
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
-                      xaxis_title='', yaxis_title='', 
+                      xaxis_title='', yaxis_title='',
+                      yaxis=dict(
+                                gridcolor='rgba(200, 200, 200, 0.03)',  # Color de la cuadrícula con transparencia
+                                gridwidth=1  # Anchura de la cuadrícula
+                        ),
                       xaxis_rangeslider_visible=False,
                       height=700,
                       dragmode='drawline',  # Habilitar el modo de dibujo de líneas
