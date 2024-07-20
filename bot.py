@@ -231,7 +231,7 @@ def calculate_poc_val_vah(data):
     return poc_price, val, vah
 
 # Función para graficar datos con Plotly
-def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI):
+def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
     format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
@@ -253,7 +253,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
         poc_price, val, vah = calculate_poc_val_vah(data)
         
         # Identificar otros máximos relativos en el volumen
-        volume_peaks = data['Volume'][(data['Volume'].shift(1) < data['Volume']) & (data['Volume'].shift(-1) < data['Volume'])]
+        volume_peaks = data['Volume'][(data['Volume'].shift(2) < data['Volume']) & (data['Volume'].shift(-2) < data['Volume'])]
 
         # Marcar el POC, VAL y VAH en el gráfico de precios
         fig.add_trace(go.Scatter(
@@ -291,7 +291,8 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
                 line=dict(color='rgba(93,93,93,0.1)', dash='dot')
             )))
 
-    fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
+    if show_par:
+        fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
                              mode='markers',
                              marker=dict(color='rgba(59,131,189,0.8)', size=5),
                              name='Parabolic SAR'))
