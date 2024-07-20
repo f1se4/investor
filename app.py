@@ -20,8 +20,9 @@ st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./as
 
 # Main function to run the app
 def main():
-    side_elements = [0,1,2,3,4,5,6,7]
-    side_elements[0], side_elements[1], side_elements[2], side_elements[3], side_elements[4], side_elements[5], side_elements[6], side_elements[7] = configure_sidebar()
+    side_elements = [0,1,2,3,4,5,6,7,8,9]
+    (side_elements[0], side_elements[1], side_elements[2], side_elements[3], side_elements[4], 
+     side_elements[5], side_elements[6], side_elements[7], side_elements[8], side_elements[9]) = configure_sidebar()
 
     if side_elements[0] == 'Analysis':
         stock = side_elements[1]

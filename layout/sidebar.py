@@ -91,11 +91,15 @@ def configure_sidebar():
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
         st.sidebar.markdown("## Trade Strategies")
         select_g_strategy = st.sidebar.checkbox('Volume Profile', value=True)
-        select_trade_simple = st.sidebar.checkbox('SMA I', value=False)
-        select_MM = st.sidebar.checkbox('SMA II', value=False)
+        col1, col2 = st.columns(2)
+        with col1:
+            select_trade_simple = st.sidebar.checkbox('SMA I', value=False)
+            select_MM = st.sidebar.checkbox('SMA II', value=False)
+        with col2:
+            smai = st.sidebar.number_input(label='SMA I Window',value=200)
+            smaii = st.sidebar.number_input(label='SMA II Window',value=200)
+        st.divider()
         select_period_trade = st.sidebar.selectbox("Select period", periods)
-        smai = st.sidebar.number_input(label='SMA I Window',value=200)
-        smaii = st.sidebar.number_input(label='SMA II Window',value=200)
         # Interval selection based on the selected period
         if select_period_trade:
             allowed_intervals = interval_options[select_period_trade]
