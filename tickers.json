@@ -6,7 +6,7 @@
     "AI or IT": ["UST.MI", "IUIT.L", "XAIX.DE", "0P00015OFP.F"]
   },
   "Divisas": {
-    "Crypto": ["BTC-USD", "ETH-EUR", "USDT-EUR", "BNB-EUR"]
+    "Crypto": ["BTC-EUR", "ETH-EUR", "USDT-EUR", "BNB-EUR"]
   },
   "Renta Fija": {
     "Bonos": ["IBGS.AS", "IBCX.L", "IBCI.AS"]
