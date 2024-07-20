@@ -5,6 +5,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 from calculations.calculations import get_company_name
+import timedelta
+
+
 
 def f_parabolic_SAR(df, af=0.03, max_af=0.3):
     """
@@ -407,6 +410,11 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
     #                              marker=dict(color='#F93822', size=12, symbol="arrow-down"), 
     #                              text=sell_signals.index.strftime(format),
     #                              textposition="top right",textfont=dict(color='#F93822')))
+
+    alldays =set(data.Datetime[0]+timedelta(x) for x in range((data.Datetime[len(data.Datetime)-1]- data.Datetime[0]).days))
+    missing=sorted(set(alldays)-set(data.Datetime))
+
+    fig.update_xaxes(rangebreaks=[dict(values=missing)])
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='',
