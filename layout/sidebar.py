@@ -91,6 +91,7 @@ def configure_sidebar():
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
         st.sidebar.markdown("## Trade Indicators")
         select_g_strategy = st.sidebar.checkbox('Volume Profile', value=False)
+        show_par = st.sidebar.checkbox('Parabolic SAR', value=False)
         select_trade_simple = st.sidebar.checkbox('Bollinger Bands', value=False)
         select_MMI = st.sidebar.checkbox('SMA I', value=False)
         smai = st.sidebar.number_input(label='SMA I Window',value=200)
@@ -112,13 +113,13 @@ def configure_sidebar():
 
     if selected_tab == 'Analysis':
         return (selected_tab, stock, selected_period, selected_interval, category, refresh_data, 
-               'NONE', 'NONE', 'NONE', 'NONE', 'NONE')
+               'NONE', 'NONE', 'NONE', 'NONE', 'NONE','NONE')
     elif selected_tab == 'Calculator':
         return (selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 
-               'NONE', 'NONE', 'NONE', 'NONE', 'NONE','NONE')
+               'NONE', 'NONE', 'NONE', 'NONE', 'NONE','NONE','NONE')
     elif selected_tab == 'Trading':
         return (selected_tab, selected_interval_trading, select_g_strategy, 
                select_trade_simple, refresh_data, select_MM, values, 
-               select_period_trade, smai, smaii, select_MMI)
+               select_period_trade, smai, smaii, select_MMI, show_par)
 
 

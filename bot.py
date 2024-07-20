@@ -294,7 +294,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
     if show_par:
         fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
                              mode='markers',
-                             marker=dict(color='rgba(59,131,189,0.8)', size=5),
+                             marker=dict(color='rgba(125,132,113,0.4)', size=5),
                              name='Parabolic SAR'))
     
 
