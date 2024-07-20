@@ -94,6 +94,8 @@ def configure_sidebar():
         select_trade_simple = st.sidebar.checkbox('SMA I', value=False)
         select_MM = st.sidebar.checkbox('SMA II', value=False)
         select_period_trade = st.sidebar.selectbox("Select period", periods)
+        smai = st.sidebar.number_input(label='SMA I Window',value=200)
+        smaii = st.sidebar.number_input(label='SMA II Window',value=200)
         # Interval selection based on the selected period
         if select_period_trade:
             allowed_intervals = interval_options[select_period_trade]
@@ -106,10 +108,14 @@ def configure_sidebar():
     st.sidebar.markdown('<a href="https://www.fisoft.es/" target="_blank" class="link-text">By: www.fisoft.es 🚀️</a>', unsafe_allow_html=True)
 
     if selected_tab == 'Analysis':
-        return selected_tab, stock, selected_period, selected_interval, category, refresh_data, 'NONE', 'NONE'
+        return (selected_tab, stock, selected_period, selected_interval, category, refresh_data, 
+               'NONE', 'NONE', 'NONE', 'NONE')
     elif selected_tab == 'Calculator':
-        return selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 'NONE', 'NONE', 'NONE'
+        return (selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 
+               'NONE', 'NONE', 'NONE', 'NONE', 'NONE')
     elif selected_tab == 'Trading':
-        return selected_tab, selected_interval_trading, select_g_strategy, select_trade_simple, refresh_data, select_MM, values, select_period_trade
+        return (selected_tab, selected_interval_trading, select_g_strategy, 
+               select_trade_simple, refresh_data, select_MM, values, 
+               select_period_trade, smai, smaii)
 
 

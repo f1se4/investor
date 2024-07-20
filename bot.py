@@ -95,7 +95,7 @@ def bollinger_bands(series, window):
     return upper_band, lower_band
 
 # Función para obtener los datos históricos
-def get_data(ticker, selected_interval, select_period):
+def get_data(ticker, selected_interval, select_period, smai=200, smaii=100):
     data = yf.download(ticker, period=select_period, interval=selected_interval)
     try:
         data.index = data.index.tz_convert('CET')
@@ -110,6 +110,9 @@ def get_data(ticker, selected_interval, select_period):
     # else:  # Si el intervalo es intradía
     #     data = data.asfreq(selected_interval)
     #     data.fillna(method='ffill', inplace=True)
+
+    data['SMAI'] = data['Close'].rolling(window=smai).mean()
+    data['SMAII'] = data['Close'].rolling(window=smaii).mean()
 
     data['EMA_50'] = ema(data['Close'], window=50)
     data['EMA_200'] = ema(data['Close'], window=200)
