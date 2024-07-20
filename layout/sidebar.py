@@ -89,21 +89,20 @@ def configure_sidebar():
 
     if selected_tab == 'Trading':
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
-        st.sidebar.markdown("## Trade Strategies")
-        select_g_strategy = st.sidebar.checkbox('Volume Profile', value=True)
-        col1, col2 = st.columns(2)
-        with col1:
-            select_trade_simple = st.sidebar.checkbox('SMA I', value=False)
-            select_MM = st.sidebar.checkbox('SMA II', value=False)
-        with col2:
-            smai = st.sidebar.number_input(label='SMA I Window',value=200)
-            smaii = st.sidebar.number_input(label='SMA II Window',value=200)
-        st.divider()
+        st.sidebar.markdown("## Trade Indicators")
+        select_g_strategy = st.sidebar.checkbox('Volume Profile', value=False)
+        select_trade_simple = st.sidebar.checkbox('Bollinger Bands', value=False)
+        select_MMI = st.sidebar.checkbox('SMA I', value=False)
+        smai = st.sidebar.number_input(label='SMA I Window',value=200)
+        select_MM = st.sidebar.checkbox('SMA II', value=False)
+        smaii = st.sidebar.number_input(label='SMA II Window',value=100)
+        st.sidebar.divider()
         select_period_trade = st.sidebar.selectbox("Select period", periods)
         # Interval selection based on the selected period
         if select_period_trade:
             allowed_intervals = interval_options[select_period_trade]
             selected_interval_trading = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True)
+        st.sidebar.divider()
         values = st.sidebar.slider("Select a range of values for display", 1, 1440, 100 )
 
     
@@ -120,6 +119,6 @@ def configure_sidebar():
     elif selected_tab == 'Trading':
         return (selected_tab, selected_interval_trading, select_g_strategy, 
                select_trade_simple, refresh_data, select_MM, values, 
-               select_period_trade, smai, smaii)
+               select_period_trade, smai, smaii, select_MMI)
 
 
