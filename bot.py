@@ -401,12 +401,15 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
                              marker_color='rgba(131, 119, 180, 0.4)'),
                   row=4, col=1)
     fig.add_trace(go.Scatter(
-                y=[peak_price, peak_price],
+                y=[30, 30],
                 x=[data.index[0], data.index[-1]],
-                mode='lines',
-                name=f'Peak {peak_date.date()}',
-                line=dict(color='rgba(93,93,93,0.1)', dash='dot', row=4, col=1)
-            ))
+                             marker_color='blue'),
+                  row=4, col=1)
+    fig.add_trace(go.Scatter(
+                y=[70, 70],
+                x=[data.index[0], data.index[-1]],
+                             marker_color='blue'),
+                  row=4, col=1)
     # Agregar divergencias al gráfico
     # for divergence in divergences:
     #     if divergence[3] == 'Bullish':
