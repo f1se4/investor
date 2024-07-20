@@ -116,11 +116,11 @@ def main():
             refresh_interval = 60000
             st_autorefresh(interval=refresh_interval,key='datarefresh')
 
-        st.title("TradeBot")
+        # st.title("TradeBot")
         for ticker in tickers:
 #            try:
             data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
-            data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
+            # data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
             st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
             # backtesting_data = bot.f_backtesting(data)
             # if backtesting_data.empty == False:

@@ -127,29 +127,29 @@ def get_data(ticker, selected_interval, select_period):
     return data
 
 # Función para generar señales de trading
-def generate_signals(data, show_MACD, show_simple_trade, show_MM):
-    data['Buy'] = 0
-    data['Sell'] = 0
-
-    if show_MM: # Diario
-        data['Buy'] = np.where((data['EMA_50'] > data['EMA_200']) &
-                                      (data['EMA_50'].shift(1) <= data['EMA_200'].shift(1)) &
-                                      (data['RSI'] < 50) 
-                                      , 1, 0)
-                                      # (data['Breakout_Volume']), 1, 0)
-        data['Sell'] = np.where((data['EMA_50'] < data['EMA_200']) &
-                                      (data['EMA_50'].shift(1) >= data['EMA_200'].shift(1)) &
-                                      (data['RSI'] < 50) 
-                                      , 1, 0)
-                                      # (data['Breakout_Volume']), 1, 0)
-
-    if show_MACD: #Intradia
-        data['Buy'] = np.where((data['Close'] < data['Bollinger_Lower']) &
-                                          (data['MACD'] > data['Signal_Line'] ), 1,0)
-
-        data['Sell'] = np.where((data['Close'] > data['Bollinger_High']) &
-                                          (data['MACD'] > data['Signal_Line'] ), 1,0)
-    return data
+# def generate_signals(data, show_MACD, show_simple_trade, show_MM):
+#     data['Buy'] = 0
+#     data['Sell'] = 0
+#
+#     if show_MM: # Diario
+#         data['Buy'] = np.where((data['EMA_50'] > data['EMA_200']) &
+#                                       (data['EMA_50'].shift(1) <= data['EMA_200'].shift(1)) &
+#                                       (data['RSI'] < 50) 
+#                                       , 1, 0)
+#                                       # (data['Breakout_Volume']), 1, 0)
+#         data['Sell'] = np.where((data['EMA_50'] < data['EMA_200']) &
+#                                       (data['EMA_50'].shift(1) >= data['EMA_200'].shift(1)) &
+#                                       (data['RSI'] < 50) 
+#                                       , 1, 0)
+#                                       # (data['Breakout_Volume']), 1, 0)
+#
+#     if show_MACD: #Intradia
+#         data['Buy'] = np.where((data['Close'] < data['Bollinger_Lower']) &
+#                                           (data['MACD'] > data['Signal_Line'] ), 1,0)
+#
+#         data['Sell'] = np.where((data['Close'] > data['Bollinger_High']) &
+#                                           (data['MACD'] > data['Signal_Line'] ), 1,0)
+#     return data
 
 # Función para determinar la acción a tomar
 def determine_action(data, position):

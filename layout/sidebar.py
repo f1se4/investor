@@ -91,8 +91,8 @@ def configure_sidebar():
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
         st.sidebar.markdown("## Trade Strategies")
         select_g_strategy = st.sidebar.checkbox('Volume Profile', value=True)
-        select_trade_simple = st.sidebar.checkbox('Bollinger Bands with MACD Strategy', value=False)
-        select_MM = st.sidebar.checkbox('Golden Cross with RSI Strategy', value=False)
+        select_trade_simple = st.sidebar.checkbox('SMA I', value=False)
+        select_MM = st.sidebar.checkbox('SMA II', value=False)
         select_period_trade = st.sidebar.selectbox("Select period", periods)
         # Interval selection based on the selected period
         if select_period_trade:
