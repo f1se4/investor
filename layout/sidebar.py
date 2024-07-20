@@ -7,13 +7,12 @@ import json
 from calculations.calculations import get_company_name
 
 # Lista de periodos y opciones de intervalos permitidos por yfinance
-periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
+periods = ['1d','5d','1mo','3mo','1y','2y','5y','10y','ytd','max']
 interval_options = {
             '1d': ['1m','2m','5m','15m','30m','1h','1d'],
             '5d': ['1m','2m','5m','15m','30m','1h','1d'],
             '1mo': ['5m','15m','30m','1h','1d','1wk'],
-            '3mo': ['15m','30m','1h','1d','1wk'],
-            '6mo': ['1h','1d','1wk'],
+            '3mo': ['30m','1h','1d','1wk'],
             '1y': ['1h','1d','1wk','1mo'],
             '2y': ['1d','1wk','1mo'],
             '5y': ['1d','1wk','1mo'],
@@ -80,7 +79,7 @@ def configure_sidebar():
         # Interval selection based on the selected period
         if selected_period:
             allowed_intervals = interval_options[selected_period]
-            selected_interval = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True, index=3)
+            selected_interval = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True)
 
     if selected_tab == 'Calculator':
         initial_investment = st.sidebar.number_input("Initial Investment (€)", min_value=0.0, value=1000.0, step=100.0)
@@ -94,12 +93,11 @@ def configure_sidebar():
         select_g_strategy = st.sidebar.checkbox('G-Channel', value=False, label_visibility="collapsed", disabled=True)
         select_trade_simple = st.sidebar.checkbox('Bollinger Bands with MACD Strategy', value=False)
         select_MM = st.sidebar.checkbox('Golden Cross with RSI Strategy', value=False)
-        # select_period_trade = st.sidebar.radio('Select Period', ['1d','1y'], index=1)
-        select_period_trade = st.sidebar.selectbox("Select period", periods, index=1)
+        select_period_trade = st.sidebar.selectbox("Select period", periods)
         # Interval selection based on the selected period
         if select_period_trade:
             allowed_intervals = interval_options[select_period_trade]
-            selected_interval_trading = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True, index=3)
+            selected_interval_trading = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True)
         values = st.sidebar.slider("Select a range of values for display", 1, 1440, 100 )
 
     
