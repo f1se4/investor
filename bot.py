@@ -245,6 +245,8 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     # Diverengcias RSI
     # divergences = identify_rsi_divergences(data)
 
+    if show_g_channel:
+
     # Calcular POC, VAL y VAH
     poc_price, val, vah = calculate_poc_val_vah(data)
     
@@ -277,7 +279,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     ))
     fig.add_trace(go.Scatter(x=data.index, y=data['SAR'],
                              mode='markers',
-                             marker=dict(color='blue', size=5),
+                             marker=dict(color='rgba(59,131,189,0.8)', size=5),
                              name='Parabolic SAR'))
     
     # Marcar otros máximos relativos
@@ -337,7 +339,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                               line=dict(color='rgba(153,204,255, 0.8)')))
         fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA_50', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
-        format = '%d-%m-%Y'
+        # format = '%d-%m-%Y'
 
     # buy_signals = data[data['Buy'] == 1]
     # sell_signals = data[data['Sell'] == 1]
@@ -364,66 +366,66 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
 
     return fig
 
-def f_backtesting(data):
-    # DataFrame para almacenar los resultados del backtesting
-    results = []
-    old_price = 0
-    counter = 0
-    
-    # Recorrer el DataFrame `data` para identificar las operaciones
-    for index, row in data.iterrows():
-        if row['Buy'] == 1.0 or row['Sell'] == 1.0:
-            print(row['Buy'],row['Sell'])
-            buy_price = 0
-            sell_price = 0
-            trade_return = 0
-
-            if row['Buy'] == 1:
-                buy_price = row['Close']
-                signal_date = index
-                action = 'Buy'
-                if counter == 0:
-                    counter =+ 1
-                    trade_return = 0
-                else:
-                    # Registrar la compra
-                    sell_price=old_price
-                    try:
-                        trade_return = (sell_price - buy_price) / buy_price
-                    except:
-                        trade_return = 0
-                old_price = buy_price
-            elif row['Sell'] == 1:
-                if counter == 0:
-                    continue
-                # Registrar la venta
-                buy_price=old_price
-                sell_price = row['Close']
-                signal_date = index
-                action = 'Sell'
-                old_price=sell_price
-                # Calcular el rendimiento de la operación
-                try:
-                    trade_return = (sell_price - buy_price) / buy_price
-                except:
-                    trade_return = 0
-            # Añadir la operación al DataFrame de resultados
-            results.append({
-                    'Date': signal_date,
-                    'Action' : action,
-                    'Buy_Price': buy_price,
-                    'Sell_Price': sell_price,
-                    'Return': trade_return
-                })
-    return pd.DataFrame(results)
-
-# Función para aplicar formato condicional y otros estilos
-def style_dataframe(df):
-    df['Return_Percent'] = df['Return'] * 100  # Convertir a porcentaje para barras de progreso
-    df['Return'] = df['Return'].apply(lambda x: "{:.2%} 💰️".format(x))  # Formatear como porcentaje
-
-    styled_df = df.style.applymap(
-        lambda x: 'color: red;' if isinstance(x, str) and '-' in x else 'color: green;' if isinstance(x, str) else '',
-        subset=['Return'])
-
-    return styled_df
+# def f_backtesting(data):
+#     # DataFrame para almacenar los resultados del backtesting
+#     results = []
+#     old_price = 0
+#     counter = 0
+#     
+#     # Recorrer el DataFrame `data` para identificar las operaciones
+#     for index, row in data.iterrows():
+#         if row['Buy'] == 1.0 or row['Sell'] == 1.0:
+#             print(row['Buy'],row['Sell'])
+#             buy_price = 0
+#             sell_price = 0
+#             trade_return = 0
+#
+#             if row['Buy'] == 1:
+#                 buy_price = row['Close']
+#                 signal_date = index
+#                 action = 'Buy'
+#                 if counter == 0:
+#                     counter =+ 1
+#                     trade_return = 0
+#                 else:
+#                     # Registrar la compra
+#                     sell_price=old_price
+#                     try:
+#                         trade_return = (sell_price - buy_price) / buy_price
+#                     except:
+#                         trade_return = 0
+#                 old_price = buy_price
+#             elif row['Sell'] == 1:
+#                 if counter == 0:
+#                     continue
+#                 # Registrar la venta
+#                 buy_price=old_price
+#                 sell_price = row['Close']
+#                 signal_date = index
+#                 action = 'Sell'
+#                 old_price=sell_price
+#                 # Calcular el rendimiento de la operación
+#                 try:
+#                     trade_return = (sell_price - buy_price) / buy_price
+#                 except:
+#                     trade_return = 0
+#             # Añadir la operación al DataFrame de resultados
+#             results.append({
+#                     'Date': signal_date,
+#                     'Action' : action,
+#                     'Buy_Price': buy_price,
+#                     'Sell_Price': sell_price,
+#                     'Return': trade_return
+#                 })
+#     return pd.DataFrame(results)
+#
+# # Función para aplicar formato condicional y otros estilos
+# def style_dataframe(df):
+#     df['Return_Percent'] = df['Return'] * 100  # Convertir a porcentaje para barras de progreso
+#     df['Return'] = df['Return'].apply(lambda x: "{:.2%} 💰️".format(x))  # Formatear como porcentaje
+#
+#     styled_df = df.style.applymap(
+#         lambda x: 'color: red;' if isinstance(x, str) and '-' in x else 'color: green;' if isinstance(x, str) else '',
+#         subset=['Return'])
+#
+#     return styled_df
