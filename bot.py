@@ -364,9 +364,12 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
     for divergence in divergences:
         if divergence[2] == 'Bullish':
             fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', 
-                                     marker=dict(color='green', size=10), name='Divergencia Alcista'),row=4,col=1)
+                                     marker=dict(color='rgba(0,255,0,0.4)', size=8, symbol='arrow-up'), 
+                                     name='Bullish'),row=4,col=1)
         if divergence[2] == 'Bearish':
-            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='red', size=10), name='Divergencia Bajista'),row=4,col=1)
+            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], 
+                                     mode='markers', marker=dict(color='rgba(255,0,0,0.4)', size=8, symbol='arrow-down'), 
+                                     name='Bearish'),row=4,col=1)
     
     if show_simple_trade: #Bollinger Bands
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
