@@ -78,6 +78,19 @@ def identify_rsi_divergences(df):
                 divergences.append((df.index[i], df['Close'][i], df['RSI'][i], 'Bearish'))
     return divergences
 
+def identify_rsi_divergences(df):
+    divergences = []
+    for i in range(1, len(df) - 1):
+        # Divergencia Alcista: Precio haciendo un mínimo más bajo y RSI haciendo un mínimo más alto
+        if df['Close'][i] < df['Close'][i-1] and df['Close'][i] < df['Close'][i+1]:
+            if df['RSI'][i] > df['RSI'][i-1] and df['RSI'][i] > df['RSI'][i+1]:
+                divergences.append((df.index[i], df['RSI'][i], 'Bullish'))
+        # Divergencia Bajista: Precio haciendo un máximo más alto y RSI haciendo un máximo más bajo
+        if df['Close'][i] > df['Close'][i-1] and df['Close'][i] > df['Close'][i+1]:
+            if df['RSI'][i] < df['RSI'][i-1] and df['RSI'][i] < df['RSI'][i+1]:
+                divergences.append((df.index[i], df['RSI'][i], 'Bearish'))
+    return divergences
+
 def calculate_macd(df):
     df['EMA_12'] = ema(df['Close'], 12)
     df['EMA_26'] = ema(df['Close'], 26)
@@ -347,12 +360,13 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI
                 row=4, col=1)
     # Diverengcias RSI
     divergences = identify_rsi_divergences(data)
-    #Agregar divergencias al gráfico
-    # for divergence in divergences:
-    #     if divergence[3] == 'Bullish':
-    #         fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='green', size=10), name='Divergencia Alcista'),row=4,col=1)
-    #     if divergence[3] == 'Bearish':
-    #         fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='red', size=10), name='Divergencia Bajista'),row=4,col=1)
+    #Agregar divergencias al gráfico# Agregar divergencias al gráfico del RSI
+    for divergence in divergences:
+        if divergence[2] == 'Bullish':
+            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', 
+                                     marker=dict(color='green', size=10), name='Divergencia Alcista'),row=4,col=1)
+        if divergence[2] == 'Bearish':
+            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='red', size=10), name='Divergencia Bajista'),row=4,col=1)
     
     if show_simple_trade: #Bollinger Bands
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
