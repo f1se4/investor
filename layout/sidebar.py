@@ -112,10 +112,10 @@ def configure_sidebar():
 
     if selected_tab == 'Analysis':
         return (selected_tab, stock, selected_period, selected_interval, category, refresh_data, 
-               'NONE', 'NONE', 'NONE', 'NONE')
+               'NONE', 'NONE', 'NONE', 'NONE', 'NONE')
     elif selected_tab == 'Calculator':
         return (selected_tab, initial_investment, monthly_contribution, annual_interest_rate, years, 
-               'NONE', 'NONE', 'NONE', 'NONE', 'NONE')
+               'NONE', 'NONE', 'NONE', 'NONE', 'NONE','NONE')
     elif selected_tab == 'Trading':
         return (selected_tab, selected_interval_trading, select_g_strategy, 
                select_trade_simple, refresh_data, select_MM, values, 

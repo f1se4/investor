@@ -20,9 +20,10 @@ st.set_page_config(layout="wide", page_title='FiserFinance Pro', page_icon='./as
 
 # Main function to run the app
 def main():
-    side_elements = [0,1,2,3,4,5,6,7,8,9]
+    side_elements = [0,1,2,3,4,5,6,7,8,9,10]
     (side_elements[0], side_elements[1], side_elements[2], side_elements[3], side_elements[4], 
-     side_elements[5], side_elements[6], side_elements[7], side_elements[8], side_elements[9]) = configure_sidebar()
+     side_elements[5], side_elements[6], side_elements[7], side_elements[8], side_elements[9],
+     side_elements[10]) = configure_sidebar()
 
     if side_elements[0] == 'Analysis':
         stock = side_elements[1]
@@ -100,11 +101,14 @@ def main():
     if side_elements[0] == 'Trading':
         selected_interval_trading = side_elements[1]
         show_g_strategy = side_elements[2]
-        show_trade_simple = side_elements[3]
+        show_trade_simple = side_elements[3] #bollinger
         refresh_data = side_elements[4]
         show_MM = side_elements[5]
         values = side_elements[6]
         select_period_trade = side_elements[7]
+        smai = side_elements[8]
+        smaii = side_elements[9]
+        show_MMI = side_elements[10]
 
         #acciones_evaluar = '''AAPL, MSFT, AMZN, GOOGL, TSLA, NVDA, META, JPM, V, NFLX, BABA, AMD, META, SQ, BTC-EUR, ETH-EUR, SPY, QQQ, GLD, SLV, UBER, LYFT, CRM, BA, GE, IBM, SNAP, GM, SBUX, MCD, KO, PFE, MRNA, XOM, CVX, T, VZ, TSM, INTC, SHOP, ZM, DOCU, NIO'''
         acciones_evaluar = "^SPX,BTC-EUR, ELE.MC, ITX.MC, TEF.MC, REP.MC, CABK.MC, FER.MC"
@@ -120,9 +124,9 @@ def main():
         # st.title("TradeBot")
         for ticker in tickers:
 #            try:
-            data = bot.get_data(ticker, selected_interval_trading, select_period_trade)
+            data = bot.get_data(ticker, selected_interval_trading, select_period_trade, smai, smaii)
             # data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
-            st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM))
+            st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, show_trade_simple, show_MM, show_MMI))
             # backtesting_data = bot.f_backtesting(data)
             # if backtesting_data.empty == False:
             #     print(backtesting_data)

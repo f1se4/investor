@@ -231,7 +231,7 @@ def calculate_poc_val_vah(data):
     return poc_price, val, vah
 
 # Función para graficar datos con Plotly
-def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
+def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI):
     format = '%Y-%m-%d %H:%M'
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
@@ -318,7 +318,7 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
     #     if divergence[3] == 'Bearish':
     #         fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', marker=dict(color='red', size=10), name='Divergencia Bajista'),row=4,col=1)
     
-    if show_simple_trade:
+    if show_simple_trade: #Bollinger Bands
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
                                  line=dict(color='rgba(248, 237, 98, 0.3)')))
 
@@ -334,13 +334,11 @@ def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM):
                                  mode='lines', name='Bollinger Bands'))
 
 
-    if show_g_channel:
-        pass
-
     if show_MM:
-        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_200'], mode='lines', name='EMA 200',
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMAII'], mode='lines', name='SMA II',
                               line=dict(color='rgba(153,204,255, 0.8)')))
-        fig.add_trace(go.Scatter(x=data.index, y=data['EMA_50'], mode='lines', name='EMA_50', line=dict(color='rgba(85,136,255,0.8)', width=1)))
+    if show_MMI:
+        fig.add_trace(go.Scatter(x=data.index, y=data['SMAI'], mode='lines', name='SMA I', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
         # format = '%d-%m-%Y'
 
