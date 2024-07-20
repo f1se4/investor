@@ -6,6 +6,22 @@ import json
 
 from calculations.calculations import get_company_name
 
+# Lista de periodos y opciones de intervalos permitidos por yfinance
+periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
+interval_options = {
+            '1d': ['1m','2m','5m','15m','30m','1h','1d'],
+            '5d': ['1m','2m','5m','15m','30m','1h','1d'],
+            '1mo': ['5m','15m','30m','1h','1d','1wk'],
+            '3mo': ['15m','30m','1h','1d','1wk'],
+            '6mo': ['1h','1d','1wk'],
+            '1y': ['1h','1d','1wk','1mo'],
+            '2y': ['1d','1wk','1mo'],
+            '5y': ['1d','1wk','1mo'],
+            '10y': ['1d','1wk','1mo'],
+            'ytd': ['1h','1d','1wk'],
+            'max': ['1d','1wk','1mo']
+        }
+
 # Function to read tickers from JSON
 def read_tickers():
     with open('tickers.json', 'r') as file:
@@ -57,21 +73,6 @@ def configure_sidebar():
     
         st.sidebar.header("Analysis Period (UTC+0)")
     
-        # Lista de periodos y opciones de intervalos permitidos por yfinance
-        periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
-        interval_options = {
-            '1d': ['1m','2m','5m','15m','30m','1h','1d'],
-            '5d': ['1m','2m','5m','15m','30m','1h','1d'],
-            '1mo': ['5m','15m','30m','1h','1d','1wk'],
-            '3mo': ['15m','30m','1h','1d','1wk'],
-            '6mo': ['1h','1d','1wk'],
-            '1y': ['1h','1d','1wk','1mo'],
-            '2y': ['1d','1wk','1mo'],
-            '5y': ['1d','1wk','1mo'],
-            '10y': ['1d','1wk','1mo'],
-            'ytd': ['1h','1d','1wk'],
-            'max': ['1d','1wk','1mo']
-        }
     
         # Period selection
         selected_period = st.sidebar.selectbox("Select period", periods, index=1)
@@ -88,21 +89,6 @@ def configure_sidebar():
         years = st.sidebar.number_input("Number of Years", min_value=1, value=10, step=1)
 
     if selected_tab == 'Trading':
-        # Lista de periodos y opciones de intervalos permitidos por yfinance
-        periods = ['1d','5d','1mo','3mo','6mo','1y','2y','5y','10y','ytd','max']
-        interval_options = {
-            '1d': ['1m','2m','5m','15m','30m','1h','1d'],
-            '5d': ['1m','2m','5m','15m','30m','1h','1d'],
-            '1mo': ['5m','15m','30m','1h','1d','1wk'],
-            '3mo': ['15m','30m','1h','1d','1wk'],
-            '6mo': ['1h','1d','1wk'],
-            '1y': ['1h','1d','1wk','1mo'],
-            '2y': ['1d','1wk','1mo'],
-            '5y': ['1d','1wk','1mo'],
-            '10y': ['1d','1wk','1mo'],
-            'ytd': ['1h','1d','1wk'],
-            'max': ['1d','1wk','1mo']
-        }
         refresh_data = st.sidebar.checkbox('Refresh Data (60s)', value=True)
         st.sidebar.markdown("## Trade Strategies")
         select_g_strategy = st.sidebar.checkbox('G-Channel', value=False, label_visibility="collapsed", disabled=True)
@@ -114,10 +100,6 @@ def configure_sidebar():
         if select_period_trade:
             allowed_intervals = interval_options[select_period_trade]
             selected_interval_trading = st.sidebar.radio("Select interval", allowed_intervals, horizontal=True, index=3)
-        # if select_period_trade == '1d':
-        #     selected_interval_trading = st.sidebar.radio('Select Interval', ['1m','2m','5m','15m'], index=2, horizontal=True)
-        # if select_period_trade == '1y':
-        #     selected_interval_trading = st.sidebar.radio('Select Interval', ['1d'], index=0, horizontal=True)
         values = st.sidebar.slider("Select a range of values for display", 1, 1440, 100 )
 
     
