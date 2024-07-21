@@ -117,46 +117,6 @@ def get_data(ticker, selected_interval, select_period, smai=200, smaii=100):
 
     return data
 
-def determine_action(data, position):
-    if position == 'None':
-        if data.iloc[-1]['Buy'] >= 1:
-            return 'Buy', data.index[-1], data.index[-1]['Close']
-        else:
-            return 'Hold', None, None
-    elif position == 'Long':
-        if data.iloc[-1]['Sell'] >= 1:
-            return 'Sell', data.index[-1], data.index[-1]['Close']
-        else:
-            return 'Hold', None, None
-
-def update_portfolio(ticker, action, quantity, price):
-    portfolio_file = 'portfolio.csv'
-    
-    if not os.path.exists(portfolio_file):
-        df = pd.DataFrame(columns=['Ticker', 'Action', 'Quantity', 'Price', 'Date'])
-    else:
-        df = pd.read_csv(portfolio_file)
-    
-    new_trade = {
-        'Ticker': ticker,
-        'Action': action,
-        'Quantity': quantity,
-        'Price': price,
-        'Date': pd.Timestamp.now()
-    }
-    df = df.append(new_trade, ignore_index=True)
-    df.to_csv(portfolio_file, index=False)
-    return df
-
-def show_portfolio():
-    portfolio_file = 'portfolio.csv'
-    
-    if os.path.exists(portfolio_file):
-        df = pd.read_csv(portfolio_file)
-        return df
-    else:
-        return pd.DataFrame(columns=['Ticker', 'Action', 'Quantity', 'Price', 'Date'])
-
 def calculate_poc_val_vah(data):
     price_volume_df = data[['Close', 'Volume']].copy()
     poc_index = data['Volume'].idxmax()
