@@ -286,14 +286,14 @@ def plot_data(data, ticker, interval, show_g_channel, show_simple_trade, show_MM
             fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], 
                                      mode='markers', marker=dict(color='rgba(255,0,0,0.4)', size=8, symbol='arrow-down'), 
                                      name='Bearish'),row=4,col=1)
-        if divergence[2] == 'Hidden Bullish':
-            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', 
-                                     marker=dict(color='rgba(0,150,0,0.4)', size=8, symbol='arrow-up'), 
-                                     name='Hidden Bullish'),row=4,col=1)
-        if divergence[2] == 'Hidden Bearish':
-            fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], 
-                                     mode='markers', marker=dict(color='rgba(150,0,0,0.4)', size=8, symbol='arrow-down'), 
-                                     name='Hidden Bearish'),row=4,col=1)
+        # if divergence[2] == 'Hidden Bullish':
+        #     fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], mode='markers', 
+        #                              marker=dict(color='rgba(0,150,0,0.4)', size=8, symbol='arrow-up'), 
+        #                              name='Hidden Bullish'),row=4,col=1)
+        # if divergence[2] == 'Hidden Bearish':
+        #     fig.add_trace(go.Scatter(x=[divergence[0]], y=[divergence[1]], 
+        #                              mode='markers', marker=dict(color='rgba(150,0,0,0.4)', size=8, symbol='arrow-down'), 
+        #                              name='Hidden Bearish'),row=4,col=1)
     
     if show_simple_trade:
         fig.add_trace(go.Scatter(x=data.index, y=data['Bollinger_High'], mode='lines', name='Bollinger High',
