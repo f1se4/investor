@@ -161,10 +161,39 @@ def calculate_poc_val_vah(data):
     
     return poc_price, val, vah
 
-def plot_data(data, ticker, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
-    data['Datetime'] = pd.to_datetime(data['Datetime'])
+def calculate_rangebreaks(data, interval):
+    rangebreaks = []
     
-    format = '%Y-%m-%d %H:%M'
+    # Determinar si hay fines de semana presentes en los datos
+    days_present = data.index.dayofweek.unique()
+    has_weekends = any(day in days_present for day in [5, 6])
+    
+    # Agregar rangebreaks para fines de semana si no están presentes
+    if not has_weekends:
+        rangebreaks.append(dict(bounds=["sat", "mon"]))
+    
+    # Si el intervalo es menor a 1 día, agregar rangebreaks para horas no bursátiles
+    if interval in ['1h', '30m', '15m', '5m', '1m']:
+        # Obtener la primera fecha y su rango horario
+        first_day = data.index[0].date()
+        first_day_data = data[data.index.date == first_day]
+        market_open = first_day_data.index.min().time()
+        print(market_open)
+        market_close = first_day_data.index.max().time()
+        print(market_close)
+        
+        # Convertir las horas a minutos para facilitar los cálculos
+        open_in_minutes = market_open.hour - 1
+        print(open_in_minutes)
+        close_in_minutes = market_close.hour + 1
+        print(close_in_minutes)
+        
+        rangebreaks.append(dict(bounds=[close_in_minutes, open_in_minutes], pattern="hour"))
+
+    return rangebreaks
+
+def plot_data(data, ticker, interval, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
+    
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
                         row_heights=[0.7, 0.1, 0.1, 0.1],

@@ -127,7 +127,7 @@ def main():
 #            try:
             data = bot.get_data(ticker, selected_interval_trading, select_period_trade, smai, smaii)
             # data = bot.generate_signals(data, show_g_strategy, show_trade_simple, show_MM)
-            st.plotly_chart(bot.plot_data(data.tail(values), ticker, show_g_strategy, 
+            st.plotly_chart(bot.plot_data(data.tail(values), ticker, select_period_trade, show_g_strategy, 
                                           show_trade_simple, show_MM, show_MMI, show_par))
             # backtesting_data = bot.f_backtesting(data)
             # if backtesting_data.empty == False:
