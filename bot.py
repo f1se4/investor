@@ -315,10 +315,8 @@ def plot_data(data, ticker, interval, show_g_channel, show_simple_trade, show_MM
     if show_MMI:
         fig.add_trace(go.Scatter(x=data.index, y=data['SMAI'], mode='lines', name='SMA I', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
-    alldays = set(data['Datetime'].min() + timedelta(days=x) for x in range((data['Datetime'].max() - data['Datetime'].min()).days + 1))
-    missing = sorted(set(alldays) - set(data['Datetime']))
 
-    fig.update_xaxes(rangebreaks=[dict(values=missing)])
+    fig.update_xaxes(rangebreaks=calculate_rangebreaks(data, interval))
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='',
