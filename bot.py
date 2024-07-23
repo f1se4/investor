@@ -1,11 +1,11 @@
 import yfinance as yf
-import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import os
 from calculations.calculations import get_company_name
-from datetime import timedelta
+import pandas as pd
+from pandas.tseries.holiday import USFederalHolidayCalendar, Holiday
+
 
 def f_parabolic_SAR(df, af=0.03, max_af=0.3):
     high = df['High']
@@ -163,7 +163,13 @@ def calculate_poc_val_vah(data):
 
 def calculate_rangebreaks(data, interval):
     rangebreaks = []
-    
+
+# Lista de festivos en España
+    spanish_holidays = [
+    '2024-01-01', '2024-01-06', '2024-04-18', '2024-05-01', '2024-08-15',
+    '2024-10-12', '2024-11-01', '2024-12-06', '2024-12-25'
+    ]
+
     # Determinar si hay fines de semana presentes en los datos
     days_present = data.index.dayofweek.unique()
     has_weekends = any(day in days_present for day in [5, 6])
@@ -178,21 +184,32 @@ def calculate_rangebreaks(data, interval):
         first_day = data.index[0].date()
         first_day_data = data[data.index.date == first_day]
         market_open = first_day_data.index.min().time()
-        print(market_open)
         market_close = first_day_data.index.max().time()
-        print(market_close)
         
         # Convertir las horas a minutos para facilitar los cálculos
         open_in_minutes = market_open.hour - 1
-        print(open_in_minutes)
         close_in_minutes = market_close.hour + 1
-        print(close_in_minutes)
+        # Convertir las horas a minutos para facilitar los cálculos
+        open_in_minutes = (market_open.hour * 60 + market_open.minute) / 60
+        close_in_minutes = (market_close.hour * 60 + market_close.minute) / 60
         
         rangebreaks.append(dict(bounds=[close_in_minutes, open_in_minutes], pattern="hour"))
 
+    # # Excluir festivos de Estados Unidos y España presentes en los datos
+    # us_calendar = USFederalHolidayCalendar()
+    # us_holidays = us_calendar.holidays(start=data.index.min(), end=data.index.max()).to_pydatetime()
+    # 
+    # all_holidays = list(us_holidays) + [pd.Timestamp(date) for date in spanish_holidays]
+    # for holiday in all_holidays:
+    #     holiday_date = holiday.date()
+    #     if holiday_date in data.index.date:
+    #         rangebreaks.append(dict(values=[holiday_date.isoformat()]))
+
+    print(rangebreaks)
+
     return rangebreaks
 
-def plot_data(data, ticker, interval, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
+def plot_data(data, ticker, rangebreak, show_g_channel, show_simple_trade, show_MM, show_MMI, show_par=True):
     
     company_name = get_company_name(ticker)
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
@@ -315,8 +332,7 @@ def plot_data(data, ticker, interval, show_g_channel, show_simple_trade, show_MM
     if show_MMI:
         fig.add_trace(go.Scatter(x=data.index, y=data['SMAI'], mode='lines', name='SMA I', line=dict(color='rgba(85,136,255,0.8)', width=1)))
 
-
-    fig.update_xaxes(rangebreaks=calculate_rangebreaks(data, interval))
+    fig.update_xaxes(rangebreaks=rangebreak)
 
     fig.update_layout(title=f'{ticker} - {company_name}', 
                       xaxis_title='', yaxis_title='',
